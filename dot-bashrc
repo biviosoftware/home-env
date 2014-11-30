@@ -1,0 +1,10 @@
+# -*-sh-*-
+for f in \
+    ~/.pre.bashrc \
+    /etc/bashrc \
+    ~/src/*/home-env/bashrc.d/*.sh \
+    ~/.post.bashrc \
+    ; do
+    test -f $f && . $f
+done
+unset f

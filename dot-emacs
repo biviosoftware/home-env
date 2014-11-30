@@ -1,0 +1,9 @@
+; -*-emacs-lisp-*-
+(let
+  ((dirs '("~/src/biviosoftware/home-env/emacs.d" "~/emacs")))
+  (dolist (p dirs)
+    ; Reversed, because add-to-list inserts in front of list
+    (add-to-list 'load-path p)))
+(require 'bivio-init)
+(ignore-errors
+    (require (make-symbol (concat user-login-name + "-init"))))
