@@ -1,4 +1,3 @@
-# -*-sh-*-
 if [ $(expr match "$BASH_SOURCE" ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
     # Execute user's dot files only
     return
