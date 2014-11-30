@@ -1,5 +1,6 @@
 # -*-sh-*-
 if [ $(expr match "$BASH_SOURCE" ~/src) == 0 -a -d ~/src/biviosoftware/home-env ]; then
+    # Execute user's dot files only
     return
 fi
 export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] % 100)')}
