@@ -52,7 +52,7 @@ function b_install_pyenv {
 
 function gcl {
     local r=$1
-    if expr "$r" : '.*/' >/dev/null; then
+    if [ $(expr match "$r" '.*/') = 0 ]; then
 	r=$(basename $(pwd))/$r
     fi
     git clone "https://github.com/$r"
