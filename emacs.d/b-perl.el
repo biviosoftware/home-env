@@ -27,8 +27,6 @@
 (require 'cl)
 (require 'thingatpt)
 (defconst b-perl-src-re "\\(.*/\\(src[^/]*\\)/\\)perl/")
-(defvar b-perl-use-version-5-6 t
-  "*If you are using Perl 5.6.x or above, leave this attribute as t.  Otherwise, set it to nil.")
 (defvar b-perl-projects
   '(("YourPackage" "project-prefix" "Your Company, Inc."))
   "*The list of project atrributes: '((\"PerlPackage\" \"prefix\" \"Your Company, Inc.\")).  Generally output from bivio Release list_projects_el")
