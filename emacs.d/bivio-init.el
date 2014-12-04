@@ -39,13 +39,15 @@
  font-lock-maximum-decoration t
 )
 
-;; Perl
 (eval-after-load
  "compile"
  '(setq compilation-error-regexp-alist
 	(append
 	 '((".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
 	 compilation-error-regexp-alist)))
+
+(add-to-list
+ 'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
 
 (autoload #'espresso-mode "espresso" "Start espresso-mode" t)
 (add-to-list 'auto-mode-alist '("\\.js$" . espresso-mode))
@@ -77,6 +79,26 @@
 	      comint-password-prompt-regexp))
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)
+
+(if (or (getenv "BIVIO_HTTPD_PORT")
+	(file-exists-p "~/bconf")
+        (file-exists-p "~/bconf.d"))
+    (let
+	;; Turn off tracing which may be on when debugging
+	((res
+	  (shell-command-to-string
+	   (concat "env BCONF="
+		   (or (getenv "BIVIO_DEFAULT_BCONF") "")
+		   " bivio release list_projects_el --trace= 2>&1"))))
+      (if (string-match "^(setq" res)
+	  (eval (read res))
+	(error "Error calling \"bivio release list_projects_el\": %s" res))
+      (setq b-copyright-owner-history
+	    (mapcar '(lambda (lst) (caddr lst)) b-perl-projects)
+	    b-perl-release-scope-history
+	    (mapcar '(lambda (lst) (car lst)) b-perl-projects)
+	    b-copyright-owner (car b-copyright-owner-history)
+	    b-perl-release-scope (car b-perl-release-scope-history))))
 
 (defun gosmacs-previous-window ()
   "Select the window above or to the left of the window now selected.
