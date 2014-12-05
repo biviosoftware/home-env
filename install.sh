@@ -9,6 +9,9 @@ fi
 mkdir -p "$(dirname $h)" 2>/dev/null
 cd $(dirname $h)
 git clone https://github.com/biviosoftware/home-env
+git clone https://github.com/biviosoftware/perl-Bivio
+mkdir ../perl
+ln -s ../biviosoftware/perl-Bivio ../perl/Bivio
 cd $h
 for b in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
     src="$h/dot-$b"
