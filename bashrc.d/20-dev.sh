@@ -78,7 +78,7 @@ function ctd {
 EOF
 }
 
-export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] % 100)')}
+export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
 export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
 
 if [ -z "$BIVIO_HOST_NAME" -a "x$(hostname)" = xapa3.bivio.biz ]; then
