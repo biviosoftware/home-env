@@ -99,11 +99,12 @@ if [ ! -z "$BIVIO_DEFAULT_BCONF" ]; then
     b_env pet Bivio/PetShop && cd - > /dev/null
 fi
 
-alias gup='git pull'
-alias gpu='git push origin master'
+alias e='emacsclient --no-wait'
 alias gco='git commit -am'
+alias gpu='git push origin master'
 alias gst='git status'
+alias gup='git pull'
 alias nup="cvs -n up 2>/dev/null|egrep '^[A-Z] |^\\? .*\\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'"
-alias up="cvs up -Pd"
-alias py3='b_pyenv 3'
 alias py2='b_pyenv 2'
+alias py3='b_pyenv 3'
+alias up="cvs up -Pd"
