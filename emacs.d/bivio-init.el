@@ -259,3 +259,7 @@ From the window at the lower right corner, select the one at the upper left."
  '(diff-removed-face ((t (:foreground "red" :weight bold))))
  '(sh-heredoc ((t (:foreground "green"))))
  '(minibuffer-prompt ((((background dark)) nil))))
+
+(if (functionp 'server-force-delete)
+    (server-force-delete))
+(ignore-errors (server-start))
