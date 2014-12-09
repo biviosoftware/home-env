@@ -99,7 +99,6 @@ if [ ! -z "$BIVIO_DEFAULT_BCONF" ]; then
     b_env pet Bivio/PetShop && cd - > /dev/null
 fi
 
-alias e='emacsclient --no-wait'
 alias gco='git commit -am'
 alias gpu='git push origin master'
 alias gst='git status'

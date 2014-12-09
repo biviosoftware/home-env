@@ -154,12 +154,17 @@ if test -f ~/.ssh/ssh_agent; then
     fi
 fi
 
-if [ "x$TERM" = xdumb ]; then
-    # Emacs needs a different version of dirs
+if [ $(expr match "$INSIDE_EMACS" ".*comint") != 0 ]; then
+    export PAGER=cat
+    export EDITOR=$(type -path emacsclient)
     alias dirs='echo $DIRSTACK'
+    alias e='emacsclient --no-wait'
+else
+    export PAGER=$(type -path less)
+    export EDITOR=$(type -path emacs)
+    alias e='emacs'
 fi
 
 alias b=bivio
-alias e='emacsclient --no-wait'
 alias which="type -path"
 alias "rm~=find . -name '*~' -exec rm {} ';'"
