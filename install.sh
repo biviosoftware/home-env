@@ -15,10 +15,12 @@ done
 if [ ! -d ../perl ]; then
     mkdir ../perl
 fi
-if [ -L ../perl/Bivio ]; then
-    rm ../perl/Bivio
-fi
-ln -s ../biviosoftware/perl-Bivio ../perl/Bivio
+for perl in Bivio ProjEx; do
+    if [ -L ../perl/$perl ]; then
+        rm ../perl/$perl
+    fi
+    ln -s ../biviosoftware/perl-$perl ../perl/$perl
+done
 cd home-env
 for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
     src="$PWD/dot-$dotfile"
