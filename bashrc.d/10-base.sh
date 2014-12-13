@@ -123,6 +123,7 @@ if test $UID = 0 -o "$USER" = cvs; then
     export CVSREAD=true
 fi
 
+export JAVA_HOME=/usr/lib/jvm/java
 # Get most recent java and any jars in /usr/java
 for f in $(ls /usr/java/*.jar 2> /dev/null); do
     export CLASSPATH=$CLASSPATH${CLASSPATH+:}$f
