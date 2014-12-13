@@ -37,14 +37,14 @@
  dabbrev-case-replace nil
  dabbrev-abbrev-char-regexp "\\sw\\|\\s_"
  font-lock-maximum-decoration t
-)
+ )
 
 (eval-after-load
- "compile"
- '(setq compilation-error-regexp-alist
-	(append
-	 '((".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
-	 compilation-error-regexp-alist)))
+    "compile"
+  '(setq compilation-error-regexp-alist
+	 (append
+	  '((".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
+	  compilation-error-regexp-alist)))
 
 (add-to-list
  'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
@@ -61,6 +61,11 @@
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+
+(add-hook 'find-file-hook
+	  (lambda ()
+	    (if (string-match "/src/biviosoftware/boldchat/" (buffer-file-name))
+		(set (make-local-variable 'tab-width) 4))))
 
 (add-hook 'css-mode-hook
 	  '(lambda ()
@@ -82,7 +87,7 @@
 
 (if (or (getenv "BIVIO_HTTPD_PORT")
 	(file-exists-p "~/bconf")
-        (file-exists-p "~/bconf.d"))
+	(file-exists-p "~/bconf.d"))
     (let
 	;; Turn off tracing which may be on when debugging
 	((res
@@ -135,18 +140,18 @@ From the window at the lower right corner, select the one at the upper left."
 (defvar shift-width 4
   "*The number of columns idented by shift-right or shift-left")
 
-		   
+
 (defun indent-by-shift (arg)
   "Change column by ARG shift-widths."
   (if (listp arg) (setq arg (car arg)))
   (if (= arg 0)
-    nil
+      nil
     (skip-chars-forward " \t")
     (if (> arg 0)
-	; Shift always
-      (indent-to-column (* (/ (+ (current-column) (* shift-width arg))
+					; Shift always
+	(indent-to-column (* (/ (+ (current-column) (* shift-width arg))
 				shift-width) shift-width))
-	; Negative shift first find spaces backwards
+					; Negative shift first find spaces backwards
       (let ((opoint (point)))
 	(beginning-of-line)
 	(let ((pos (point)))
@@ -161,9 +166,9 @@ From the window at the lower right corner, select the one at the upper left."
 				  (* shift-width 1)) ;arg
 			       0) shift-width)
 		       shift-width))))
-	    ; failed to find spaces before point
+					; failed to find spaces before point
 	    (beginning-of-line)))))))
-  
+
 (defun shift-right (&optional arg)
   "Shift to the right by shift-width spaces."
   (interactive "p")
@@ -176,7 +181,7 @@ From the window at the lower right corner, select the one at the upper left."
 
 (defun join-line (&optional arg)
   (interactive "p")
-  (let ((count (max (or arg 1) 1)))   ; Don't allow negative args
+  (let ((count (max (or arg 1) 1)))	  ; Don't allow negative args
     (while (> count 0)
       (end-of-line)
       (delete-char 1)  ; If end of buffer, then will get a signal
@@ -247,10 +252,10 @@ From the window at the lower right corner, select the one at the upper left."
     (if face (message "Face: %s" face) (message "No face at %d" pos))))
 
 (custom-set-faces
-  ;; custom-set-faces was added by Custom.
-  ;; If you edit it by hand, you could mess it up, so be careful.
-  ;; Your init file should contain only one such instance.
-  ;; If there is more than one, they won't work right.
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(diff-added-face ((t (:foreground "blue" :weight bold))))
  '(diff-changed-face ((t (:foreground "magenta" :weight extra-bold))))
  '(diff-context-face ((((class color) (background dark)) (:foreground "black"))))
