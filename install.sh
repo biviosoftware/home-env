@@ -25,8 +25,11 @@ cd home-env
 for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
     src="$PWD/dot-$dotfile"
     dst=~/.$dotfile
-    rm -f "$dst.old"
-    if [ -e "$dst" -o -L "$dst" ]; then
+    if [ -L "$dst" ]; then
+	# Don't backup symlinks, no point
+	rm -f "$dst"
+    elif [ -e "$dst" ]; then
+        rm -f "$dst.old"
 	mv "$dst" "$dst.old"
     fi
     ln -s "$src" "$dst"
