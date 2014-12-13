@@ -81,8 +81,23 @@ EOF
 export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
 export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
 
-if [ -z "$BIVIO_HOST_NAME" -a "x$(hostname)" = xapa3.bivio.biz ]; then
-    export BIVIO_HOST_NAME=dev.bivio.biz
+if [ -z "$BIVIO_HOST_NAME" ]; then
+    if [ "x$(hostname)" = xapa3.bivio.biz ]; then
+        BIVIO_HOST_NAME=dev.bivio.biz
+    else
+	eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
+	if [ -z "$BIVIO_HOST_NAME" ]; then
+	    BIVIO_HOST_NAME=$(hostname)
+	fi
+    fi
+    export BIVIO_HOST_NAME
+fi
+
+if [ -z "$BIVIO_CFG_DIR" ]; then
+    if [ -d /vagrant ]; then
+        BIVIO_CFG_DIR=/vagrant
+    fi
+    export BIVIO_CFG_DIR
 fi
 
 if [ -z "$BIVIO_DEFAULT_BCONF" ]; then
