@@ -1,4 +1,4 @@
-### User home environemt for Bivio development
+### User home environment for Bivio development
 
 Install in your home directory:
 
