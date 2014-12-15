@@ -158,6 +158,7 @@ fi
 if [ $(expr match "$INSIDE_EMACS" ".*comint") != 0 ]; then
     export PAGER=cat
     export EDITOR=$(type -path emacsclient)
+    export NODE_NO_READLINE=1
     alias dirs='echo $DIRSTACK'
     alias e='emacsclient --no-wait'
 else
