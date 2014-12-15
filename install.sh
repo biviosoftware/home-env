@@ -35,6 +35,13 @@ for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))
     ln -s "$src" "$dst"
 done
 cd
+# npmrc may contain credentials so need to append
+if grep -q -s '^color' .npmrc; then
+    : ok
+else
+    echo 'color = false' >> .npmrc
+    chmod 600 .npmrc
+fi
 for dotfile in .gitconfig .netrc; do
     if [ ! -r $dotfile ]; then
 	src=/my/$dotfile
