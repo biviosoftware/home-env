@@ -39,12 +39,11 @@
  font-lock-maximum-decoration t
  )
 
-(eval-after-load
-    "compile"
-  '(setq compilation-error-regexp-alist
-	 (append
-	  '((".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
-	  compilation-error-regexp-alist)))
+(add-to-list 'compilation-error-regexp-alist
+	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
+(setq
+ shell-file-name "/bin/bash"
+ shell-command-switch "-lc")
 
 (add-to-list
  'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
@@ -56,7 +55,14 @@
 	  '(lambda ()
 	     (setq espresso-indent-level 2)
 	     (setq espresso-expr-indent-offset 0)
-	     (define-key espresso-mode-map "\C-c\C-m" 'compile)))
+	     (define-key espresso-mode-map "\C-c\C-m" 'compile)
+	     (set (make-local-variable 'compile-command)
+		  (setq compile-command
+			(concat
+			 (if (string-match "/test/" (buffer-file-name))
+			     "mocha "
+			     "node ")
+			 (file-name-nondirectory buffer-file-name))))))
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
