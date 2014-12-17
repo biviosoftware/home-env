@@ -114,6 +114,9 @@ if [ ! -z "$BIVIO_DEFAULT_BCONF" ]; then
     b_env pet Bivio/PetShop && cd - > /dev/null
 fi
 
+# Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
+export NODE_TLS_REJECT_UNAUTHORIZED=0
+
 alias gco='git commit -am'
 alias gpu='git push origin master'
 alias gst='git status'
