@@ -89,7 +89,7 @@ function mocha {
     while [ "$d" != '/' ]; do
 	if [ -x "$d/node_modules/.bin/mocha" ]; then
 	    # some mocha versions don't obey --no-colors so just strip manually
-	    $d/node_modules/.bin/mocha "$@" | perl -p -e 's/\e.*?m//g';
+	    $d/node_modules/.bin/mocha "$@" | perl -p -e 's/\e.*?m//g'
 	    return $?
         fi
 	d=$(dirname "$d")
