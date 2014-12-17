@@ -84,6 +84,20 @@ function b_path_insert {
     fi
 }
 
+function mocha {
+    local d="$PWD"
+    while [ "$d" != '/' ]; do
+	if [ -x "$d/node_modules/.bin/mocha" ]; then
+	    # some mocha versions don't obey --no-colors so just strip manually
+	    $d/node_modules/.bin/mocha "$@" | perl -p -e 's/\e.*?m//g';
+	    return $?
+        fi
+	d=$(dirname "$d")
+    done
+    echo 'node_modules/.bin/mocha not found' 1>&2
+    return 1
+}
+
 unset BCONF
 umask o-rwx
 export LOGNAME=${LOGNAME:-$(logname)}
