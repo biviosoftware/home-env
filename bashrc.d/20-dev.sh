@@ -3,7 +3,35 @@ if [ $(expr match "$BASH_SOURCE" ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]
     return
 fi
 
-function b_pyenv {
+b_install_nvm() {
+    if [ ! -d ~/.nvm ]; then
+	curl -L https://raw.githubusercontent.com/creationix/nvm/master/install.sh | env PROFILE=/dev/null bash
+    fi
+    nvm install stable
+}
+
+b_nvm() {
+    local v="$1"
+    case "x$v" in
+	xstable)
+	    ;;
+	*)
+	    echo 'You need to supply a version (e.g. stable)' 1>&2
+	    return 1
+	    ;;
+    esac
+    if [ -z "$NVM_DIR" ]; then
+	export NVM_DIR=~/.nvm
+	test -s "$NVM_DIR/nvm.sh" && . "$NVM_DIR/nvm.sh"
+	local d
+	for d in ../../.. ../.. .. .; do
+	    b_insert_path $d/node_modules
+	done
+    fi
+    nvm use $v
+}
+
+b_pyenv() {
     local v="$1"
     export WORKON_HOME=$HOME/Envs
     export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV=true
@@ -17,7 +45,7 @@ function b_pyenv {
     fi
 }
 
-function b_install_pyenv {
+b_install_pyenv() {
     local v="$1"
     local vv
     case "x$v" in
@@ -50,7 +78,7 @@ function b_install_pyenv {
     b_pyenv $v
 }
 
-function gcl {
+gcl() {
     local r=$1
     if [ $(expr match "$r" '.*/') = 0 ]; then
 	r=$(basename $(pwd))/$r
@@ -58,7 +86,7 @@ function gcl {
     git clone "https://github.com/$r"
 }
 
-function ctd {
+ctd() {
     perl <<'EOF' "$@"
     system('bivio project link_facade_files') 
         if -M "$ENV{PERLLIB}/../javascript/qooxdoo/b_agent/build/index.html" > 1;
@@ -78,8 +106,13 @@ function ctd {
 EOF
 }
 
+mocha() {
+    command mocha "$@" | perl -p -e 's/\e.*?m//g'
+}
+
 export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
 export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
+
 
 if [ -z "$BIVIO_HOST_NAME" ]; then
     if [ "x$(hostname)" = xapa3.bivio.biz ]; then
