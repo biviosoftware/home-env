@@ -14,7 +14,7 @@ function dirs {
     done
 }
 
-function b_ps1 {
+b_ps1() {
     local x="["
     test "$1" && x="$x$1;"
     if [ "x$USER" != "x$LOGNAME" ]; then
@@ -26,7 +26,7 @@ function b_ps1 {
     PS1="$x \W]\\$ "
 }
 
-function bconf {
+bconf() {
     if [ -r /etc/$1.bconf ]; then
         export BCONF=/etc/$1.bconf
     else
@@ -36,11 +36,11 @@ function bconf {
     b_ps1 $1
 }
 
-function bu {
+bu() {
     bivio test unit "${@-.}"
 }
 
-function ba {
+ba() {
     bivio test acceptance "${@-.}"
 }
 
@@ -51,19 +51,19 @@ if test $UID = 0; then
         test -f /etc/$p.bconf && p=perl-app-$p
         bivio release install $p "$@"
     }
-    function bihs {
+    bihs() {
         bivio release install_host_stream
     }
 fi
 
-function g {
+g() {
     local x="$1"
     shift
     grep -Ir --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
-function gp {
+gp() {
     local x="$1"
     shift
     g --include '*.btest' \
@@ -77,25 +77,11 @@ function gp {
 	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
 }
 
-function b_path_insert {
+b_path_insert() {
     local f="$1"
     if [ -d $f -a $(expr match ":$PATH:" ".*:$f:") = 0 ]; then
 	export PATH="$f:$PATH"
     fi
-}
-
-function mocha {
-    local d="$PWD"
-    while [ "$d" != '/' ]; do
-	if [ -x "$d/node_modules/.bin/mocha" ]; then
-	    # some mocha versions don't obey --no-colors so just strip manually
-	    $d/node_modules/.bin/mocha "$@" | perl -p -e 's/\e.*?m//g'
-	    return $?
-        fi
-	d=$(dirname "$d")
-    done
-    echo 'node_modules/.bin/mocha not found' 1>&2
-    return 1
 }
 
 unset BCONF
