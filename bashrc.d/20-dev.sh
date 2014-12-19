@@ -29,6 +29,10 @@ b_nvm() {
 	done
     fi
     nvm use $v
+    if [ -x /usr/bin/node ]; then
+	echo &> 'Remove global node and npm:'
+        echo &> 'yum remove npm node'
+    fi
 }
 
 b_pyenv() {
