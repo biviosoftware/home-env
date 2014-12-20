@@ -25,7 +25,7 @@ b_nvm() {
 	test -s "$NVM_DIR/nvm.sh" && . "$NVM_DIR/nvm.sh"
 	local d
 	for d in ../../.. ../.. .. .; do
-	    b_insert_path $d/node_modules
+	    b_path_insert $d/node_modules/.bin 1
 	done
     fi
     nvm use $v

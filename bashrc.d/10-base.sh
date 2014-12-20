@@ -78,9 +78,10 @@ gp() {
 }
 
 b_path_insert() {
-    local f="$1"
-    if [ -d $f -a $(expr match ":$PATH:" ".*:$f:") = 0 ]; then
-	export PATH="$f:$PATH"
+    local dir="$1"
+    local ignore_not_exist="$2"
+    if [ \( "$ignore_not_exist" -o -d $dir \) -a $(expr match ":$PATH:" ".*:$dir:") = 0 ]; then
+	export PATH="$dir:$PATH"
     fi
 }
 
