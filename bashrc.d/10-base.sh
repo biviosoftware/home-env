@@ -85,6 +85,13 @@ b_path_insert() {
     fi
 }
 
+b_classpath_append() {
+    local jar="$1"
+    if [ $(expr match ":$CLASSPATH:" ".*:$jar:") = 0 ]; then
+	export CLASSPATH=$CLASSPATH${CLASSPATH+:}$jar
+    fi
+}
+
 unset BCONF
 umask o-rwx
 export LOGNAME=${LOGNAME:-$(logname)}
@@ -125,15 +132,16 @@ if test $UID = 0 -o "$USER" = cvs; then
 fi
 
 export JAVA_HOME=/usr/lib/jvm/java
+#java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore
 # Get most recent java and any jars in /usr/java
 for f in $(ls /usr/java/*.jar 2> /dev/null); do
-    export CLASSPATH=$CLASSPATH${CLASSPATH+:}$f
+    b_classpath_append $f
 done
 unset f
 
 if [ -d $HOME/src/java ]; then
     export JAVA_ROOT=$HOME/src/java
-    export CLASSPATH="$CLASSPATH:$JAVA_ROOT"
+    b_classpath_append $JAVA_ROOT
 fi
 
 if [ -z "$PERLLIB" -a -d $HOME/src/perl ]; then
