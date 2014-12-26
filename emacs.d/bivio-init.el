@@ -38,6 +38,7 @@
  dabbrev-abbrev-char-regexp "\\sw\\|\\s_"
  font-lock-maximum-decoration t
  )
+(setq-default indent-tabs-mode nil)
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
