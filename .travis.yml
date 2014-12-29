@@ -1,0 +1,8 @@
+notifications:
+  email: false
+language: bash
+install:
+  sh install.sh
+script:
+  env
+  
