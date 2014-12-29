@@ -35,21 +35,7 @@ b_nvm() {
     fi
 }
 
-b_pyenv() {
-    local v="$1"
-    export WORKON_HOME=$HOME/Envs
-    export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV=true
-    b_path_insert "$HOME/.pyenv/bin"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
-    pyenv virtualenvwrapper
-    if [ ! -z "$v" -a -d $WORKON_HOME ]; then
-	workon py$v
-	b_ps1 py$v
-    fi
-}
-
-b_install_pyenv() {
+b_pyenv_minor_version() {
     local v="$1"
     local vv
     case "x$v" in
@@ -61,22 +47,66 @@ b_install_pyenv() {
 	    ;;
 	*)
 	    echo 'You need to supply a python version' 1>&2
-	    return 1
+            return 1
 	    ;;
     esac
+    echo -n $vv
+    return 0
+}
+
+b_pyenv() {
+    local v="$1"
+    local vv=$(b_pyenv_minor_version "$v")
+    if [ -z "$vv" ]; then
+        return 1
+    fi
+    export WORKON_HOME=$HOME/Envs
+    export PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV=true
+    b_path_insert "$HOME/.pyenv/bin"
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
+    pyenv virtualenvwrapper
+    if [ ! -z "$v" -a -d $WORKON_HOME ]; then
+        pyenv global $vv
+	workon py$v
+	b_ps1 py$v
+    fi
+}
+
+b_install_pyenv() {
+    local v="$1"
+    local vv=$(b_pyenv_minor_version "$v")
+    if [ -z "$vv" ]; then
+        return 1
+    fi
+    unset PYENV_SHELL
+    unset PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV
+    unset PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV
+    unset PYENV_VIRTUALENVWRAPPER_PYENV_VERSION
+    unset PYENV_VIRTUALENVWRAPPER_PYENV_VERSION
+    unset PYENV_VIRTUALENV_INIT
+    unset PYENV_VIRTUALENV_INIT
+    unset VIRTUALENVWRAPPER_HOOK_DIR
+    unset VIRTUALENVWRAPPER_LAZY_SCRIPT
+    unset VIRTUALENVWRAPPER_PROJECT_FILENAME
+    unset VIRTUALENVWRAPPER_PYTHON
+    unset VIRTUALENVWRAPPER_SCRIPT
+    unset VIRTUALENVWRAPPER_VIRTUALENV
+    unset VIRTUALENVWRAPPER_VIRTUALENV_CLONE
+    unset WORKON_HOME
     if [ ! -d ~/.pyenv ]; then
 	curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
     fi
-    b_pyenv $v 2>/dev/null
+    b_pyenv 2 &> /dev/null
+    b_path_insert "$HOME/.pyenv/bin"
+    eval "$(pyenv init -)"
     pyenv install $vv
-    if [ $v = 3 ]; then
-	pyenv global $vv
-    fi
+    pyenv global $vv
     pip install virtualenvwrapper
     if [ ! -d ~/.pyenv/plugins/pyenv-virtualenvwrapper ]; then
 	git clone https://github.com/yyuu/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
     fi
-    b_pyenv $v 2>/dev/null
+    b_pyenv $v &>/dev/null
     pyenv virtualenvwrapper
     mkvirtualenv py$v
     b_pyenv $v
