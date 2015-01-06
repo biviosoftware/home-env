@@ -4,5 +4,4 @@ language: bash
 install:
   sh install.sh
 script:
-  env
-  
+  sh test.sh
