@@ -11,6 +11,7 @@
 (require 'markdown-mode)
 (require 'yaml-mode)
 (require 'css-mode)
+(ignore-errors (require 'java-mode))
 
 (global-font-lock-mode t)
 (transient-mark-mode t)
@@ -48,6 +49,8 @@
 
 (add-to-list
  'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
+
+(define-key java-mode-map "\C-c\C-m" 'compile)
 
 (autoload #'espresso-mode "espresso" "Start espresso-mode" t)
 (add-to-list 'auto-mode-alist '("\\.js$" . espresso-mode))
@@ -106,9 +109,9 @@
 	  (eval (read res))
 	(error "Error calling \"bivio release list_projects_el\": %s" res))
       (setq b-copyright-owner-history
-	    (mapcar '(lambda (lst) (caddr lst)) b-perl-projects)
+	    (mapcar #'(lambda (lst) (caddr lst)) b-perl-projects)
 	    b-perl-release-scope-history
-	    (mapcar '(lambda (lst) (car lst)) b-perl-projects)
+	    (mapcar #'(lambda (lst) (car lst)) b-perl-projects)
 	    b-copyright-owner (car b-copyright-owner-history)
 	    b-perl-release-scope (car b-perl-release-scope-history))))
 

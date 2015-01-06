@@ -788,10 +788,10 @@ our($VERSION) = sprintf('%d.%02d', q$Revision" ": 0.0$ =~ /\\d+/g);
 
 (defun b-perl-which-project (filename)
   "Returns project list from b-perl-projects based on filename"
-  (labels
+  (cl-labels
       ((regexp (regexp string)
 	       (if (string-match regexp string)
-		   (labels
+		   (cl-labels
 		       ((get-substrings
 			 (s mdata)
 			 (if (null mdata) nil
