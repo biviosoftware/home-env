@@ -144,6 +144,18 @@ mocha() {
     command mocha "$@" | perl -p -e 's/\e.*?m//g'
 }
 
+http() {
+    local cmd=
+    if type -p python3 &> /dev/null; then
+        cmd='python3 -m http.server'
+    elif type -p python2 &> /dev/null; then
+        cmd='python2 -m SimpleHTTPServer'
+    else
+        cmd='python -m SimpleHTTPServer'
+    fi
+    $cmd $BIVIO_HTTPD_PORT
+}
+
 export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
 export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
 
