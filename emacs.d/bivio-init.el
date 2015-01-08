@@ -11,6 +11,7 @@
 (require 'markdown-mode)
 (require 'yaml-mode)
 (require 'css-mode)
+(require 'shell)
 (ignore-errors (require 'java-mode))
 
 (global-font-lock-mode t)
@@ -40,6 +41,7 @@
  font-lock-maximum-decoration t
  )
 (setq-default indent-tabs-mode nil)
+(ansi-color-for-comint-mode-off)
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
@@ -255,24 +257,36 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key ctl-x-map "\C-u" nil); DELETE
 (define-key ctl-x-map "\C-z" 'shrink-window)
 
-(defun b-face-under-cursor (pos)
-  (interactive "d")
-  (let ((face (or (get-char-property (point) 'read-face-name)
-		  (get-char-property (point) 'face))))
-    (if face (message "Face: %s" face) (message "No face at %d" pos))))
+
+ ;; '(font-lock-comment-face ((t (:foreground "red"))))
+ ;; '(font-lock-doc-face ((t (:foreground "red"))))
+ ;; '(font-lock-string-face ((t (:foreground "magenta"))))
+ ;; '(font-lock-keyword-face ((t (:foreground "blue"))))
+ ;; '(font-lock-builtin-face ((t (:foreground "blue"))))
+ ;; '(font-lock-function-name-face ((t (:foreground "green"))))
+ ;; '(font-lock-type-face ((t (:foreground "cyan"))))
+ ;; '(font-lock-variable-name-face ((t (:foreground "green"))))
 
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
+ ;;; (what-cursor-position) \C-u \C-x = verbose details about face under cursor
+ ;;; (list-colors-display)  colors available to emacs
+ ;;; (describe-face) explains what faces are shown
+ '(font-lock-comment-face ((t (:foreground "magenta"))))
+ '(font-lock-doc-face ((t (:foreground "magenta"))))
+ '(font-lock-string-face ((t (:foreground "red"))))
+ '(font-lock-keyword-face ((t (:foreground "cyan"))))
+ '(font-lock-builtin-face ((t (:foreground "cyan"))))
+ '(font-lock-type-face ((t (:foreground "green"))))
+ '(font-lock-function-name-face ((t (:foreground "blue"))))
+ '(font-lock-variable-name-face ((t (:foreground "blue"))))
+ '(font-lock-constant-face ((t (:foreground "cyan"))))
  '(diff-added-face ((t (:foreground "blue" :weight bold))))
  '(diff-changed-face ((t (:foreground "magenta" :weight extra-bold))))
  '(diff-context-face ((((class color) (background dark)) (:foreground "black"))))
  '(diff-file-header-face ((t nil)))
  '(diff-header-face ((t nil)))
  '(diff-removed-face ((t (:foreground "red" :weight bold))))
- '(sh-heredoc ((t (:foreground "green"))))
+ '(sh-heredoc ((t (:foreground "magenta"))))
  '(minibuffer-prompt ((((background dark)) nil))))
 
 (if (functionp 'server-force-delete)
