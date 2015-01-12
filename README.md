@@ -12,4 +12,4 @@ To setup python:
 b_install_pyenv 3
 ```
 
-Will install the latest version of python 3 in a pyenv.
+Will install the latest version of python 3 in a pyenv and virtualenv.
