@@ -83,12 +83,20 @@
 	  '(lambda ()
 	     (setq css-indent-offset 2)))
 
+(defun b-comint-fix-window-size ()
+  "Change process window size."
+  (when (derived-mode-p 'comint-mode)
+    (let ((process (get-buffer-process (current-buffer))))
+      (unless (eq nil process)
+        (set-process-window-size process (window-height) (window-width))))))
+
 (add-hook
  'shell-mode-hook
  (lambda (&optional arg)
    (setq
     shell-dirstack-query "command dirs"
     explicit-shell-file-name "/bin/bash")
+   (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
    (define-key shell-mode-map "\C-cc" 'dirs)))
 
 (setq comint-password-prompt-regexp
@@ -96,6 +104,10 @@
 	      comint-password-prompt-regexp))
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)
+
+(defun b-shell-mode-hook ()
+  ;; add this hook as buffer local, so it runs once per window.
+
 
 (if (or (getenv "BIVIO_HTTPD_PORT")
 	(file-exists-p "~/bconf")
