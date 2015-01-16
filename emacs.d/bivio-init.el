@@ -105,10 +105,6 @@
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)
 
-(defun b-shell-mode-hook ()
-  ;; add this hook as buffer local, so it runs once per window.
-
-
 (if (or (getenv "BIVIO_HTTPD_PORT")
 	(file-exists-p "~/bconf")
 	(file-exists-p "~/bconf.d"))
