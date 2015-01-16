@@ -3,9 +3,15 @@ if [ $(expr match "$BASH_SOURCE" ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]
     return
 fi
 
-# must be "function", because "dirs" may be an alias. "dirs () { " will throw
-# an exception in that case
-function dirs {
+# Undo some stuff 
+x="$(compgen -a)"
+if [ ! -z "$x" ]; then
+    unalias $x
+fi
+export LS_COLORS=
+export USER_LS_COLORS=
+
+dirs() {
     local f
     local -i i=0
     for f in `command dirs`; do
@@ -168,14 +174,26 @@ if [ $(expr match "$INSIDE_EMACS" ".*comint") != 0 ]; then
     export PAGER=cat
     export EDITOR=$(type -path emacsclient)
     export NODE_NO_READLINE=1
-    alias dirs='echo $DIRSTACK'
-    alias e='emacsclient --no-wait'
+    dirs() {
+        'echo $DIRSTACK'
+    }
+    e() {
+        emacsclient --no-wait "$@"
+    }
 else
     export PAGER=$(type -path less)
     export EDITOR=$(type -path emacs)
-    alias e='emacs'
+    e() {
+        emacs "$@"
+    }
 fi
 
-alias b=bivio
-alias which="type -path"
-alias "rm~=find . -name '*~' -exec rm {} ';'"
+b() {
+    bivio "$@"
+}
+which() {
+    type -path "$@"
+}
+clean() {
+    find . -name '*~' -exec rm {} \;
+}

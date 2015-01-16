@@ -196,11 +196,27 @@ fi
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 
-alias gco='git commit -am'
-alias gpu='git push origin master'
-alias gst='git status'
-alias gup='git pull'
-alias nup="cvs -n up 2>/dev/null|egrep '^[A-Z] |^\\? .*\\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'"
-alias py2='b_pyenv 2'
-alias py3='b_pyenv 3'
-alias up="cvs up -Pd"
+gco() {
+    git commit -am "$@"
+}
+gpu() {
+    git push origin master "$@"
+}
+gst() {
+    git status "$@"
+}
+gup() {
+    git pull "$@"
+}
+nup() {
+    cvs -n up 2>/dev/null|egrep '^[A-Z] |^\? .*\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'
+}
+py2() {
+    b_pyenv 2
+}
+py3() {
+    b_pyenv 3
+}
+up() {
+    cvs up -Pd
+}
