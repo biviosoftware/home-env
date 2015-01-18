@@ -27,7 +27,7 @@
   (cond
    ((string-match "/test_[^/]+\\.py$" (buffer-file-name)) "pytest")
    ((string-match "\\.py$" (buffer-file-name)) "module")
-   (nil (error "Buffer not known python file type"))))
+   (t nil)))
 
 (defun b-python-flask-restart nil
   "Start manage.py in the current python root"
@@ -80,7 +80,7 @@
   (interactive)
   (funcall
    (intern-soft
-    (concat "b-python-template-" (b-python-file-type) ""))))
+    (concat "b-python-template-" (b-python-file-type)))))
 
 (defun b-python-template-module nil
   "inserts a template for a python module."
