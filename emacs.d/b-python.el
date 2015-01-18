@@ -27,7 +27,7 @@
   (cond
    ((string-match "/test_[^/]+\\.py$" (buffer-file-name)) "pytest")
    ((string-match "\\.py$" (buffer-file-name)) "module")
-   (error "Buffer not known python file type")))
+   (nil (error "Buffer not known python file type"))))
 
 (defun b-python-flask-restart nil
   "Start manage.py in the current python root"
