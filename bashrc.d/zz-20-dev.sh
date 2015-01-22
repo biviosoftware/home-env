@@ -94,7 +94,7 @@ b_install_pyenv() {
     if [ ! -d ~/.pyenv ]; then
 	curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
     fi
-    b_pyenv 2 &> /dev/null
+    b_pyenv $v &> /dev/null
     b_path_insert "$HOME/.pyenv/bin"
     eval "$(pyenv init -)"
     pyenv install $vv
