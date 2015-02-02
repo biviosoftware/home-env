@@ -44,6 +44,8 @@
 
 (if (fboundp 'ansi-color-for-comint-mode-off)
     (ansi-color-for-comint-mode-off))
+(if (fboundp 'menu-bar-mode)
+    (menu-bar-mode -1))
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
