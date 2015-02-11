@@ -192,6 +192,11 @@ if type bconf &>/dev/null; then
     fi
 fi
 
+if [ 0 != "$(expr "x$SHELLOPTS" : '.*igncr')" ]; then
+    git() {
+        env SHELLOPTS= git "$@"
+    }
+fi
 gco() {
     git commit -am "$@"
 }
