@@ -20,7 +20,7 @@ dirs() {
     done
 }
 
-if bivio >& /dev/null; then
+if bivio class info Bivio::BConf >& /dev/null; then
     b_ps1() {
         local x="["
         test "$1" && x="$x$1;"
