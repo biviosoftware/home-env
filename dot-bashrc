@@ -1,7 +1,5 @@
 # -*-sh-*-
-if set -o igncr &>/dev/null; then # ignore cr
-    export SHELLOPTS
-fi
+(set -o igncr) &>/dev/null && set -o igncr && export SHELLOPTS # ignore cr
 for f in \
     ~/.pre.bashrc \
     /etc/bashrc \

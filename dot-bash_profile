@@ -1,5 +1,3 @@
 # -*-sh-*-
-if set -o igncr &>/dev/null; then # comment cr
-    export SHELLOPTS
-fi
+(set -o igncr) &>/dev/null && set -o igncr && export SHELLOPTS # ignore cr
 test -f ~/.bashrc && . ~/.bashrc
