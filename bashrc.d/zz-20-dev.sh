@@ -1,4 +1,4 @@
-if [ $(expr match "$BASH_SOURCE" ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
+if [ $(expr "$BASH_SOURCE" : ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
     # Execute user's dot files only
     return
 fi
@@ -111,7 +111,7 @@ b_install_pyenv() {
 
 gcl() {
     local r=$1
-    if [ $(expr match "$r" '.*/') = 0 ]; then
+    if [ $(expr "$r" : '.*/') = 0 ]; then
 	r=$(basename $(pwd))/$r
     fi
     git clone "https://github.com/$r"

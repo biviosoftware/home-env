@@ -1,4 +1,4 @@
-if [ $(expr match "$BASH_SOURCE" ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
+if [ $(expr "$BASH_SOURCE" : ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
     # Execute user's dot files only
     return
 fi
@@ -92,14 +92,14 @@ gp() {
 b_path_insert() {
     local dir="$1"
     local ignore_not_exist="$2"
-    if [ \( "$ignore_not_exist" -o -d $dir \) -a $(expr match ":$PATH:" ".*:$dir:") = 0 ]; then
+    if [ \( "$ignore_not_exist" -o -d $dir \) -a $(expr ":$PATH:" : ".*:$dir:") = 0 ]; then
 	export PATH="$dir:$PATH"
     fi
 }
 
 b_classpath_append() {
     local jar="$1"
-    if [ $(expr match ":$CLASSPATH:" ".*:$jar:") = 0 ]; then
+    if [ $(expr ":$CLASSPATH:" : ".*:$jar:") = 0 ]; then
 	export CLASSPATH=$CLASSPATH${CLASSPATH+:}$jar
     fi
 }
@@ -120,7 +120,7 @@ if test -z "$CVSROOT"; then
     if test -d /home/cvs/CVSROOT; then
 	# We're on the CVS server
 	export CVSROOT=/home/cvs
-    elif test $(expr match "$(hostname)" '\(dfw4\|dfw1\|dfw3\|apa3\|apa11\|apa1\)\.'); then
+    elif test $(expr "$(hostname)" : '\(dfw4\|dfw1\|dfw3\|apa3\|apa11\|apa1\)\.'); then
 	# direct connect
 	export CVSROOT=":pserver:$LOGNAME@locker.bivio.biz:/home/cvs"
     else
@@ -179,7 +179,7 @@ if test -f ~/.ssh/ssh_agent; then
     fi
 fi
 
-if [ $(expr match "$INSIDE_EMACS" ".*comint") != 0 ]; then
+if [ $(expr "$INSIDE_EMACS" : ".*comint") != 0 ]; then
     export PAGER=cat
     export EDITOR=$(type -path emacsclient)
     export NODE_NO_READLINE=1

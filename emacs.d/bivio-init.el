@@ -49,9 +49,20 @@
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
-(setq
- shell-file-name "/bin/bash"
- shell-command-switch "-lc")
+(if (file-readable-p "/bin/bash")
+    (progn
+      (setq
+       shell-file-name "/bin/bash"
+       shell-command-switch "-lc")
+      (add-hook
+       'shell-mode-hook
+       (lambda (&optional arg)
+         (setq
+          shell-dirstack-query "command dirs"
+          explicit-shell-file-name shell-file-name)
+         (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
+         (define-key shell-mode-map "\C-cc" 'dirs)))))
+
 
 (add-to-list
  'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
@@ -93,15 +104,6 @@
     (let ((process (get-buffer-process (current-buffer))))
       (unless (eq nil process)
         (set-process-window-size process (window-height) (window-width))))))
-
-(add-hook
- 'shell-mode-hook
- (lambda (&optional arg)
-   (setq
-    shell-dirstack-query "command dirs"
-    explicit-shell-file-name "/bin/bash")
-   (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
-   (define-key shell-mode-map "\C-cc" 'dirs)))
 
 (setq comint-password-prompt-regexp
       (concat "[pP]assphrase: \\|[pP]assword: \\|"
