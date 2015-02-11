@@ -1,5 +1,5 @@
 # -*-sh-*-
-if set -o igncr &>/dev/null; then #
+if set -o igncr &>/dev/null; then # ignore cr
     export SHELLOPTS
 fi
 for f in \
@@ -11,4 +11,3 @@ for f in \
     test -f $f && . $f
 done
 unset f
-
