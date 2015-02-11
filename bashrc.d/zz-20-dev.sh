@@ -160,7 +160,7 @@ export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
 if [ -z "$BIVIO_HOST_NAME" ]; then
     if [ "x$(hostname)" = xapa3.bivio.biz ]; then
         BIVIO_HOST_NAME=dev.bivio.biz
-    else
+    elif [ ! -z "$(type ifconfig 2>/dev/null)" ]; then
 	eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
 	if [ -z "$BIVIO_HOST_NAME" ]; then
 	    BIVIO_HOST_NAME=$(hostname)
@@ -176,22 +176,21 @@ if [ -z "$BIVIO_CFG_DIR" ]; then
     export BIVIO_CFG_DIR
 fi
 
-if [ -z "$BIVIO_DEFAULT_BCONF" ]; then
-    for x in Artisans::BConf Bivio::DefaultBConf; do
-        if perl -M$x -e 1 2>/dev/null; then
-	    export BIVIO_DEFAULT_BCONF=$x
-	    break
-        fi
-    done
-fi
+if type bconf &>/dev/null; then
+    if [ -z "$BIVIO_DEFAULT_BCONF" ]; then
+        for x in Artisans::BConf Bivio::DefaultBConf; do
+            if perl -M$x -e 1 2>/dev/null; then
+                export BIVIO_DEFAULT_BCONF=$x
+                break
+            fi
+        done
+    fi
 
-if [ ! -z "$BIVIO_DEFAULT_BCONF" ]; then
-    eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
-    b_env pet Bivio/PetShop && cd - > /dev/null
+    if [ ! -z "$BIVIO_DEFAULT_BCONF" ]; then
+        eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
+        b_env pet Bivio/PetShop && cd - > /dev/null
+    fi
 fi
-
-# Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
-export NODE_TLS_REJECT_UNAUTHORIZED=0
 
 gco() {
     git commit -am "$@"
@@ -217,3 +216,6 @@ py3() {
 up() {
     cvs up -Pd
 }
+
+# Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
+export NODE_TLS_REJECT_UNAUTHORIZED=0

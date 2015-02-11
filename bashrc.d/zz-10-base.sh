@@ -20,46 +20,52 @@ dirs() {
     done
 }
 
-b_ps1() {
-    local x="["
-    test "$1" && x="$x$1;"
-    if [ "x$USER" != "x$LOGNAME" ]; then
-    	x="$x\u";
-    fi
-    if [ "x$DISPLAY" != 'x:0' ]; then
-    	x="$x@\h";
-    fi
-    PS1="$x \W]\\$ "
-}
-
-bconf() {
-    if [ -r /etc/$1.bconf ]; then
-        export BCONF=/etc/$1.bconf
-    else
-        echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
-        return 1
-    fi
-    b_ps1 $1
-}
-
-bu() {
-    bivio test unit "${@-.}"
-}
-
-ba() {
-    bivio test acceptance "${@-.}"
-}
-
-if test $UID = 0; then
-    function bi {
-        local p=$1
-	shift
-        test -f /etc/$p.bconf && p=perl-app-$p
-        bivio release install $p "$@"
+if bivio >& /dev/null; then
+    b_ps1() {
+        local x="["
+        test "$1" && x="$x$1;"
+        if [ "x$USER" != "x$LOGNAME" ]; then
+            x="$x\u";
+        fi
+        if [ "x$DISPLAY" != 'x:0' ]; then
+            x="$x@\h";
+        fi
+        PS1="$x \W]\\$ "
     }
-    bihs() {
-        bivio release install_host_stream
+
+    bconf() {
+        if [ -r /etc/$1.bconf ]; then
+            export BCONF=/etc/$1.bconf
+        else
+            echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
+            return 1
+        fi
+        b_ps1 $1
     }
+
+    b() {
+        bivio "$@"
+    }
+
+    bu() {
+        bivio test unit "${@-.}"
+    }
+
+    ba() {
+        bivio test acceptance "${@-.}"
+    }
+
+    if test $UID = 0; then
+        function bi {
+            local p=$1
+            shift
+            test -f /etc/$p.bconf && p=perl-app-$p
+            bivio release install $p "$@"
+        }
+        bihs() {
+            bivio release install_host_stream
+        }
+    fi
 fi
 
 g() {
@@ -102,8 +108,11 @@ unset BCONF
 umask o-rwx
 export LOGNAME=${LOGNAME:-$(logname)}
 
-if [ ! -z "$PS1" -a "x$TERM" != xdumb ]; then
-    stty quit '^_'
+if [ ! -z "$PS1" ]; then
+    if [ "x$TERM" != xdumb ]; then
+        stty quit '^_'
+    fi
+    PS1='\W$ '
 fi
 
 export CVSUMASK=07
@@ -188,9 +197,6 @@ else
     }
 fi
 
-b() {
-    bivio "$@"
-}
 which() {
     type -path "$@"
 }

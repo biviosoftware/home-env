@@ -1,2 +1,5 @@
 # -*-sh-*-
+if set -o igncr &>/dev/null; then # comment cr
+    export SHELLOPTS
+fi
 test -f ~/.bashrc && . ~/.bashrc

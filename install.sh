@@ -21,6 +21,13 @@ for perl in Bivio ProjEx; do
     fi
     ln -s ../biviosoftware/perl-$perl ../perl/$perl
 done
+if [ ! -d ~/bin ]; then
+    mkdir ~/bin
+fi
+if [ ! -x ~/bin/bivio ]; then
+    ln -s ~/src/biviosoftware/perl-Bivio/Util/bivio ~/bin/bivio
+    chmod +x ~/bin/bivio
+fi
 cd home-env
 for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
     src="$PWD/dot-$dotfile"

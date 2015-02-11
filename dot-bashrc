@@ -1,4 +1,7 @@
 # -*-sh-*-
+if set -o igncr &>/dev/null; then #
+    export SHELLOPTS
+fi
 for f in \
     ~/.pre.bashrc \
     /etc/bashrc \
@@ -8,3 +11,4 @@ for f in \
     test -f $f && . $f
 done
 unset f
+
