@@ -29,17 +29,23 @@ if [ ! -x ~/bin/bivio ]; then
     chmod +x ~/bin/bivio
 fi
 cd home-env
+is_cygwin="$(expr "$(uname 2>/dev/null)" : '.*CYGWIN')"
 for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
     src="$PWD/dot-$dotfile"
+    cmd='ln -s'
+    if [ "$is_cygwin" != 0 -a -r "cygwin/dot-$dotfile" ]; then
+        src="$PWD/cygwin/dot-$dotfile"
+        cmd='cp'
+    fi
     dst=~/.$dotfile
-    if [ -L "$dst" ]; then
-	# Don't backup symlinks, no point
-	rm -f "$dst"
-    elif [ -e "$dst" ]; then
+    if [ -e "$dst" ]; then
+        if cmp --silent "$dst" "$src"; then
+            continue
+        fi
         rm -f "$dst.old"
 	mv "$dst" "$dst.old"
     fi
-    ln -s "$src" "$dst"
+    $cmd "$src" "$dst"
 done
 cd
 # npmrc may contain credentials so need to append
