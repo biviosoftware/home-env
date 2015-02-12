@@ -89,6 +89,8 @@
 
 (add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
 
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 (add-hook 'find-file-hook
 	  (lambda ()
 	    (if (string-match "/src/biviosoftware/boldchat/" (buffer-file-name))
