@@ -109,17 +109,9 @@ b_install_pyenv() {
     b_pyenv $v
 }
 
-gcl() {
-    local r=$1
-    if [ $(expr "$r" : '.*/') = 0 ]; then
-	r=$(basename $(pwd))/$r
-    fi
-    git clone "https://github.com/$r"
-}
-
 ctd() {
     perl <<'EOF' "$@"
-    system('bivio project link_facade_files') 
+    system('bivio project link_facade_files')
         if -M "$ENV{PERLLIB}/../javascript/qooxdoo/b_agent/build/index.html" > 1;
     exec(
 	qw(
@@ -197,27 +189,43 @@ if [ 0 != "$(expr "x$SHELLOPTS" : '.*igncr')" ]; then
         env SHELLOPTS= git "$@"
     }
 fi
+
+gcl() {
+    local r=$1
+    if [ $(expr "$r" : '.*/') = 0 ]; then
+	r=$(basename $(pwd))/$r
+    fi
+    git clone "https://github.com/$r"
+}
+
 gco() {
     git commit -am "$@"
 }
+
 gpu() {
     git push origin master "$@"
 }
+
 gst() {
     git status "$@"
 }
+
 gup() {
     git pull "$@"
 }
+
 nup() {
     cvs -n up 2>/dev/null|egrep '^[A-Z] |^\? .*\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'
 }
+
 py2() {
     b_pyenv 2
 }
+
 py3() {
     b_pyenv 3
 }
+
 up() {
     cvs up -Pd
 }
