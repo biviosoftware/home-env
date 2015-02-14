@@ -115,9 +115,10 @@
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)
 
-(if (or (getenv "BIVIO_HTTPD_PORT")
-	(file-exists-p "~/bconf")
-	(file-exists-p "~/bconf.d"))
+(if (and (getenv "BCONF")
+         (or (getenv "BIVIO_HTTPD_PORT")
+             (file-exists-p "~/bconf")
+             (file-exists-p "~/bconf.d")))
     (let
 	;; Turn off tracing which may be on when debugging
 	((res
