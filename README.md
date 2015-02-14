@@ -13,3 +13,9 @@ b_install_pyenv 3
 ```
 
 Will install the latest version of python 3 in a pyenv and virtualenv.
+
+#### Cygwin
+
+You need to bring in: emacs, curl, diffutils, and git. Don't install the windows
+git, because it has its own bash, and it doesn't behave nicely with SHELLOPTS or
+/cygdrive/c.
