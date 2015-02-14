@@ -40,6 +40,8 @@
  dabbrev-abbrev-char-regexp "\\sw\\|\\s_"
  font-lock-maximum-decoration t
  )
+(blink-cursor-mode -1)
+(set-cursor-color "red")
 (setq-default indent-tabs-mode nil)
 
 (if (fboundp 'ansi-color-for-comint-mode-off)
