@@ -66,8 +66,15 @@
          (define-key shell-mode-map "\C-cc" 'dirs)))))
 
 
+(defalias 'perl-mode 'cperl-mode)
 (add-to-list
- 'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)$"  . cperl-mode))
+ 'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)\\'"  . cperl-mode))
+; interpreter-mode-alist takes priority over auto-mode-alist
+(mapc
+ (lambda (pair)
+   (if (eq (cdr pair) 'perl-mode)
+       (setcdr pair 'cperl-mode)))
+ (append auto-mode-alist interpreter-mode-alist))
 
 (define-key java-mode-map "\C-c\C-m" 'compile)
 
