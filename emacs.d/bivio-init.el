@@ -68,7 +68,7 @@
 
 (defalias 'perl-mode 'cperl-mode)
 (add-to-list
- 'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)\\'"  . cperl-mode))
+ 'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)\\'" . cperl-mode))
 ; interpreter-mode-alist takes priority over auto-mode-alist
 (mapc
  (lambda (pair)
