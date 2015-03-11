@@ -13,10 +13,10 @@
   "Returns a string compile-command."
   (concat
    (cond
-    ((eq "pytest" (b-python-file-type)) "py.test ")
+    ((string-equal "pytest" (b-python-file-type)) "py.test ")
     (t "python "))
-   (if buffer-file-name
-       (file-name-nondirectory buffer-file-name)
+   (if (buffer-file-name)
+       (file-name-nondirectory (buffer-file-name))
      "")))
 
 (defun b-python-copyright nil
@@ -28,7 +28,7 @@
 (defun b-python-file-type nil
   "Returns module or pytest"
   (cond
-   ((eq (buffer-file-name) nil) "module")
+   ((not (buffer-file-name)) "module")
    ((string-match "\\(/test_[^/]+\\|_test\\)\\.py$" (buffer-file-name)) "pytest")
    ((string-match "\\.py$" (buffer-file-name)) "module")
    (t nil)))
@@ -72,7 +72,7 @@
       ((pwd (or d (directory-file-name
 		   (file-name-directory
 		    (or (buffer-file-name) (error "buffer has no name")))))))
-    (if (eq pwd "/")
+    (if (string-equal pwd "/")
 	(error "not in python directory")
       (if (file-exists-p (concat pwd "/setup.py"))
 	  pwd
