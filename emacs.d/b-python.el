@@ -1,6 +1,7 @@
 ; Copyright (c) 2014 bivio Software, Inc.  All rights reserved.
 (provide 'b-python)
 (require 'python)
+(load-library "mmm-rst-python")
 
 (defvar b-python-copyright-owner "Bivio Software, Inc."
   "*Who owns the copyrights for templates")
@@ -14,8 +15,10 @@
    (cond
     ((eq "pytest" (b-python-file-type)) "py.test ")
     (t "python "))
-   (file-name-nondirectory buffer-file-name)))
-  
+   (if buffer-file-name
+       (file-name-nondirectory buffer-file-name)
+     "")))
+
 (defun b-python-copyright nil
   "Returns a copyright statement for this year."
   (format "Copyright (c) %s %s  All Rights Reserved."
@@ -25,7 +28,8 @@
 (defun b-python-file-type nil
   "Returns module or pytest"
   (cond
-   ((string-match "/test_[^/]+\\.py$" (buffer-file-name)) "pytest")
+   ((eq (buffer-file-name) nil) "module")
+   ((string-match "\\(/test_[^/]+\\|_test\\)\\.py$" (buffer-file-name)) "pytest")
    ((string-match "\\.py$" (buffer-file-name)) "module")
    (t nil)))
 
@@ -38,7 +42,7 @@
        (dir (b-python-project-root)))
     (progn
       (message "Restarting flask")
-;TODO: Keep existing window just like compile command does
+;TODO(robnagler): Keep existing window just like compile command does
       (if (get-buffer "*flask*")
 	  (progn
 	    (set-buffer (get-buffer "*flask*"))
@@ -66,7 +70,7 @@
   "Find project's root"
   (let
       ((pwd (or d (directory-file-name
-		   (file-name-directory 
+		   (file-name-directory
 		    (or (buffer-file-name) (error "buffer has no name")))))))
     (if (eq pwd "/")
 	(error "not in python directory")
@@ -86,16 +90,16 @@
   "inserts a template for a python module."
   (goto-char (point-min))
   (insert "# -*- coding: utf-8 -*-
-\"\"\" ?
+\"\"\"?
 
-    :copyright: " (b-python-copyright) "
-    :license: " b-python-license "
+:copyright: " (b-python-copyright) "
+:license: " b-python-license "
 \"\"\"
 
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
-  
+
 
 (defun b-python-template-pytest nil
   "inserts a template for a pytest."
@@ -108,7 +112,8 @@
 (add-hook 'python-mode-hook
 	  '(lambda ()
 	     (set (make-local-variable 'compile-command)
-		  (b-python-compile-command))))
+		  (b-python-compile-command))
+             (mmm-mode)))
 
 (progn
   (define-key python-mode-map "\C-c\C-m" 'compile)

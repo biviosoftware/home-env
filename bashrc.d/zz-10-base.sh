@@ -3,7 +3,7 @@ if [ $(expr "$BASH_SOURCE" : ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; th
     return
 fi
 
-# Undo some stuff 
+# Undo some stuff
 x="$(compgen -a)"
 if [ ! -z "$x" ]; then
     unalias $x
@@ -71,7 +71,7 @@ fi
 g() {
     local x="$1"
     shift
-    grep -Ir --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+    grep -Ir --exclude='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
