@@ -189,7 +189,7 @@ if [ $(expr "$INSIDE_EMACS" : ".*comint") != 0 ]; then
     export EDITOR=$(type -path emacsclient)
     export NODE_NO_READLINE=1
     dirs() {
-        'echo $DIRSTACK'
+        echo "$DIRSTACK"
     }
     e() {
         emacsclient --no-wait "$@"
