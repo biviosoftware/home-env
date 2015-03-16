@@ -1,4 +1,5 @@
 # -*-sh-*-
+echo $BASH_VERSION
 (set -o igncr) &>/dev/null && set -o igncr && export SHELLOPTS # ignore cr
 for f in \
     ~/.pre.bashrc \
