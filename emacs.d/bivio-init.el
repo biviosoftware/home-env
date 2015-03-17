@@ -243,6 +243,12 @@ From the window at the lower right corner, select the one at the upper left."
   (setq debug-on-error (not debug-on-error))
   (message "debug-on-error is %s" debug-on-error))
 
+(defun bivio-git-push ()
+  "Calls git push in the current directory"
+  (interactive)
+  (message "Pushing...")
+  (shell-command "git push"))
+
 (define-key global-map "\177" 'backward-delete-char-untabify)
 
 (define-key minibuffer-local-completion-map " " 'minibuffer-complete-word)
@@ -284,6 +290,9 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key ctl-x-map "\C-u" nil); DELETE
 (define-key ctl-x-map "\C-z" 'shrink-window)
 
+
+;;;; VC keys
+(define-key vc-prefix-map "p" 'bivio-git-push)
 
  ;; '(font-lock-comment-face ((t (:foreground "red"))))
  ;; '(font-lock-doc-face ((t (:foreground "red"))))
