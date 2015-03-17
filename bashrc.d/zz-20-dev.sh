@@ -136,15 +136,7 @@ mocha() {
 }
 
 http() {
-    local cmd=
-    if type -p python3 &> /dev/null; then
-        cmd='python3 -m http.server'
-    elif type -p python2 &> /dev/null; then
-        cmd='python2 -m SimpleHTTPServer'
-    else
-        cmd='python -m SimpleHTTPServer'
-    fi
-    $cmd $BIVIO_HTTPD_PORT
+    python2 -m SimpleHTTPServer $BIVIO_HTTPD_PORT
 }
 
 export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
@@ -184,12 +176,6 @@ if type bconf &>/dev/null; then
         eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
         b_env pet Bivio/PetShop && cd - > /dev/null
     fi
-fi
-
-if [ 0 != "$(expr "x$SHELLOPTS" : '.*igncr')" ]; then
-    git() {
-        env SHELLOPTS= git "$@"
-    }
 fi
 
 gcl() {

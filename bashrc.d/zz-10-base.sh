@@ -30,7 +30,7 @@ if bivio class info Bivio::BConf >& /dev/null; then
         if [ "x$DISPLAY" != 'x:0' ]; then
             x="$x@\h";
         fi
-        PS1="$x \W]\\$ "
+        PS1="$x \W]$bivio_ps1_suffix"
     }
 
     bconf() {
@@ -71,7 +71,7 @@ fi
 g() {
     local x="$1"
     shift
-    grep -Ir --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+    grep -Ir --exclude='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
@@ -109,10 +109,15 @@ umask o-rwx
 export LOGNAME=${LOGNAME:-$(logname)}
 
 if [ ! -z "$PS1" ]; then
+    if [ $UID = 0 ]; then
+        bivio_ps1_suffix='# '
+    else
+        bivio_ps1_suffix='$ '
+    fi
     if [ "x$TERM" != xdumb ]; then
         stty quit '^_'
     fi
-    PS1='\W$ '
+    PS1="\W$bivio_ps1_suffix"
 fi
 
 export CVSUMASK=07
@@ -165,7 +170,7 @@ export FTP_PASSIVE=1
 
 if test -f ~/.ssh/ssh_agent; then
     . ~/.ssh/ssh_agent > /dev/null
-    if [ "$PS1" ]; then
+    if [ ! -z "$PS1" ]; then
         if ps ${SSH_AGENT_PID-0} 2>&1 | grep ssh-agent > /dev/null 2>&1; then
 	    : We have a daemon
 	else
@@ -183,7 +188,7 @@ if [ $(expr "$INSIDE_EMACS" : ".*comint") != 0 ]; then
     export EDITOR=$(type -path emacsclient)
     export NODE_NO_READLINE=1
     dirs() {
-        'echo $DIRSTACK'
+        echo "$DIRSTACK"
     }
     e() {
         emacsclient --no-wait "$@"

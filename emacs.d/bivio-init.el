@@ -12,6 +12,7 @@
 (require 'yaml-mode)
 (require 'css-mode)
 (require 'shell)
+(require 'mmm-mode)
 (ignore-errors (require 'java-mode))
 
 (global-font-lock-mode t)
@@ -242,6 +243,12 @@ From the window at the lower right corner, select the one at the upper left."
   (setq debug-on-error (not debug-on-error))
   (message "debug-on-error is %s" debug-on-error))
 
+(defun bivio-git-push ()
+  "Calls git push in the current directory"
+  (interactive)
+  (message "Pushing...")
+  (shell-command "git push"))
+
 (define-key global-map "\177" 'backward-delete-char-untabify)
 
 (define-key minibuffer-local-completion-map " " 'minibuffer-complete-word)
@@ -284,6 +291,9 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key ctl-x-map "\C-z" 'shrink-window)
 
 
+;;;; VC keys
+(define-key vc-prefix-map "p" 'bivio-git-push)
+
  ;; '(font-lock-comment-face ((t (:foreground "red"))))
  ;; '(font-lock-doc-face ((t (:foreground "red"))))
  ;; '(font-lock-string-face ((t (:foreground "magenta"))))
@@ -313,7 +323,15 @@ From the window at the lower right corner, select the one at the upper left."
  '(diff-file-header-face ((t nil)))
  '(diff-header-face ((t nil)))
  '(diff-removed-face ((t (:foreground "red" :weight bold))))
- '(minibuffer-prompt ((((background dark)) nil))))
+ '(minibuffer-prompt ((((background dark)) nil)))
+ '(mmm-default-submode-face ((t (:foreground "red" :background nil))))
+ '(mmm-init-submode-face ((t (:background nil))))
+ '(mmm-cleanup-submode-face ((t (:background nil))))
+ '(mmm-declaration-submode-face ((t (:background nil))))
+ '(mmm-comment-submode-face ((t (:background nil))))
+ '(mmm-output-submode-face ((t (:background nil))))
+ '(mmm-special-submode-face ((t (:background nil))))
+ '(mmm-code-submode-face ((t (:background nil)))))
 
 (if (functionp 'server-force-delete)
     (server-force-delete))
