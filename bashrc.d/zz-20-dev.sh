@@ -79,33 +79,35 @@ b_install_pyenv() {
     if [ -z "$vv" ]; then
         return 1
     fi
-    unset PYENV_SHELL
-    unset PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV
-    unset PYENV_VIRTUALENVWRAPPER_PYENV_VERSION
-    unset PYENV_VIRTUALENV_INIT
-    unset VIRTUALENVWRAPPER_HOOK_DIR
-    unset VIRTUALENVWRAPPER_LAZY_SCRIPT
-    unset VIRTUALENVWRAPPER_PROJECT_FILENAME
-    unset VIRTUALENVWRAPPER_PYTHON
-    unset VIRTUALENVWRAPPER_SCRIPT
-    unset VIRTUALENVWRAPPER_VIRTUALENV
-    unset VIRTUALENVWRAPPER_VIRTUALENV_CLONE
-    unset WORKON_HOME
-    if [ ! -d ~/.pyenv ]; then
-	curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
-    fi
-    b_pyenv $v &> /dev/null
-    b_path_insert "$HOME/.pyenv/bin"
-    eval "$(pyenv init -)"
-    pyenv install $vv
-    pyenv global $vv
-    pip install virtualenvwrapper
-    if [ ! -d ~/.pyenv/plugins/pyenv-virtualenvwrapper ]; then
-	git clone https://github.com/yyuu/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
-    fi
-    b_pyenv $v &>/dev/null
-    pyenv virtualenvwrapper
-    mkvirtualenv py$v
+    (
+        unset PYENV_SHELL
+        unset PYENV_VIRTUALENVWRAPPER_PREFER_PYVENV
+        unset PYENV_VIRTUALENVWRAPPER_PYENV_VERSION
+        unset PYENV_VIRTUALENV_INIT
+        unset VIRTUALENVWRAPPER_HOOK_DIR
+        unset VIRTUALENVWRAPPER_LAZY_SCRIPT
+        unset VIRTUALENVWRAPPER_PROJECT_FILENAME
+        unset VIRTUALENVWRAPPER_PYTHON
+        unset VIRTUALENVWRAPPER_SCRIPT
+        unset VIRTUALENVWRAPPER_VIRTUALENV
+        unset VIRTUALENVWRAPPER_VIRTUALENV_CLONE
+        unset WORKON_HOME
+        if [ ! -d ~/.pyenv ]; then
+            curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+        fi
+        b_pyenv $v &> /dev/null
+        b_path_insert "$HOME/.pyenv/bin"
+        eval "$(pyenv init -)"
+        pyenv install $vv
+        pyenv global $vv
+        pip install virtualenvwrapper
+        if [ ! -d ~/.pyenv/plugins/pyenv-virtualenvwrapper ]; then
+            git clone https://github.com/yyuu/pyenv-virtualenvwrapper.git ~/.pyenv/plugins/pyenv-virtualenvwrapper
+        fi
+        b_pyenv $v &>/dev/null
+        pyenv virtualenvwrapper
+        mkvirtualenv py$v
+    )
     b_pyenv $v
 }
 
