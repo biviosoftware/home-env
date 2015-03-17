@@ -3,7 +3,7 @@ if [ $(expr "$BASH_SOURCE" : ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; th
     return
 fi
 
-# Undo some stuff 
+# Undo some stuff
 x="$(compgen -a)"
 if [ ! -z "$x" ]; then
     unalias $x
@@ -134,7 +134,6 @@ for f in \
     /opt/local/bin \
     /usr/local/bin \
     /usr/local/cuda/bin \
-    /usr/local/anaconda/bin \
     $(test $UID = 0 && echo /sbin /usr/sbin /usr/local/sbin) \
     ~/bin \
     ; do
