@@ -9,7 +9,7 @@ for repo in home-env perl-Bivio javascript-Bivio perl-ProjEx; do
     if [ -d $repo ]; then
 	echo "Using existing $repo"
     else
-        git clone https://github.com/biviosoftware/$repo
+        git clone -q https://github.com/biviosoftware/$repo
     fi
 done
 if [ ! -d ../perl ]; then

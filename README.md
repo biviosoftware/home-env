@@ -3,7 +3,7 @@
 Install in your home directory:
 
 ```
-curl -L https://raw.githubusercontent.com/biviosoftware/home-env/master/install.sh | bash
+curl -s -L https://raw.githubusercontent.com/biviosoftware/home-env/master/install.sh | bash
 ```
 
 To setup python:
