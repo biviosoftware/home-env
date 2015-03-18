@@ -27,7 +27,7 @@ b_ps1() {
     if [ "x$USER" != "x$LOGNAME" ]; then
         x="$x\u";
     fi
-    if [ "x$DISPLAY" != 'x:0' ]; then
+    if [ ! -f /.dockerinit -a "x$DISPLAY" != 'x:0' ]; then
         x="$x@\h";
     fi
     PS1="$x \W]$bivio_ps1_suffix"
