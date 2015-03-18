@@ -94,7 +94,12 @@ b_install_pyenv() {
         unset WORKON_HOME
         if [ ! -d ~/.pyenv ]; then
             curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+            # Newer versions of patch do not like relative file names. Give this warning:
+            # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
+            # Updating the patches this way fixes the problem
+            perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}' $(find ~/.pyenv -name \*.patch)
         fi
+        # Update all patches to not include '../' in the path
         b_pyenv $v &> /dev/null
         b_path_insert "$HOME/.pyenv/bin"
         eval "$(pyenv init -)"
