@@ -21,19 +21,19 @@ dirs() {
     done
 }
 
-if bivio class info Bivio::BConf >& /dev/null; then
-    b_ps1() {
-        local x="["
-        test "$1" && x="$x$1;"
-        if [ "x$USER" != "x$LOGNAME" ]; then
-            x="$x\u";
-        fi
-        if [ "x$DISPLAY" != 'x:0' ]; then
-            x="$x@\h";
-        fi
-        PS1="$x \W]$bivio_ps1_suffix"
-    }
+b_ps1() {
+    local x="["
+    test "$1" && x="$x$1;"
+    if [ "x$USER" != "x$LOGNAME" ]; then
+        x="$x\u";
+    fi
+    if [ "x$DISPLAY" != 'x:0' ]; then
+        x="$x@\h";
+    fi
+    PS1="$x \W]$bivio_ps1_suffix"
+}
 
+if bivio class info Bivio::BConf >& /dev/null; then
     bconf() {
         if [ -r /etc/$1.bconf ]; then
             export BCONF=/etc/$1.bconf
