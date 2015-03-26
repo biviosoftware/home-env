@@ -100,7 +100,7 @@ b_install_pyenv() {
             perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}' $(find ~/.pyenv -name \*.patch)
         fi
         # Update all patches to not include '../' in the path
-        b_pyenv $v &> /dev/null
+        b_pyenv $v &> /dev/null || true
         b_path_insert "$HOME/.pyenv/bin"
         eval "$(pyenv init -)"
         pyenv install $vv
