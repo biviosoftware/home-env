@@ -96,6 +96,8 @@
 :license: " b-python-license "
 \"\"\"
 
+from __future__ import print_function
+from __future__ import absolute_import
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
