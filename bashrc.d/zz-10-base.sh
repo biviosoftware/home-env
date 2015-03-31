@@ -11,6 +11,7 @@ fi
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
+export VAGRANT_NO_COLOR=true
 
 dirs() {
     local f
