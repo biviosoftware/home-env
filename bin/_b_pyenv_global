@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# Intialize global pyenv
+#
+version=$1
+if [ -z "$version" ]; then
+    echo "Usage: $0 python-version" 1>&2
+    exit 1
+fi
+~/.bashrc
+if [ ! -d ~/.pyenv/versions/$version ]; then
+    b_pyenv_install $version
+    . ~/.bashrc
+fi
+pyenv global $version

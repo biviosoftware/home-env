@@ -5,7 +5,7 @@ fi
 
 # Undo some stuff
 x="$(compgen -a)"
-if [ ! -z "$x" ]; then
+if [ -n "$x" ]; then
     unalias $x
 fi
 export LS_COLORS=
@@ -91,12 +91,18 @@ gp() {
 	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
 }
 
+b_path_dedup() {
+    export PATH=$(perl -e 'print(join(q{:}, grep(!$x{$_}++, split(/:/, $ENV{PATH}))))')
+}
+
 b_path_insert() {
     local dir="$1"
     local ignore_not_exist="$2"
     if [ \( "$ignore_not_exist" -o -d $dir \) -a $(expr ":$PATH:" : ".*:$dir:") = 0 ]; then
 	export PATH="$dir:$PATH"
+        return 0
     fi
+    return 1
 }
 
 b_classpath_append() {
@@ -206,6 +212,7 @@ fi
 which() {
     type -path "$@"
 }
+
 clean() {
     find . -name '*~' -exec rm {} \;
 }

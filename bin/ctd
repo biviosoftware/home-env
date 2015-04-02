@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+# -*-perl-*-
+use strict
+system('bivio project link_facade_files')
+    if -M "$ENV{PERLLIB}/../javascript/qooxdoo/b_agent/build/index.html" > 1;
+exec(
+    qw(
+        bivio
+        SQL
+        -force
+        create_test_db
+        --Bivio::IO::Trace.package_filter=
+        --Bivio::Die.stack_trace=0
+        --Bivio::Die.stack_trace_error=0
+        --Bivio::IO::Alert.stack_trace_warn=0
+    ),
+    @ARGV,
+);

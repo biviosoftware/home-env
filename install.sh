@@ -30,14 +30,17 @@ if [ ! -x ~/bin/bivio ]; then
 fi
 cd home-env
 is_cygwin="$(expr "$(uname 2>/dev/null)" : '.*CYGWIN')"
-for dotfile in $(perl -e 'print(map(/^dot-(\w+)$/ ? "$1\n" : (), glob("dot-*")))'); do
-    src="$PWD/dot-$dotfile"
+for f in $(perl -e 'print(map(m{^[-\w/]+\w$} ? "$_\n" : (), glob("{dot-,bin/}*")))'); do
+    if expr "$f" : bin/ >& /dev/null; then
+        chmod +x "$f"
+    fi
+    src="$PWD/$f"
     cmd='ln -s'
-    if [ "$is_cygwin" != 0 -a -r "cygwin/dot-$dotfile" ]; then
-        src="$PWD/cygwin/dot-$dotfile"
+    if [ "$is_cygwin" != 0 -a -r "cygwin/$f" ]; then
+        src="$PWD/cygwin/$f"
         cmd='cp'
     fi
-    dst=~/.$dotfile
+    dst=~/"${f/#dot-/.}"
     if [ -e "$dst" ]; then
         if cmp --silent "$dst" "$src"; then
             continue
