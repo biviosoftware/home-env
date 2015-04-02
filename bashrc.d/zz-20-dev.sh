@@ -52,6 +52,10 @@ if [ -d ~/.pyenv/bin ]; then
     if [ 'function' != "$(type -t _pyenv_virtualenv_hook)" ]; then
         eval "$(pyenv virtualenv-init -)"
         function _b_pyenv_virtualenv_hook {
+            if [ 'function' != "$(type -t pyenv)" ]; then
+                export PROMPT_COMMAND=
+                return
+            fi
             _pyenv_virtualenv_hook
             if [ -z "$VIRTUAL_ENV" ]; then
                 b_ps1 $(pyenv global)

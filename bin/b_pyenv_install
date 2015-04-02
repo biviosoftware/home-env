@@ -13,6 +13,7 @@ if [ ! -d ~/.pyenv ]; then
     # Updating the patches this way fixes the problem
     perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}' $(find ~/.pyenv -name \*.patch)
 fi
+. ~/.bashrc
 if [ Darwin = $(uname) ]; then
     export CFLAGS="-I$(xcrun --show-sdk-path)/usr/include"
 fi

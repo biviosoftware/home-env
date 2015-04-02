@@ -21,6 +21,14 @@ project_dir="$(pwd)"
 project=$(basename "$project_dir")
 venv="$(pyenv local 2> /dev/null)"
 
+# Make sure venv exists
+if [ -n "$venv" ]; then
+    if ! pyenv activate "$venv" >& /dev/null; then
+        rm -f .python-version
+    fi
+    venv=
+fi
+
 # Create the local virtualenv
 if [ -z "$venv" ]; then
     venv="$project"
