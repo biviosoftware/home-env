@@ -18,7 +18,7 @@ fi
 
 if ! pyenv global >& /dev/null; then
     echo 'No global pyenv version' 1>&2
-    echo 'Create one, e.g. run: py2' 1>&2
+    echo 'Create one, e.g. run: bivio_pyenv_2' 1>&2
     exit 1
 fi
 
