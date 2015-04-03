@@ -57,22 +57,22 @@ if [[ -d ~/.pyenv/bin ]]; then
     fi
     if [[ function != $(type -t _pyenv_virtualenv_hook) ]]; then
         eval "$(pyenv virtualenv-init -)"
-        if [[ -n $PS1 ]]; then
-            bivio_pyenv_virtualenv_hook() {
-                bivio_prompt_command
-                if [[ function != $(type -t pyenv) ]]; then
-                    export PROMPT_COMMAND=bivio_prompt_command
-                    return
-                fi
-                _pyenv_virtualenv_hook
-                if [[ -z $VIRTUAL_ENV ]]; then
-                    bivio_ps1 $(pyenv global)
-                else
-                    bivio_ps1 $(basename "$VIRTUAL_ENV")
-                fi
-            }
-            export PROMPT_COMMAND=bivio_pyenv_virtualenv_hook
-        fi
+    fi
+    if [[ -n $PS1 ]]; then
+        bivio_pyenv_virtualenv_hook() {
+            if [[ function != $(type -t pyenv) ]]; then
+                export PROMPT_COMMAND=bivio_prompt_command
+                return
+            fi
+            _pyenv_virtualenv_hook
+            if [[ -z $VIRTUAL_ENV ]]; then
+                bivio_ps1 $(pyenv global)
+            else
+                bivio_ps1 $(basename "$VIRTUAL_ENV")
+            fi
+            bivio_prompt_command
+        }
+        export PROMPT_COMMAND=bivio_pyenv_virtualenv_hook
     fi
 fi
 

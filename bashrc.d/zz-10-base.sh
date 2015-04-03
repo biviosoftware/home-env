@@ -96,7 +96,7 @@ if bivio class info Bivio::BConf >& /dev/null; then
         bivio test acceptance "${@-.}"
     }
 
-    if [[ $EUID = 0 ]]; then
+    if [[ $EUID == 0 ]]; then
         function bi {
             local p="$1"
             shift
@@ -176,14 +176,14 @@ for f in \
     /opt/local/bin \
     /usr/local/bin \
     /usr/local/cuda/bin \
-    $( [[ $EUID = 0 ]] && echo /sbin /usr/sbin /usr/local/sbin) \
+    $( [[ $EUID == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin) \
     ~/bin \
     ; do
     bivio_path_insert "$f"
 done
 unset f
 
-if [[ $EUID == 0 || $USER = cvs ]]; then
+if [[ $EUID == 0 || $USER == cvs ]]; then
     export CVSREAD=true
 fi
 
