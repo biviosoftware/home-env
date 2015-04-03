@@ -1,48 +1,87 @@
-if [ $(expr "$BASH_SOURCE" : ~/src) = 0 -a -d ~/src/biviosoftware/home-env ]; then
+bivio_not_src_home_env() {
+    [[ ! ( $BASH_SOURCE =~ ~/src/biviosoftware/home-env ) && -d ~/src/biviosoftware/home-env ]]
+}
+if bivio_not_src_home_env; then
     # Execute user's dot files only
     return
 fi
 
 # Undo some stuff
-x="$(compgen -a)"
-if [ -n "$x" ]; then
+x=$(compgen -a)
+if [[ -n $x ]]; then
     unalias $x
 fi
+unset x
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
 export VAGRANT_NO_COLOR=true
+export LOGNAME=${LOGNAME:-$(logname)}
+export CVSUMASK=07
+unset BCONF
+umask o-rwx
 
 dirs() {
     local f
     local -i i=0
-    for f in `command dirs`; do
+    for f in $(command dirs); do
       	echo "    $i  $f"
       	i=$i+1
     done
 }
 
-b_ps1() {
-    local x="["
-    test "$1" && x="$x$1;"
-    if [ "x$USER" != "x$LOGNAME" ]; then
+bivio_ps1() {
+    if [[ -z $PS1 ]]; then
+        return
+    fi
+    local x='['
+    if [[ -n $1 ]]; then
+        x="$x$1;"
+    fi
+    if [[ $USER != $LOGNAME ]]; then
         x="$x\u";
     fi
-    if [ ! -f /.dockerinit -a "x$DISPLAY" != 'x:0' ]; then
-        x="$x@\h";
+    if [[ ! -f /.dockerinit && $DISPLAY != :0 ]]; then
+        x="$x@\h"
     fi
     PS1="$x \W]$bivio_ps1_suffix"
 }
 
+if [[ -n $PS1 ]]; then
+    bivio_prompt_command() {
+        case $TERM in
+        xterm*)
+            printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"
+            ;;
+        screen)
+            printf "\033]0;%s@%s:%s\033\\" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"
+            ;;
+        *)
+            ;;
+        esac
+    }
+    if [[ $EUID == 0 ]]; then
+        bivio_ps1_suffix='# '
+    else
+        bivio_ps1_suffix='$ '
+    fi
+    if [[ $TERM != dumb ]]; then
+        stty quit '^_'
+    fi
+    PS1="\W$bivio_ps1_suffix"
+    PROMPT_COMMAND=bivio_prompt_command
+    bivio_prompt_command
+fi
+
 if bivio class info Bivio::BConf >& /dev/null; then
     bconf() {
-        if [ -r /etc/$1.bconf ]; then
-            export BCONF=/etc/$1.bconf
+        if [[ -r /etc/$1.bconf ]]; then
+            export BCONF="/etc/$1.bconf"
         else
             echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
             return 1
         fi
-        b_ps1 $1
+        bivio_ps1 $1
     }
 
     b() {
@@ -57,13 +96,16 @@ if bivio class info Bivio::BConf >& /dev/null; then
         bivio test acceptance "${@-.}"
     }
 
-    if test $UID = 0; then
+    if [[ $EUID = 0 ]]; then
         function bi {
-            local p=$1
+            local p="$1"
             shift
-            test -f /etc/$p.bconf && p=perl-app-$p
-            bivio release install $p "$@"
+            if [[ -f /etc/$p.bconf ]]; then
+                p="perl-app-$p"
+            fi
+            bivio release install "$p" "$@"
         }
+
         bihs() {
             bivio release install_host_stream
         }
@@ -91,49 +133,36 @@ gp() {
 	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
 }
 
-b_path_dedup() {
+bivio_path_dedup() {
     export PATH=$(perl -e 'print(join(q{:}, grep(!$x{$_}++, split(/:/, $ENV{PATH}))))')
 }
 
-b_path_insert() {
+bivio_path_insert() {
     local dir="$1"
     local ignore_not_exist="$2"
-    if [ \( "$ignore_not_exist" -o -d $dir \) -a $(expr ":$PATH:" : ".*:$dir:") = 0 ]; then
+    if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$PATH: =~ :$dir: ) ]]; then
 	export PATH="$dir:$PATH"
         return 0
     fi
     return 1
 }
 
-b_classpath_append() {
+bivio_path_remove() {
+    export PATH=$(perl -e 'print(join(q{:}, grep($_ ne $ARGV[0], split(/:/, $ENV{PATH}))))' "$1")
+}
+
+bivio_classpath_append() {
     local jar="$1"
-    if [ $(expr ":$CLASSPATH:" : ".*:$jar:") = 0 ]; then
+    if [[ ! ( :$CLASSPATH: =~ :$jar: ) ]]; then
 	export CLASSPATH=$CLASSPATH${CLASSPATH+:}$jar
     fi
 }
 
-unset BCONF
-umask o-rwx
-export LOGNAME=${LOGNAME:-$(logname)}
-
-if [ ! -z "$PS1" ]; then
-    if [ $UID = 0 ]; then
-        bivio_ps1_suffix='# '
-    else
-        bivio_ps1_suffix='$ '
-    fi
-    if [ "x$TERM" != xdumb ]; then
-        stty quit '^_'
-    fi
-    PS1="\W$bivio_ps1_suffix"
-fi
-
-export CVSUMASK=07
-if test -z "$CVSROOT"; then
-    if test -d /home/cvs/CVSROOT; then
+if [[ -z $CVSROOT ]]; then
+    if [[ -d /home/cvs/CVSROOT ]]; then
 	# We're on the CVS server
 	export CVSROOT=/home/cvs
-    elif test $(expr "$(hostname)" : '\(dfw4\|dfw1\|dfw3\|apa3\|apa11\|apa1\)\.'); then
+    elif [[ $HOSTNAME =~ (dfw1|apa3|apa11|apa1)(\.|$) ]]; then
 	# direct connect
 	export CVSROOT=":pserver:$LOGNAME@locker.bivio.biz:/home/cvs"
     else
@@ -147,14 +176,14 @@ for f in \
     /opt/local/bin \
     /usr/local/bin \
     /usr/local/cuda/bin \
-    $(test $UID = 0 && echo /sbin /usr/sbin /usr/local/sbin) \
+    $( [[ $EUID = 0 ]] && echo /sbin /usr/sbin /usr/local/sbin) \
     ~/bin \
     ; do
-    b_path_insert "$f"
+    bivio_path_insert "$f"
 done
 unset f
 
-if test $UID = 0 -o "$USER" = cvs; then
+if [[ $EUID == 0 || $USER = cvs ]]; then
     export CVSREAD=true
 fi
 
@@ -162,55 +191,59 @@ export JAVA_HOME=/usr/lib/jvm/java
 #java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore
 # Get most recent java and any jars in /usr/java
 for f in $(ls /usr/java/*.jar 2> /dev/null); do
-    b_classpath_append $f
+    bivio_classpath_append $f
 done
 unset f
 
-if [ -d $HOME/src/java ]; then
+if [[ -d $HOME/src/java ]]; then
     export JAVA_ROOT=$HOME/src/java
-    b_classpath_append $JAVA_ROOT
+    bivio_classpath_append $JAVA_ROOT
 fi
 
-if [ -z "$PERLLIB" -a -d $HOME/src/perl ]; then
+if [[ -z $PERLLIB && -d ~/src/perl ]]; then
     export PERLLIB=$HOME/src/perl
 fi
 export FTP_PASSIVE=1
 
-if test -f ~/.ssh/ssh_agent; then
+if [[ -f ~/.ssh/ssh_agent ]]; then
     . ~/.ssh/ssh_agent > /dev/null
-    if [ ! -z "$PS1" ]; then
-        if ps ${SSH_AGENT_PID-0} 2>&1 | grep ssh-agent > /dev/null 2>&1; then
-	    : We have a daemon
-	else
+    if [[ -n "$PS1" ]]; then
+        if ! ps ${SSH_AGENT_PID-0} 2>&1 | grep -s -q ssh-agent; then
 	    # Start a daemon and add
 	    ssh-agent > ~/.ssh/ssh_agent
 	    . ~/.ssh/ssh_agent
 	    ssh-add
-            (x=~/.vagrant.d/insecure_private_key && test -f $x && ssh-add $x)
+            x=~/.vagrant.d/insecure_private_key
+            if [[ -f $x  ]]; then
+                ssh-add $x
+            fi
+            unset x
 	fi
     fi
 fi
 
-if [ $(expr "$INSIDE_EMACS" : ".*comint") != 0 ]; then
+if [[ $INSIDE_EMACS =~ comint ]]; then
     export PAGER=cat
-    export EDITOR=$(type -path emacsclient)
+    export EDITOR=$(type -p emacsclient)
     export NODE_NO_READLINE=1
+
     dirs() {
         echo "$DIRSTACK"
     }
+
     e() {
         emacsclient --no-wait "$@"
     }
 else
-    export PAGER=$(type -path less)
-    export EDITOR=$(type -path emacs)
+    export PAGER=$(type -p less)
+    export EDITOR=$(type -p emacs)
     e() {
         emacs "$@"
     }
 fi
 
 which() {
-    type -path "$@"
+    type "$@"
 }
 
 clean() {
