@@ -82,8 +82,12 @@ bivio_pyenv_global() {
         return
     fi
     local _bivio_pyenv_global_flag=1
-    _bivio_pyenv_global "$@"
-    . ~/.bashrc
+    local version="$1"
+    # This test avoids significant overhead
+    if [[ function != $(type -t pyenv) || $(pyenv global) != $version ]]; then
+        _bivio_pyenv_global "$version"
+        . ~/.bashrc
+    fi
 }
 
 bivio_pyenv_2() {
