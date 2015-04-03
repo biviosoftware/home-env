@@ -77,8 +77,21 @@ if [[ -d ~/.pyenv/bin ]]; then
 fi
 
 bivio_pyenv_global() {
+    # This function might be called within bashrc
+    if [[ -n $_bivio_pyenv_global_flag ]]; then
+        return
+    fi
+    local _bivio_pyenv_global_flag=1
     _bivio_pyenv_global "$@"
     . ~/.bashrc
+}
+
+bivio_pyenv_2() {
+    bivio_pyenv_global 2.7.8
+}
+
+bivio_pyenv_3() {
+    bivio_pyenv_global 3.4.2
 }
 
 gcl() {
@@ -115,14 +128,6 @@ mocha() {
 
 nup() {
     cvs -n up 2>/dev/null|egrep '^[A-Z] |^\? .*\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'
-}
-
-py2() {
-    bivio_pyenv_global 2.7.8
-}
-
-py3() {
-    bivio_pyenv_global 3.4.2
 }
 
 up() {

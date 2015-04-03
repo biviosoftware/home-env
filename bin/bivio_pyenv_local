@@ -3,6 +3,11 @@
 # Initialize a project directory with a local virtualenv. Take care to install
 # special packages (see below).
 #
+if [[ -n $_BIVIO_PYENV_LOCAL_FLAG ]]; then
+    # Called recursively (we call ~/.bashrc below which may recurse)
+    exit 0
+fi
+export _BIVIO_PYENV_LOCAL_FLAG=1
 
 if [ ! -d .git ]; then
     echo 'No .git directory in pwd' 1>&2

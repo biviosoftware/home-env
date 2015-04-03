@@ -2,6 +2,12 @@
 #
 # Intialize global pyenv
 #
+if [[ -n $_BIVIO_PYENV_GLOBAL_FLAG ]]; then
+    # Called recursively (we call ~/.bashrc below which may recurse)
+    exit 0
+fi
+export _BIVIO_PYENV_GLOBAL_FLAG=1
+
 version=$1
 if [ -z "$version" ]; then
     echo "Usage: $0 python-version" 1>&2
