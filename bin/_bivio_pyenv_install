@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#
+# Wraps pyenv install
+# usage: . $0
+#
+if [[ ! -d ~/.pyenv ]]; then
+    curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+    # Newer versions of patch do not like relative file names. Give this warning:
+    # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
+    # Updating the patches this way fixes the problem
+    find ~/.pyenv -name \*.patch -print0 | xargs -0 -n 100 perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}'
+fi
+
+# Reset the environment
+. ~/.bashrc
+
+if [[ Darwin == $(uname) ]]; then
+    export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
+fi
+
+pyenv install "$_bivio_pyenv_version"
+pyenv global "$_bivio_pyenv_version"
