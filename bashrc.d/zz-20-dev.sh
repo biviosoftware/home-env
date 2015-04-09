@@ -76,6 +76,15 @@ if [[ -d ~/.pyenv/bin ]]; then
     fi
 fi
 
+bivio_pyenv_local() {
+    # This function might be called within bashrc
+    if [[ $_in_bivio_pyenv_local ]]; then
+        return
+    fi
+    local _in_bivio_pyenv_local=1
+    . _bivio_pyenv_local
+}
+
 bivio_pyenv_global() {
     # This function might be called within bashrc
     if [[ -n $_bivio_pyenv_version ]]; then
