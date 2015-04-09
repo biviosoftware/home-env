@@ -83,7 +83,7 @@ bivio_pyenv_global() {
     fi
     local version=$1
     # This test avoids significant overhead
-    if [[ function != $(type -t pyenv) || $(pyenv global) != $version ]]; then
+    if [[ ! $(type -t pyenv) =~ function || $(pyenv global) != $version ]]; then
         local _bivio_pyenv_version=$version
         . _bivio_pyenv_global
     fi
