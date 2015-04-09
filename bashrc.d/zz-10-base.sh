@@ -1,5 +1,6 @@
 bivio_not_src_home_env() {
-    [[ ! ( $BASH_SOURCE =~ ~/src/biviosoftware/home-env ) && -d ~/src/biviosoftware/home-env ]]
+    local d=~/src/biviosoftware/home-env
+    [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]
 }
 if bivio_not_src_home_env; then
     # Execute user's dot files only
