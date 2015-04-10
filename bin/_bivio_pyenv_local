@@ -48,7 +48,7 @@ if [[ -z $venv ]]; then
         # pyenv will automatically install requirements.txt,
         # but this doesn't work in a couple of cases (see below)
         # so remove requirements.txt temporarily
-        tmp=requirements.tmp
+        local tmp=requirements.tmp
         rm -f "$tmp"
         cleanup() {
             local e=$?
@@ -66,10 +66,8 @@ if [[ -z $venv ]]; then
     fi
 fi
 
-
-# install numpy, because needs to be installed separately from 
-numpy=$(egrep '^numpy\W' requirements.txt 2>/dev/null)
-if [[ -n $numpy ]]; then
+# install numpy manually, because needs to be installed before scipy
+if [[ $(egrep '^numpy\W' requirements.txt 2>/dev/null) ]]; then
     pip install "$numpy"
 fi
 
