@@ -76,26 +76,30 @@ if [[ -d ~/.pyenv/bin ]]; then
     fi
 fi
 
-bivio_pyenv_local() {
-    # This function might be called within bashrc
-    if [[ $_in_bivio_pyenv_local ]]; then
-        return
+_bivio_pyenv_source() {
+    local source=$1
+    # Avoid recursion
+    if [[ $_bivio_pyenv_source_stack ]]; then
+        if [[ $_bivio_pyenv_source_stack[@] =~ $source ]]; then
+            return
+        fi
+    else
+        local _bivio_pyenv_source_stack=()
     fi
-    local _in_bivio_pyenv_local=1
-    . _bivio_pyenv_local
+    _bivio_pyenv_source_stack+=($source)
+    . $source
+    local res=$?
+    _bivio_pyenv_source_stack=${_bivio_pyenv_source_stack[@]/$source/}
+    return $res
 }
 
 bivio_pyenv_global() {
-    # This function might be called within bashrc
-    if [[ -n $_bivio_pyenv_version ]]; then
-        return
-    fi
-    local version=$1
-    # This test avoids significant overhead
-    if [[ ! $(type -t pyenv) =~ function || $(pyenv global) != $version ]]; then
-        local _bivio_pyenv_version=$version
-        . _bivio_pyenv_global
-    fi
+    local _bivio_pyenv_global_version=$version
+    _bivio_pyenv_source _bivio_pyenv_global
+}
+
+bivio_pyenv_local() {
+    _bivio_pyenv_source _bivio_pyenv_local
 }
 
 bivio_pyenv_2() {
