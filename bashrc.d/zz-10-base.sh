@@ -10,17 +10,23 @@ fi
 # Undo some stuff
 x=$(compgen -a)
 if [[ -n $x ]]; then
-    unalias $x
+    unalias "$x"
 fi
 unset x
+
+umask o-rwx
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
 export VAGRANT_NO_COLOR=true
 export LOGNAME=${LOGNAME:-$(logname)}
-export CVSUMASK=07
 unset BCONF
-umask o-rwx
+
+# python pip installs in /tmp, which doesn't work if the package is large
+# and /tmp is on tmpfs.
+if [[ ! $TMPDIR && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
+    export TMPDIR=${TMPDIR-/var/tmp}
+fi
 
 dirs() {
     local f
@@ -159,6 +165,7 @@ bivio_classpath_append() {
     fi
 }
 
+export CVSUMASK=07
 if [[ -z $CVSROOT ]]; then
     if [[ -d /home/cvs/CVSROOT ]]; then
 	# We're on the CVS server
