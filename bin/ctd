@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-# -*-perl-*-
-use strict
+use strict;
+use warnings;
 system('bivio project link_facade_files')
     if -M "$ENV{PERLLIB}/../javascript/qooxdoo/b_agent/build/index.html" > 1;
 exec(
