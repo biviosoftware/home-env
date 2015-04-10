@@ -3,7 +3,7 @@
 # Cache how vagrant makes the ssh connection, because at least 3 seconds faster
 # since don't have to startup Ruby.
 #
-if [[ ! -f .vssh ]]; then
+if [[ ! -f .vssh || .vagrant/machines/default/virtualbox/synced_folders -nt .vssh ]]; then
     vagrant ssh -c 'sleep 2' </dev/null &>/dev/null &
     p=$!
     declare -i i=0
@@ -15,7 +15,7 @@ if [[ ! -f .vssh ]]; then
         sleep 1
         i+=1
     done
-    if [[ $(wait $x) ]]; then
+    if [[ $(wait "$p") ]]; then
         # Something went wrong, show the user the error, don't write .vssh
         exec vagrant ssh
     fi
