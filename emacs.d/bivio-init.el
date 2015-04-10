@@ -90,7 +90,7 @@
 	     (set (make-local-variable 'compile-command)
 		  (setq compile-command
 			(concat
-			 (if (string-match "/test/" (buffer-file-name))
+			 (if (string-match-p "/test/" (buffer-file-name))
 			     "mocha "
 			     "node ")
 			 (file-name-nondirectory buffer-file-name))))))
@@ -101,9 +101,16 @@
 
 (add-hook 'find-file-hook
 	  (lambda ()
-	    (if (string-match "/src/biviosoftware/boldchat/" (buffer-file-name))
-		(set (make-local-variable 'tab-width) 4))))
-
+            (let ((case-fold-search t))
+              (if (string-match-p "/src/biviosoftware/boldchat/" (buffer-file-name))
+                  (set (make-local-variable 'tab-width) 4))
+              (if (if (boundp 'bivio-delete-trailing-whitespace)
+                      bivio-delete-trailing-whitespace
+                    (not (string-match-p "/wiki/\\w+$" (or buffer-file-name ""))))
+                  (add-hook 'write-contents-functions
+                            (lambda()
+                              (save-excursion
+                                (delete-trailing-whitespace))))))))
 (add-hook 'css-mode-hook
 	  '(lambda ()
 	     (setq css-indent-offset 2)))
