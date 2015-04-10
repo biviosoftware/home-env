@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#
+# Cache how vagrant makes the ssh connection, because at least 3 seconds faster
+# since don't have to startup Ruby.
+#
+if [[ ! -f .vssh ]]; then
+    vagrant ssh -c 'sleep 2' </dev/null &>/dev/null &
+    p=$!
+    declare -i i=0
+    while [[ $i < 6 ]]; do
+        x="$(ps axww | grep ' ssh vagrant@'| grep -v ' grep ')"
+        if [[ $x ]]; then
+            break
+        fi
+        sleep 1
+        i+=1
+    done
+    if [[ $(wait $x) ]]; then
+        # Something went wrong, show the user the error, don't write .vssh
+        exec vagrant ssh
+    fi
+    if [[ $x ]]; then
+        x="${x#* ssh }"
+        x="ssh ${x% -t bash -l*}"
+    else
+        x='vagrant ssh'
+    fi
+    echo "exec $x" > .vssh
+fi
+. ./.vssh
