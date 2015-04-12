@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+# Tag current branch on origin and the remote
+#
+if [[ ! $1 ]]; then
+    echo "usage: $0 tag" 1>&2
+    exit 1
+fi
+tag=$1
+{
+    git tag -d $tag
+    git push --delete origin $rag
+} &> /dev/null
+git tag $tag
+git push origin $tag
