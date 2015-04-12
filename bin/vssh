@@ -20,6 +20,7 @@ if [[ ! -f .vssh || .vagrant/machines/default/virtualbox/synced_folders -nt .vss
         exec vagrant ssh
     fi
     if [[ $x ]]; then
+        #TODO(robnagler): Does not work with spaces in the directory name
         x="${x#* ssh }"
         x="ssh ${x% -t bash -l*}"
     else
