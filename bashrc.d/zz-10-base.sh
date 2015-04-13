@@ -8,11 +8,10 @@ if bivio_not_src_home_env; then
 fi
 
 # Undo some stuff
-x=$(compgen -a)
-if [[ -n $x ]]; then
-    unalias "$x"
-fi
-unset x
+for f in $(compgen -a); do
+    unalias "$f"
+done
+unset f
 
 umask o-rwx
 export LS_COLORS=
