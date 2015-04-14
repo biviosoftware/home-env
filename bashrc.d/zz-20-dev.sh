@@ -94,7 +94,7 @@ _bivio_pyenv_source() {
 }
 
 bivio_pyenv_global() {
-    local _bivio_pyenv_global_version=$version
+    local _bivio_pyenv_global_version=$1
     _bivio_pyenv_source _bivio_pyenv_global
 }
 
