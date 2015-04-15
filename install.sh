@@ -46,7 +46,7 @@ for f in $(perl -e 'print(map(m{^[-\w/]+\w$} ? "$_\n" : (), glob("{dot-,bin/}*")
     fi
     src=$PWD/$f
     cmd='ln -s'
-    if [[ $is_cygwin && -r cygwin/$f ]]; then
+    if [[ $is_cygwin != 0 && -r cygwin/$f ]]; then
         src=$PWD/cygwin/$f
         cmd=cp
     fi
