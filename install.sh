@@ -13,7 +13,10 @@ cd $biviosoftware
 for repo in home-env perl-Bivio javascript-Bivio perl-ProjEx; do
     if [[ -d $repo ]]; then
 	echo "Pulling from existing remote $repo"
-        git pull -q
+        (
+            cd $repo
+            git pull -q
+        )
     else
         git clone -q "https://github.com/biviosoftware/$repo"
     fi
