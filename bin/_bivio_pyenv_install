@@ -18,5 +18,5 @@ if [[ Darwin == $(uname) ]]; then
     export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
 fi
 
-pyenv install "$_bivio_pyenv_version"
-pyenv global "$_bivio_pyenv_version"
+pyenv install "$_bivio_pyenv_global_version"
+pyenv global "$_bivio_pyenv_global_version"

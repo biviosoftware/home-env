@@ -3,8 +3,8 @@
 # Intialize global pyenv
 # usage: . $0
 #
-if [[ ! -d ~/.pyenv/versions/$_bivio_pyenv_version ]]; then
+if [[ ! -d ~/.pyenv/versions/$_bivio_pyenv_global_version ]]; then
     . _bivio_pyenv_install
 else
-    pyenv global "$_bivio_pyenv_version"
+    pyenv global "$_bivio_pyenv_global_version"
 fi
