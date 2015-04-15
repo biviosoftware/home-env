@@ -11,7 +11,8 @@ if [[ ! -d .git ]]; then
     return 1
 fi
 
-if ! pyenv global >& /dev/null; then
+local global_env=$(pyenv global 2>/dev/null)
+if [[ ! $global_env ]]; then
     echo 'No global pyenv version' 1>&2
     echo 'Create one, e.g. run: bivio_pyenv_2' 1>&2
     return 1
@@ -22,7 +23,7 @@ local project=$(basename "$project_dir")
 local venv=$(pyenv local 2> /dev/null)
 
 # Make sure venv exists
-if [[ -n $venv ]]; then
+if [[ $venv ]]; then
     if ! pyenv activate "$venv" >& /dev/null; then
         rm -f .python-version
         venv=
@@ -36,11 +37,11 @@ if [[ -n $venv ]]; then
 fi
 
 # Create the local virtualenv
-if [[ -z $venv ]]; then
+if [[ ! $venv ]]; then
     venv="$project"
     (
         cd ..
-        pyenv virtualenv "$venv"
+        pyenv virtualenv "$global_env" "$venv"
     )
     if [[ ! -f requirements.txt ]]; then
         pyenv local "$venv"

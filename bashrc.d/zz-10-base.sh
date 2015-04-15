@@ -1,7 +1,12 @@
 bivio_not_src_home_env() {
     local d=~/src/biviosoftware/home-env
-    [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]
+    if [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]; then
+        return 0
+    fi
+    return 1
+
 }
+
 if bivio_not_src_home_env; then
     # Execute user's dot files only
     return
@@ -148,9 +153,7 @@ bivio_path_insert() {
     local ignore_not_exist="$2"
     if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$PATH: =~ :$dir: ) ]]; then
 	export PATH="$dir:$PATH"
-        return 0
     fi
-    return 1
 }
 
 bivio_path_remove() {
