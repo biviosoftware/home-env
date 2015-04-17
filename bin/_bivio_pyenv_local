@@ -69,7 +69,7 @@ fi
 
 # install numpy manually, because needs to be installed before scipy
 if [[ $(egrep '^numpy\W' requirements.txt 2>/dev/null) ]]; then
-    pip install "$numpy"
+    pip install numpy
 fi
 
 # install pybivio
