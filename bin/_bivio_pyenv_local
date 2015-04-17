@@ -83,7 +83,7 @@ if [[ pybivio != $project ]]; then
     fi
     (
         cd ~/src/biviosoftware/pybivio
-        pyenv deactivate >& /dev/null
+        pyenv deactivate >& /dev/null || true
         pyenv activate "$venv"
         python setup.py develop
     )
