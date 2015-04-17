@@ -8,7 +8,7 @@ if [[ ! -f .vssh || .vagrant/machines/default/virtualbox/synced_folders -nt .vss
     p=$!
     declare -i i=0
     while [[ $i < 6 ]]; do
-        x="$(ps axww | grep ' ssh vagrant@.*$PWD'| grep -v ' grep ')"
+        x="$(ps axww | grep ' ssh vagrant@.*$(pwd)'| grep -v ' grep ')"
         if [[ $x ]]; then
             break
         fi

@@ -1,5 +1,8 @@
 #!/bin/bash
-# curl -L https://raw.githubusercontent.com/biviosoftware/home-env/master/bin/install.sh | bash
+#
+# curl -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
+# For development, do this:
+#
 biviosoftware=~/src/biviosoftware
 
 [[ ! $(uname) =~ CYGWIN ]]
@@ -18,7 +21,7 @@ for repo in home-env perl-Bivio javascript-Bivio perl-ProjEx; do
             git pull -q
         )
     else
-        git clone -q "https://github.com/biviosoftware/$repo"
+        git clone -q "${BIVIO_GIT_SERVER-https://github.com}/biviosoftware/$repo.git"
     fi
 done
 

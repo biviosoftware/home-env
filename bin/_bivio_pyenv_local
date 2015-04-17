@@ -78,7 +78,7 @@ if [[ pybivio != $project ]]; then
         mkdir -p ~/src/biviosoftware >& /dev/null
         (
             cd ~/src/biviosoftware
-            git clone https://github.com/biviosoftware/pybivio
+            git clone ${BIVIO_GIT_SERVER-https://github.com}/biviosoftware/pybivio.git
         )
     fi
     (
