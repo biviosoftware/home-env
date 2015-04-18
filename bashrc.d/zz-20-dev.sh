@@ -58,9 +58,9 @@ if [[ -d ~/.pyenv/bin ]]; then
     if [[ function != $(type -t _pyenv_virtualenv_hook) ]]; then
         eval "$(pyenv virtualenv-init -)"
     fi
-    if [[ -n $PS1 ]]; then
+    if [[ $PS1 ]]; then
         bivio_pyenv_virtualenv_hook() {
-            if [[ function != $(type -t pyenv) ]]; then
+            if [[ function != $(type -t pyenv) || ! -x ~/.pyenv/bin/pyenv ]]; then
                 export PROMPT_COMMAND=bivio_prompt_command
                 return
             fi
@@ -87,9 +87,15 @@ _bivio_pyenv_source() {
         local _bivio_pyenv_source_stack=()
     fi
     _bivio_pyenv_source_stack+=($source)
-    . $source
+    (
+        set -e
+        . $source
+    )
     local res=$?
     _bivio_pyenv_source_stack=${_bivio_pyenv_source_stack[@]/$source/}
+    if [[ $res ]]; then
+        echo 'ERROR: install failed' 1>&2
+    fi
     return $res
 }
 
