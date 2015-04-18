@@ -5,8 +5,8 @@
 #
 # Usage: . $0
 #
-if [[ ! -d .git ]]; then
-    echo 'No .git directory in pwd' 1>&2
+if ! [[ -d .git || -r setup.py ]]; then
+    echo 'No .git or setup.py in pwd' 1>&2
     echo 'cd to the project directory' 1>&2
     return 1
 fi
