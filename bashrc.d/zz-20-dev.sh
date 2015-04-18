@@ -99,6 +99,12 @@ _bivio_pyenv_source() {
     return $res
 }
 
+bivio_pyenv_deactivate() {
+    pyenv deactivate
+    # This needs to be cleared for auto-de/activation to work again
+    unset VIRTUAL_ENV
+}
+
 bivio_pyenv_global() {
     local _bivio_pyenv_global_version=$1
     _bivio_pyenv_source _bivio_pyenv_global
