@@ -4,6 +4,7 @@
 # usage: . $0
 #
 if [[ ! -d ~/.pyenv ]]; then
+    bivio_path_insert ~/.pyenv/bin 1
     curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
     # Newer versions of patch do not like relative file names. Give this warning:
     # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
@@ -15,6 +16,7 @@ fi
 . ~/.bashrc
 
 if [[ Darwin == $(uname) ]]; then
+    local CFLAGS
     export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
 fi
 
