@@ -11,7 +11,7 @@ if [[ ! -d .git ]]; then
     return 1
 fi
 
-local global_env=$(pyenv global 2>/dev/null)
+local global_env=$(pyenv global 2>/dev/null || true)
 if [[ ! $global_env ]]; then
     echo 'No global pyenv version' 1>&2
     echo 'Create one, e.g. run: bivio_pyenv_2' 1>&2
@@ -20,7 +20,7 @@ fi
 
 local project_dir=$(pwd)
 local project=$(basename "$project_dir")
-local venv=$(pyenv local 2> /dev/null)
+local venv=$(pyenv local 2> /dev/null || true)
 
 # Make sure venv exists
 if [[ $venv ]]; then
@@ -67,9 +67,12 @@ if [[ ! $venv ]]; then
     fi
 fi
 
+pyenv activate "$venv"
+
 # install numpy manually, because needs to be installed before scipy
-if [[ $(egrep '^numpy\W' requirements.txt 2>/dev/null) ]]; then
-    pip install numpy
+local pkg=$(egrep '^numpy\W' requirements.txt 2>/dev/null || true)
+if [[ $pkg ]]; then
+    pip install "$pkg"
 fi
 
 # install pybivio
@@ -88,6 +91,8 @@ if [[ pybivio != $project ]]; then
         python setup.py develop
     )
 fi
+
+
 
 # install $project
 pyenv activate
