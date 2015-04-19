@@ -13,6 +13,7 @@
 (require 'css-mode)
 (require 'shell)
 (require 'mmm-mode)
+(require 'js)
 (ignore-errors (require 'java-mode))
 
 (global-font-lock-mode t)
@@ -79,14 +80,11 @@
 
 (define-key java-mode-map "\C-c\C-m" 'compile)
 
-(autoload #'espresso-mode "espresso" "Start espresso-mode" t)
-(add-to-list 'auto-mode-alist '("\\.js$" . espresso-mode))
-(add-to-list 'auto-mode-alist '("\\.json$" . espresso-Mode))
-(add-hook 'espresso-mode-hook
+(add-hook 'js-mode
 	  '(lambda ()
-	     (setq espresso-indent-level 2)
-	     (setq espresso-expr-indent-offset 0)
-	     (define-key espresso-mode-map "\C-c\C-m" 'compile)
+	     (setq js-indent-level 2)
+	     (setq js-expr-indent-offset 0)
+	     (define-key js-mode-map "\C-c\C-m" 'compile)
 	     (set (make-local-variable 'compile-command)
 		  (setq compile-command
 			(concat
