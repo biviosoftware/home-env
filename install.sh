@@ -8,12 +8,18 @@ biviosoftware=~/src/biviosoftware
 [[ ! $(uname) =~ CYGWIN ]]
 is_cygwin=$?
 
+if [[ ! -d ~/bin ]]; then
+    mkdir ~/bin
+fi
+
 if [[ ! -d $biviosoftware ]]; then
     mkdir -p $biviosoftware
 fi
 cd $biviosoftware
 
-for repo in home-env perl-Bivio javascript-Bivio perl-ProjEx; do
+for repo in home-env pybivio \
+    $( [[ $no_perl ]] || echo perl-Bivio javascript-Bivio perl-ProjEx ) \
+    ; do
     if [[ -d $repo ]]; then
 	echo "Pulling from existing remote $repo"
         (
@@ -25,24 +31,22 @@ for repo in home-env perl-Bivio javascript-Bivio perl-ProjEx; do
     fi
 done
 
-if [[ ! -d ../perl ]]; then
-    mkdir ../perl
-fi
-
-for perl in Bivio ProjEx; do
-    if [[ -L ../perl/$perl ]]; then
-        rm "../perl/$perl"
+if ! [[ $no_perl ]]; then
+    if [[ ! -d ../perl ]]; then
+        mkdir ../perl
     fi
-    ln -s "../biviosoftware/perl-$perl" "../perl/$perl"
-done
 
-if [[ ! -d ~/bin ]]; then
-    mkdir ~/bin
-fi
+    for perl in Bivio ProjEx; do
+        if [[ -L ../perl/$perl ]]; then
+            rm "../perl/$perl"
+        fi
+        ln -s "../biviosoftware/perl-$perl" "../perl/$perl"
+    done
 
-if [[ ! -x ~/bin/bivio ]]; then
-    ln -s ~/src/biviosoftware/perl-Bivio/Util/bivio ~/bin/bivio
-    chmod +x ~/bin/bivio
+    if [[ ! -x ~/bin/bivio ]]; then
+        ln -s ~/src/biviosoftware/perl-Bivio/Util/bivio ~/bin/bivio
+        chmod +x ~/bin/bivio
+    fi
 fi
 
 cd home-env
