@@ -35,7 +35,7 @@ if type bconf &>/dev/null; then
         done
     fi
 
-    if [[ -n $BIVIO_DEFAULT_BCONF ]]; then
+    if [[ $BIVIO_DEFAULT_BCONF ]]; then
         eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
 
         #TODO(robnagler): backwards compatibility for bashrc_b_env_aliases
@@ -93,7 +93,7 @@ _bivio_pyenv_source() {
     )
     local res=$?
     _bivio_pyenv_source_stack=${_bivio_pyenv_source_stack[@]/$source/}
-    if [[ $res ]]; then
+    if [[ $res != 0 ]]; then
         echo 'ERROR: install failed' 1>&2
     fi
     return $res
@@ -124,7 +124,7 @@ bivio_pyenv_3() {
 
 gcl() {
     local r=$1
-    if [[ ! ( $r =~ / ) ]]; then
+    if ! [[ $r =~ / ]]; then
 	r="$(basename $(pwd))/$r"
     fi
     git clone "https://github.com/$r"
