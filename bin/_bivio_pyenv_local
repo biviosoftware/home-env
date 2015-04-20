@@ -56,7 +56,7 @@ if [[ ! $venv ]]; then
             if [[ -f $tmp ]]; then
                 mv "$tmp" requirements.txt
             fi
-            exit "$e"
+            exit $e
         }
         trap cleanup EXIT
         # pyenv will automatically load requirements.txt
