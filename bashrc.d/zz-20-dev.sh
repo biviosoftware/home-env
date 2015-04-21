@@ -143,7 +143,7 @@ gst() {
 }
 
 gup() {
-    git pull "$@"
+    git pull --tags "$@"
 }
 
 http() {
