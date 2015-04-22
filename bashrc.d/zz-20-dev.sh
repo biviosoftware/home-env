@@ -135,7 +135,8 @@ gco() {
 }
 
 gpu() {
-    git push --tags origin master "$@"
+    git push origin master "$@"
+    git push --tags
 }
 
 gst() {
@@ -143,7 +144,8 @@ gst() {
 }
 
 gup() {
-    git pull --tags "$@"
+    git pull "$@"
+    git fetch --tags
 }
 
 http() {
