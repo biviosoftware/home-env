@@ -112,7 +112,7 @@ if grep -s -q '# *PyQt4' requirements.txt; then
             rm -rf "$tmp"
             mkdir -p "$tmp"
             cd "$tmp"
-            curl -s -S -L -O "${BIVIO_FOSS_MIRROR-http://depot.radiasoft.org/foss}/$tgz"
+            curl -s -S -L -O "${BIVIO_FOSS_MIRROR-https://depot.radiasoft.org/foss}/$tgz"
             tar xzf "$tgz"
             rm -f "$tgz"
             cd *
