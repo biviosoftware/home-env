@@ -5,8 +5,8 @@
 #
 # Usage: . $0
 #
-if ! [[ -d .git || -r setup.py ]]; then
-    echo 'No .git or setup.py in pwd' 1>&2
+if ! [[ -d .git || -r setup.py || -r requirements.txt ]]; then
+    echo 'No .git, setup.py or requirements.txt in pwd' 1>&2
     echo 'cd to the project directory' 1>&2
     return 1
 fi
@@ -40,64 +40,89 @@ fi
 if [[ ! $venv ]]; then
     venv="$project"
     (
+        set -e
         cd ..
         pyenv virtualenv "$global_env" "$venv"
-    )
+    ) || return $?
     if [[ ! -f requirements.txt ]]; then
-        pyenv local "$venv"
+        pyenv local "$venv" || return $?
     else
-        # pyenv will automatically install requirements.txt,
-        # but this doesn't work in a couple of cases (see below)
-        # so remove requirements.txt temporarily
-        local tmp=requirements.tmp
-        rm -f "$tmp"
-        cleanup() {
-            local e=$?
-            if [[ -f $tmp ]]; then
-                mv "$tmp" requirements.txt
-            fi
-            exit $e
-        }
-        trap cleanup EXIT
-        # pyenv will automatically load requirements.txt
-        mv requirements.txt "$tmp"
-        pyenv local "$venv"
-        mv "$tmp" requirements.txt
-        trap - EXIT
+        (
+            set  -e
+            # pyenv will automatically install requirements.txt,
+            # but this doesn't work in a couple of cases (see below)
+            # so remove requirements.txt temporarily
+            local tmp=requirements.tmp
+            rm -f "$tmp"
+            trap "[[ -f $tmp ]] && mv -f '$tmp' requirements.txt" EXIT
+            set -e
+            # pyenv will automatically load requirements.txt
+            mv requirements.txt "$tmp"
+            pyenv local "$venv"
+        ) || return $?
     fi
 fi
 
-pyenv activate "$venv"
+pyenv activate "$venv" || return ?
 
 # install numpy manually, because needs to be installed before scipy
 local pkg=$(egrep '^numpy\W' requirements.txt 2>/dev/null || true)
 if [[ $pkg ]]; then
-    pip install "$pkg"
+    pip install "$pkg" || return $?
 fi
 
-# install pybivio
-if [[ pybivio != $project ]]; then
+# install pybivio always from local copy
+if [[ pybivio != $project && $(grep -s '^pybivio' requirements.txt) ]]; then
     if [[ ! -d ~/src/biviosoftware/pybivio ]]; then
-        mkdir -p ~/src/biviosoftware >& /dev/null
         (
+            set -e
+            mkdir -p ~/src/biviosoftware >& /dev/null
             cd ~/src/biviosoftware
             git clone ${BIVIO_GIT_SERVER-https://github.com}/biviosoftware/pybivio.git
-        )
+        ) || return $?
     fi
     (
+        set -e
         cd ~/src/biviosoftware/pybivio
-        pyenv deactivate >& /dev/null || true
+        bivio_pyenv_deactivate
         pyenv activate "$venv"
         python setup.py develop
-    )
+    ) || return $?
 fi
-
-
 
 # install $project
-pyenv activate
+pyenv activate "$venv" || return $?
 if [[ -f setup.py ]]; then
-    python setup.py develop
+    python setup.py develop || return $?
 elif [[ -f requirements.txt ]]; then
-    pip install -r requirements.txt
+    pip install -r requirements.txt || return $?
 fi
+
+# PyQt4 to be after pip requirements.txt since may contain dependencies
+# in the requirements.txt. There can't be a dependency on PyQt4 so can be last.
+if grep -s -q '# *PyQt4' requirements.txt; then
+    (
+        set -e
+        build_qt_pkg() {
+            local tgz=$1.tar.gz
+            shift
+            # Put tmp local to user
+            local tmp=~/tmp/build_qt_pkg
+            trap "cd; rm -rf '$tmp'" EXIT
+            rm -rf "$tmp"
+            mkdir -p "$tmp"
+            cd "$tmp"
+            curl -s -S -L -O "${BIVIO_FOSS_MIRROR-http://depot.radiasoft.org/foss}/$tgz"
+            tar xzf "$tgz"
+            rm -f "$tgz"
+            cd *
+            python configure.py "$@"
+            make
+            make install
+        }
+        build_qt_pkg sip --incdir="$VIRTUAL_ENV/include"
+        build_qt_pkg PyQt4 --confirm-license -q /usr/lib64/qt4/bin/qmake
+    ) || return $?
+fi
+
+bivio_pyenv_deactivate

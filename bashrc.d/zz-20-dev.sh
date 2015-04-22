@@ -100,7 +100,8 @@ _bivio_pyenv_source() {
 }
 
 bivio_pyenv_deactivate() {
-    pyenv deactivate
+    # so safe to deactivate any time
+    pyenv deactivate || true
     # This needs to be cleared for auto-de/activation to work again
     unset VIRTUAL_ENV
 }
