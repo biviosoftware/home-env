@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+#
+# Cache how vagrant makes the ssh connection, because at least 3 seconds faster
+# since don't have to startup Ruby.
+#
+# Also gives us a hook for checking guest additions
+#
+
+# What we execute to start ssh efficiently
+ssh_file=.vagrant/.bivio.ssh
+
+# Where ssh outputs errors (below)
+ssh_err_file=.vagrant/.bivio.ssh_err
+
+# Where we cache version
+version_file=.vagrant/.bivio.host_version
+
+# Computed host version
+host_version=$(perl -e 'print((`VBoxManage --version` =~ /^([\d\.]+)/)[0])')
+
+err_exit() {
+    echo "$1"
+    if [[ $2 ]]; then
+        cat "$2"
+    fi
+    exit 1
+}
+
+empty_cache() {
+    rm -f "$ssh_file" "$version_file" "$ssh_err_file"
+}
+
+is_running() {
+    local vbox_id=$(cat .vagrant/machines/default/virtualbox/id 2>/dev/null)
+    if [[ ! $vbox_id ]]; then
+        return 1
+    fi
+    eval $(VBoxManage showvminfo "$vbox_id" --machinereadable 2>/dev/null | grep -s '^VMState')
+    [[ $VMState == running ]]
+}
+
+exec_ssh() {
+    exec $(cat $ssh_file) "$@"
+    empty_cache
+    err_exit 'Something went seriously wrong. Try "vagrant ssh" or "vagrant status"'
+}
+
+user_msg() {
+    echo "$1" 1>&2
+}
+
+is_ssh_file_ok() {
+    if [[ ! -f $ssh_file ]]; then
+        return 1
+    fi
+    # VMStateChangeTime is full ISO, e.g. 2015-04-23T01:08:04.000000000
+    # Hopefully, Time::Local is on all systems by now
+    perl - "$VMStateChangeTime" "$ssh_file" <<'EOF'
+use Time::Local;
+@x = $ARGV[0] =~ /(\d+)/g;
+pop(@x);
+--$x[1];
+exit(timegm(reverse(@x)) < (stat($ARGV[1]))[9] ? 0 : 1);
+EOF
+}
+
+if [[ ! $host_version ]]; then
+    err_exit 'VBoxManage needs to be in path to work'
+fi
+
+if ! is_running; then
+    if [[ ! -f Vagrantfile ]]; then
+        err_exit 'You need to initialize vagrant, e.g. "vagrant init radiasoft/fedora"'
+    fi
+
+    user_msg 'VM not running. Booting... (may take a few minutes)'
+    # This may fail due to a guest update problem.
+    vagrant up
+    empty_cache
+    if ! is_running; then
+        err_exit 'Unable to boot VM (see above)'
+    fi
+
+elif [[ -f $version_file && $(cat $version_file) != $host_version ]]; then
+    empty_cache
+
+elif is_ssh_file_ok; then
+    exec_ssh "$@"
+fi
+
+user_msg 'Verifying VirtualBox software is up to date ... (may take a few seconds)'
+
+check_guest_version() {
+    vagrant ssh -c 'VBoxControl --version; sleep 1' > $ssh_err_file 2>&1 < /dev/null &
+    child=$!
+    declare -i i=0
+    while (( $i < 6 )); do
+        cmd="$(ps axww | grep ' ssh vagrant@.*VBoxControl' | grep -v ' grep ')"
+        if [[ $cmd ]]; then
+            break
+        fi
+        sleep 1
+    done
+
+    if [[ ! $cmd ]]; then
+        err_exit 'Unable to access virtual machine:' "$ssh_err_file"
+    fi
+
+    i=0
+    while ps "$child" &>/dev/null; do
+        if (( $i > 5 )); then
+            kill -9 "$child"
+            err_exit 'Software check failed:'  "$ssh_err_file"
+        fi
+        sleep 1
+        i+=1
+    done
+
+    guest_version=$(perl -n -e '/^(\d+\.\d+\.\d+)/ && print($1) && exit(0)' "$ssh_err_file")
+    if [[ ! $guest_version ]]; then
+        if ! grep -s -q 'VBoxControl: command not found' "$ssh_err_file"; then
+            err_exit 'Unable to extract guest version from VBoxControl --version:' "$ssh_err_file"
+        fi
+        # No VBoxControl, no guest additions, do fresh install
+        guest_version=''
+    fi
+
+    cmd=${cmd#* ssh }
+    # Obviously only works with Unix hosts
+    cmd="ssh ${cmd% -t bash -l*}"
+    # FATAL outputs nothing on error so switch to ERROR
+    cmd=${cmd/LogLevel=FATAL/LogLevel=ERROR}
+}
+
+check_guest_version
+if [[ $guest_version != $host_version ]]; then
+    user_msg 'VirtualBox "guest" software is out of date; Updating ... (may take tens of minutes)'
+    update_script=.vbox-guest-update.sh
+    $cmd "dd of='$update_script'" <<'EOF'
+iso=VBoxGuestAdditions_$host_version.iso
+
+clean_up() {
+    set +e
+    trap - EXIT
+    cd
+    umount /mnt &> /dev/null
+    rm -f "$iso"
+}
+trap clean_up EXIT
+
+#TODO(robnagler) Is this robust enough?
+rpms=$(rpm -qa | grep VirtualBox)
+if [[ $rpms ]]; then
+    yum remove -y $rpms || true
+fi
+
+set -e
+echo 'Downloading VirtualBox guest software'
+curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
+mount -t iso9660 -o loop,rw "$iso" /mnt
+
+# Returns false even when it succeeds, if the reload fails (next),
+# then the guest additions didn't get added right (or something else
+# is wrong). Sometimes this prompts, but if it does, ignore it as we
+# can't make this that robust. If there is no ~/RadTrack, then we will
+# have a failure anyway.
+sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
+EOF
+    if ! $cmd "sudo host_version='$host_version' bash '$update_script'"; then
+        err_exit 'Upgrade failed. See output' "$ssh_err_file"
+    fi
+    user_msg 'Rebooting virtual machine... (may take a few minutes)'
+    vagrant reload
+    check_guest_version
+    if [[ $guest_version != $host_version ]]; then
+        err_exit 'Unable to update VirtualBox guest software.'
+    fi
+fi
+
+echo -n "$host_version" > "$version_file"
+echo -n "$cmd" > "$ssh_file"
+
+user_msg 'Starting ssh...'
+
+exec_ssh "$@"

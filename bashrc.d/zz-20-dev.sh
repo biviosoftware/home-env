@@ -165,5 +165,9 @@ up() {
     cvs up -Pd
 }
 
+vssh() {
+    bivio_vagrant_ssh "$@"
+}
+
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
 export NODE_TLS_REJECT_UNAUTHORIZED=0
