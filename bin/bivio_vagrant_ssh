@@ -133,7 +133,7 @@ vagrant ssh -c 'sleep 2' > $ssh_err_file 2>&1 < /dev/null &
 child=$!
 declare -i i=0
 while (( $i < 6 )); do
-    ssh_cmd="$(ps axww | grep ' ssh vagrant@.*sleep' | grep -v ' grep ')"
+    ssh_cmd=$(ps axww | grep ' ssh vagrant@.*sleep' | grep -v ' grep ')
     if [[ $ssh_cmd ]]; then
         break
     fi
