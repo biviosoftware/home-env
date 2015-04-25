@@ -5,17 +5,15 @@
 #
 biviosoftware=~/src/biviosoftware
 
-[[ ! $(uname) =~ CYGWIN ]]
-is_cygwin=$?
-
-if [[ ! -d ~/bin ]]; then
-    mkdir ~/bin
+is_cygwin=
+if [[ ! $(uname) =~ CYGWIN ]]; then
+    is_cygwin=1
 fi
 
-if [[ ! -d $biviosoftware ]]; then
-    mkdir -p $biviosoftware
-fi
-cd $biviosoftware
+mkdir -p ~/bin
+
+mkdir -p "$biviosoftware"
+cd "$biviosoftware"
 
 for repo in home-env pybivio \
     $( [[ $no_perl ]] || echo perl-Bivio javascript-Bivio perl-ProjEx ) \
@@ -23,7 +21,7 @@ for repo in home-env pybivio \
     if [[ -d $repo ]]; then
 	echo "Pulling from existing remote $repo"
         (
-            cd $repo
+            cd "$repo"
             git pull -q
         )
     else
@@ -31,10 +29,16 @@ for repo in home-env pybivio \
     fi
 done
 
-if ! [[ $no_perl ]]; then
-    if [[ ! -d ../perl ]]; then
-        mkdir ../perl
+# Check for dead links from previous install before this install in case
+# we moved a file
+for f in ~/.??* ~/bin/*; do
+    if [[ -L $f && ! -e $f ]]; then
+        rm "$f"
     fi
+done
+
+if [[ ! $no_perl ]]; then
+    mkdir -p ../perl
 
     for perl in Bivio ProjEx; do
         if [[ -L ../perl/$perl ]]; then
@@ -50,18 +54,26 @@ if ! [[ $no_perl ]]; then
 fi
 
 cd home-env
+
 # Our file names don't have spaces so ok
-for f in $(perl -e 'print(map(m{^[-\w/]+\w$} ? "$_\n" : (), glob("{dot-,bin/}*")))'); do
-    if [[ $f =~ ^bin/ ]]; then
-        chmod +x "$f"
-    fi
+shopt -s nullglob
+for f in {bin,dot}/*; do
     src=$PWD/$f
-    cmd='ln -s'
-    if [[ $is_cygwin != 0 && -r cygwin/$f ]]; then
-        src=$PWD/cygwin/$f
-        cmd=cp
+    if [[ ! $(basename $src) =~ ^[_a-zA-Z][_a-zA-Z0-9-]+$ ]]; then
+        # probably tilde or backup file
+        continue
     fi
-    dst=~/${f/#dot-/.}
+    cmd='ln -s'
+    if [[ $is_cygwin && -r cygwin/$f ]]; then
+        src=$PWD/cygwin/$f
+        cmd='cp -a'
+    fi
+    if [[ $src =~ bin/ ]]; then
+        chmod +x "$src"
+        dst=~/$f
+    else
+        dst=~/.${f#dot/}
+    fi
     if [ -e "$dst" ]; then
         if cmp --silent "$dst" "$src"; then
             continue
@@ -72,15 +84,22 @@ for f in $(perl -e 'print(map(m{^[-\w/]+\w$} ? "$_\n" : (), glob("{dot-,bin/}*")
     $cmd "$src" "$dst"
 done
 
-# Check for dead links from previous install
-for f in ~/.??* ~/bin/*; do
-    if [[ -L $f && ! -e $f ]]; then
-        rm "$f"
+for f in gitconfig netrc; do
+    dst=~/.$f
+    if [[ -e $dst ]]; then
+        continue
+    fi
+    if [[ -L $dst ]]; then
+        rm "$dst"
+    fi
+    src=$PWD/template/$f
+    if [[ -r $src ]]; then
+        echo "Copying template to $dst; YOU NEED TO EDIT IT."
+	install -m 0600 "$src" "$dst"
     fi
 done
 
 cd
-# Final dot-file fixups/tests
 
 # npmrc may contain credentials so need to append
 if grep -q -s '^color' .npmrc; then
@@ -89,14 +108,3 @@ else
     echo 'color = false' >> .npmrc
     chmod 600 .npmrc
 fi
-
-for dotfile in .gitconfig .netrc; do
-    if [[ ! -r $dotfile ]]; then
-	src=/my/$dotfile
-	if [[ -r $src ]]; then
-	    install --mode=0600 "$src" "$dotfile"
-	else
-	    echo "You need to install $dotfile"
-	fi
-    fi
-done

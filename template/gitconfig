@@ -1,0 +1,7 @@
+# FIRST TIME: replace the <values>
+[user]
+	name = <git-user>
+	email = <git-email>
+[core]
+	excludesfile = <home-dir>/.gitignore_global
+	pager =
