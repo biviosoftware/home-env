@@ -141,7 +141,7 @@ gpu() {
 }
 
 gst() {
-    git status "$@"
+    git status -s "$@"
 }
 
 gup() {
