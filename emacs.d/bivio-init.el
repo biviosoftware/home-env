@@ -13,7 +13,9 @@
 (require 'css-mode)
 (require 'shell)
 (require 'mmm-mode)
-(require 'js)
+;;; remove after emacs 23 is gone
+(ignore-errors (require 'js))
+(ignore-errors (require 'espresso))
 (ignore-errors (require 'java-mode))
 
 (global-font-lock-mode t)
