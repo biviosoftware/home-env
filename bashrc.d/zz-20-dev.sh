@@ -17,15 +17,7 @@ if [[ -z $BIVIO_HOST_NAME ]]; then
     export BIVIO_HOST_NAME
 fi
 
-if [[ -z $BIVIO_CFG_DIR ]]; then
-    if [[ -d /cfg ]]; then
-        export BIVIO_CFG_DIR=/cfg
-    elif [[ -d /vagrant ]]; then
-        export BIVIO_CFG_DIR=/vagrant
-    fi
-fi
-
-if type bconf &>/dev/null; then
+if type -f bu &>/dev/null; then
     if [[ -z $BIVIO_DEFAULT_BCONF ]]; then
         for x in Artisans::BConf Bivio::DefaultBConf; do
             if perl -M$x -e 1 &>/dev/null; then
