@@ -101,6 +101,16 @@ fi
 # PyQt4 to be after pip requirements.txt since may contain dependencies
 # in the requirements.txt. There can't be a dependency on PyQt4 so can be last.
 if grep -s -q '# *PyQt4' requirements.txt; then
+    local qmake=
+    for qmake in "$VIRTUAL_ENV/bin/qmake" /usr/lib64/qt4/bin/qmake; do
+        if [[ -x $qmake ]]; then
+            break
+        fi
+    done
+    if [[ ! $qmake ]]; then
+        echo 'qmake not found. Need for PyQt4.' 1>&2
+        return 1
+    fi
     (
         set -e
         build_qt_pkg() {
@@ -121,7 +131,7 @@ if grep -s -q '# *PyQt4' requirements.txt; then
             make install
         }
         build_qt_pkg sip --incdir="$VIRTUAL_ENV/include"
-        build_qt_pkg PyQt4 --confirm-license -q /usr/lib64/qt4/bin/qmake
+        build_qt_pkg PyQt4 --confirm-license -q "$qmake"
     ) || return $?
 fi
 
