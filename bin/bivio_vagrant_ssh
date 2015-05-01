@@ -29,7 +29,8 @@ check_vm_state() {
 }
 
 exec_ssh() {
-    exec $ssh_cmd "$@"
+    local -a cmd=( "${ssh_cmd[@]}" "$@" )
+    "${cmd[@]}"
     echo 'Something went seriously wrong. Try "vagrant ssh" or "vagrant status"' 1>&2
     exit 1
 }
@@ -160,9 +161,11 @@ ssh_cmd=${ssh_cmd#* ssh }
 ssh_cmd="ssh ${ssh_cmd% -t bash -l*}"
 # FATAL outputs nothing on error so switch to ERROR
 ssh_cmd=${ssh_cmd/LogLevel=FATAL/LogLevel=ERROR}
+echo "$ssh_cmd"
+ssh_cmd=$(echo "$ssh_cmd" | perl -p -e 's/(?<=-i )(.+?)(?= -o)/"$1"/')
 
 cat > "$state_file" <<EOF
-ssh_cmd='$ssh_cmd'
+ssh_cmd=(exec $ssh_cmd)
 last_vm_boot='$VMStateChangeTime'
 EOF
 
