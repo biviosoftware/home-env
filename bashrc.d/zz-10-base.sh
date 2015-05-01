@@ -18,6 +18,14 @@ for f in $(compgen -a); do
 done
 unset f
 
+# Undo bivio functions from /etc/bashrc.d
+for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivio_)'); do
+    if [[ $f != bivio_not_src_home_env ]]; then
+        unset -f "$f"
+    fi
+done
+unset f
+
 umask o-rwx
 export LS_COLORS=
 export USER_LS_COLORS=
@@ -85,30 +93,32 @@ if [[ -n $PS1 ]]; then
 fi
 
 if bivio class info Bivio::BConf >& /dev/null; then
-    bconf() {
-        if [[ -r /etc/$1.bconf ]]; then
-            export BCONF="/etc/$1.bconf"
-        else
-            echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
-            return 1
-        fi
-        bivio_ps1 $1
-    }
-
     b() {
         bivio "$@"
     }
 
-    bu() {
-        bivio test unit "${@-.}"
-    }
+    if [[ ~/src/biviosofware/perl-Bivio ]]; then
+        bu() {
+            bivio test unit "${@-.}"
+        }
 
-    ba() {
-        bivio test acceptance "${@-.}"
-    }
+        ba() {
+            bivio test acceptance "${@-.}"
+        }
+    fi
 
     if [[ $EUID == 0 ]]; then
-        function bi {
+        bconf() {
+            if [[ -r /etc/$1.bconf ]]; then
+                export BCONF="/etc/$1.bconf"
+            else
+                echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
+                return 1
+            fi
+            bivio_ps1 $1
+        }
+
+        bi() {
             local p="$1"
             shift
             if [[ -f /etc/$p.bconf ]]; then
