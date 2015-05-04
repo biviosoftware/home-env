@@ -106,6 +106,7 @@ fi
 
 set -e
 echo 'Downloading VirtualBox guest software'
+rm -f "$iso"
 curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
 mount -t iso9660 -o loop,rw "$iso" /mnt
 
@@ -115,6 +116,8 @@ mount -t iso9660 -o loop,rw "$iso" /mnt
 # can't make this that robust. If there is no ~/RadTrack, then we will
 # have a failure anyway.
 sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
+umount /mnt
+rm -f "$iso"
 EOF
     if (( $? != 0 )); then
         err_exit 'Upgrade failed. See output'
