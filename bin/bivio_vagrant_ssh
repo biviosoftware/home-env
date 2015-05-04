@@ -170,6 +170,7 @@ cat > "$state_file" <<EOF
 ssh_cmd=(exec $ssh_cmd)
 last_vm_boot='$VMStateChangeTime'
 EOF
+. "$state_file"
 
 user_msg 'Starting ssh...'
 
