@@ -5,3 +5,5 @@
 [core]
 	excludesfile = <home-dir>/.gitignore_global
 	pager =
+[push]
+        default = simple
