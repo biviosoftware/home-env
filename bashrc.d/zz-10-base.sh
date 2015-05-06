@@ -192,11 +192,11 @@ if [[ -z $CVSROOT ]]; then
 fi
 
 for f in \
-    $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
-    /opt/local/bin \
-    /usr/local/bin \
     /usr/local/cuda/bin \
-    $( [[ $EUID == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin) \
+    $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
+    /usr/local/bin \
+    /opt/local/bin \
+    $( [[ $EUID == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin) \
     ~/bin \
     ; do
     bivio_path_insert "$f"
