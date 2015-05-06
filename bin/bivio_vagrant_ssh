@@ -98,13 +98,19 @@ clean_up() {
 }
 trap clean_up EXIT
 
+set -e
 #TODO(robnagler) Is this robust enough?
 rpms=$(rpm -qa | grep VirtualBox)
 if [[ $rpms ]]; then
     yum remove -y -q $rpms || true
 fi
 
-set -e
+if [[ ! $(type -p tar) ]]; then
+    # VBoxLinuxAdditions.run assumes tar is available.
+    # BTW: You don't get a sensible error when it isn't installed.
+    yum install -y -q tar
+fi
+
 echo 'Downloading VirtualBox guest software'
 rm -f "$iso"
 curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
