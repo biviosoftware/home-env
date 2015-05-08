@@ -160,7 +160,7 @@ i=0
 while ps "$child" &>/dev/null; do
     if (( $i > 5 )); then
         kill -9 "$child"
-        err_exit 'Remote process had to be killed:'  "$ssh_err_file"
+        err_exit 'Remote process had to be killed:' "$ssh_err_file"
     fi
     sleep 1
     i+=1
@@ -172,7 +172,6 @@ ssh_cmd=${ssh_cmd#* ssh }
 ssh_cmd="ssh ${ssh_cmd% -t bash -l*}"
 # FATAL outputs nothing on error so switch to ERROR
 ssh_cmd=${ssh_cmd/LogLevel=FATAL/LogLevel=ERROR}
-echo "$ssh_cmd"
 ssh_cmd=$(echo "$ssh_cmd" | perl -p -e 's/(?<=-i )(.+?)(?= -o)/"$1"/')
 
 cat > "$state_file" <<EOF
