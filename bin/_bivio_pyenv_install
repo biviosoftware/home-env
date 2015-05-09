@@ -15,7 +15,8 @@ fi
 # Reset the environment
 . ~/.bashrc
 
-if [[ Darwin == $(uname) ]]; then
+# 3.x doesn't build with CFLAGS. See https://github.com/yyuu/pyenv/issues/298
+if [[ Darwin == $(uname) && $_bivio_pyenv_global_version =~ ^2\. ]]; then
     local CFLAGS
     export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
 fi

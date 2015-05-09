@@ -92,14 +92,19 @@ _bivio_pyenv_source() {
 }
 
 bivio_pyenv_deactivate() {
-    # so safe to deactivate any time
-    pyenv deactivate || true
+    if [[ $PYENV_ACTIVATE ]]; then
+        # so safe to deactivate any time
+        pyenv deactivate || true
+    fi
     # This needs to be cleared for auto-de/activation to work again
     unset VIRTUAL_ENV
+    # Remove global version
+    rm -f ~/.pyenv/version
 }
 
 bivio_pyenv_global() {
     local _bivio_pyenv_global_version=$1
+    bivio_pyenv_deactivate
     _bivio_pyenv_source _bivio_pyenv_global
 }
 
