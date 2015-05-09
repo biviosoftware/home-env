@@ -6,7 +6,7 @@
 (defvar b-python-copyright-owner "Bivio Software, Inc."
   "*Who owns the copyrights for templates")
 
-(defvar b-python-license "Apache, see LICENSE for more details."
+(defvar b-python-license "http://www.apache.org/licenses/LICENSE-2.0.html"
   "*What license")
 
 (defun b-python-compile-command ()
