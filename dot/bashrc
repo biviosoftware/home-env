@@ -1,5 +1,7 @@
 # -*-sh-*-
 (set -o igncr) &>/dev/null && set -o igncr && export SHELLOPTS # ignore cr
+# Avoid recursion on scripts called from ~/.bashrc
+unset BASH_ENV
 for f in \
     ~/.pre.bashrc \
     /etc/bashrc \
