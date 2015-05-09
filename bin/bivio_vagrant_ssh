@@ -100,7 +100,7 @@ trap clean_up EXIT
 
 set -e
 #TODO(robnagler) Is this robust enough?
-rpms=$(rpm -qa | grep VirtualBox)
+rpms=$(rpm -qa | grep VirtualBox || true)
 if [[ $rpms ]]; then
     yum remove -y -q $rpms || true
 fi
