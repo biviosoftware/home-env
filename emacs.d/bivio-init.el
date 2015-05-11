@@ -336,7 +336,9 @@ From the window at the lower right corner, select the one at the upper left."
  '(mmm-comment-submode-face ((t (:background nil))))
  '(mmm-output-submode-face ((t (:background nil))))
  '(mmm-special-submode-face ((t (:background nil))))
- '(mmm-code-submode-face ((t (:background nil)))))
+ '(mmm-code-submode-face ((t (:background nil))))
+ '(rst-level-1 ((t nil)))
+ )
 
 (if (functionp 'server-force-delete)
     (server-force-delete))
