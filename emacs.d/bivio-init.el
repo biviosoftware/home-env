@@ -320,6 +320,8 @@ From the window at the lower right corner, select the one at the upper left."
  '(font-lock-function-name-face ((t (:foreground "blue"))))
  '(font-lock-variable-name-face ((t (:foreground "blue"))))
  '(font-lock-constant-face ((t (:foreground "cyan"))))
+ '(cperl-hash-face ((t (:foreground "black"))))
+ '(cperl-array-face ((t (:foreground "black"))))
  '(sh-heredoc ((t (:foreground "red"))))
  '(font-lock-string-face ((t (:foreground "red"))))
  '(diff-added-face ((t (:foreground "blue" :weight bold))))
