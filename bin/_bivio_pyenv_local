@@ -71,19 +71,19 @@ if [[ $pkg ]]; then
     pip install "$pkg" || return $?
 fi
 
-# install pybivio always from local copy
-if [[ pybivio != $project && $(grep -s '^pybivio' requirements.txt) ]]; then
-    if [[ ! -d ~/src/biviosoftware/pybivio ]]; then
+# install pykern always from local copy
+if [[ pykern != $project && $(grep -s '^pykern' requirements.txt) ]]; then
+    if [[ ! -d ~/src/radiasoft/pykern ]]; then
         (
             set -e
-            mkdir -p ~/src/biviosoftware >& /dev/null
-            cd ~/src/biviosoftware
-            git clone ${BIVIO_GIT_SERVER-https://github.com}/biviosoftware/pybivio.git
+            mkdir -p ~/src/radiasoft >& /dev/null
+            cd ~/src/radiasoft
+            git clone ${BIVIO_GIT_SERVER-https://github.com}/radiasoft/pykern.git
         ) || return $?
     fi
     (
         set -e
-        cd ~/src/biviosoftware/pybivio
+        cd ~/src/radiasoft/pykern
         bivio_pyenv_deactivate
         pyenv activate "$venv"
         python setup.py develop
