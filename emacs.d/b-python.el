@@ -90,13 +90,13 @@
   "inserts a template for a python module."
   (goto-char (point-min))
   (insert "# -*- coding: utf-8 -*-
-\"\"\"?
+u\"\"\"?
 
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
 \"\"\"
-
 from __future__ import absolute_import, division, print_function, unicode_literals
+from io import open
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
