@@ -70,12 +70,12 @@ need_install() {
         return 1
     fi
     if [[ ! $required ]]; then
-        pkg=$(egrep '^$p' requirements.txt 2>/dev/null || true)
+        pkg=$(egrep "^$p" requirements.txt 2>/dev/null || true)
         if [[ ! $pkg ]]; then
             return 1
         fi
     fi
-    if python -c "import $p"; then
+    if python -c "import $p" 2>/dev/null; then
         return 1
     fi
 }
