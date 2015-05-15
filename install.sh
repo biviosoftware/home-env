@@ -15,7 +15,7 @@ mkdir -p ~/bin
 mkdir -p "$biviosoftware"
 cd "$biviosoftware"
 
-for repo in home-env pybivio \
+for repo in home-env \
     $( [[ $no_perl ]] || echo perl-Bivio javascript-Bivio perl-ProjEx ) \
     ; do
     if [[ -d $repo ]]; then
