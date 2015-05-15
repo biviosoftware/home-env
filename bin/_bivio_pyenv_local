@@ -5,9 +5,8 @@
 #
 # Usage: . $0
 #
-if ! [[ -d .git || -r setup.py || -r requirements.txt ]]; then
-    echo 'No .git, setup.py or requirements.txt in pwd' 1>&2
-    echo 'cd to the project directory' 1>&2
+if ! [[ -r setup.py || -r requirements.txt ]]; then
+    echo 'No setup.py or requirements.txt in current directory' 1>&2
     return 1
 fi
 
@@ -102,7 +101,7 @@ fi
 # in the requirements.txt. There can't be a dependency on PyQt4 so can be last.
 if grep -s -q '# *PyQt4' requirements.txt; then
     local qmake=
-    for qmake in "$VIRTUAL_ENV/bin/qmake" /usr/lib64/qt4/bin/qmake; do
+    for qmake in {$QMAKE-not-found} "$VIRTUAL_ENV/bin/qmake" /usr/lib64/qt4/bin/qmake; do
         if [[ -x $qmake ]]; then
             break
         fi
