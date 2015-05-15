@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Initialize a project directory with a local virtualenv. Take care to install
+# Initialize a python directory with a local virtualenv. Take care to install
 # special packages (see below).
 #
 # Usage: . $0
@@ -17,34 +17,32 @@ if [[ ! $global_env ]]; then
     return 1
 fi
 
-local project_dir=$(pwd)
-local project=$(basename "$project_dir")
-local venv=$(pyenv local 2> /dev/null || true)
+local new_venv=$(basename "$PWD")
+local curr_venv=$(pyenv local 2>/dev/null || true)
 
 # Make sure venv exists
-if [[ $venv ]]; then
-    if ! pyenv activate "$venv" >& /dev/null; then
+if [[ $curr_venv ]]; then
+    if ! pyenv activate "$curr_venv" >& /dev/null; then
         rm -f .python-version
-        venv=
+        curr_venv=
     # If already have a local, make sure it's named corrrectly
-    elif [[ $project != $venv ]]; then
-        echo "project ($project) is not same as virtualenv ($venv)" 1>&2
-        echo "You may want to: pyenv uninstall $venv" 1>&2
+    elif [[ $new_venv != $curr_venv ]]; then
+        echo "directory ($new_venv) is not same as virtualenv ($curr_venv)" 1>&2
+        echo "You may want to: pyenv uninstall $curr_venv" 1>&2
         echo "And then: rm .python-version" 1>&2
         return 1
     fi
 fi
 
 # Create the local virtualenv
-if [[ ! $venv ]]; then
-    venv="$project"
+if [[ ! $curr_venv ]]; then
     (
         set -e
         cd ..
-        pyenv virtualenv "$global_env" "$venv"
+        pyenv virtualenv "$global_env" "$new_venv"
     ) || return $?
     if [[ ! -f requirements.txt ]]; then
-        pyenv local "$venv" || return $?
+        pyenv local "$new_venv" || return $?
     else
         (
             set  -e
@@ -57,25 +55,43 @@ if [[ ! $venv ]]; then
             set -e
             # pyenv will automatically load requirements.txt
             mv requirements.txt "$tmp"
-            pyenv local "$venv"
+            pyenv local "$new_venv"
         ) || return $?
     fi
 fi
 
-pyenv activate "$venv" || return ?
+pyenv activate "$new_venv" || return ?
 
-# install numpy manually, because needs to be installed before scipy
-local pkg=$(egrep '^numpy\W' requirements.txt 2>/dev/null || true)
-if [[ $pkg ]]; then
+local pkg=
+need_install() {
+    local p=$1
+    local required=$2
+    if [[ $p == $new_venv ]]; then
+        return 1
+    fi
+    if [[ ! $required ]]; then
+        pkg=$(egrep '^$p' requirements.txt 2>/dev/null || true)
+        if [[ ! $pkg ]]; then
+            return 1
+        fi
+    fi
+    if python -c "import $p"; then
+        return 1
+    fi
+}
+
+# install numpy manually, because needs to be installed before
+# "pip install -r requirements.txt' if scipy is in requirements.txt
+if need_install numpy; then
     pip install "$pkg" || return $?
 fi
 
 # install pykern always from local copy
-if [[ pykern != $project && $(grep -s '^pykern' requirements.txt) ]]; then
+if need_install pykern; then
     if [[ ! -d ~/src/radiasoft/pykern ]]; then
         (
             set -e
-            mkdir -p ~/src/radiasoft >& /dev/null
+            mkdir -p ~/src/radiasoft
             cd ~/src/radiasoft
             git clone ${BIVIO_GIT_SERVER-https://github.com}/radiasoft/pykern.git
         ) || return $?
@@ -84,24 +100,27 @@ if [[ pykern != $project && $(grep -s '^pykern' requirements.txt) ]]; then
         set -e
         cd ~/src/radiasoft/pykern
         bivio_pyenv_deactivate
-        pyenv activate "$venv"
+        pyenv activate "$new_venv"
         python setup.py develop
     ) || return $?
 fi
 
-# install $project
-pyenv activate "$venv" || return $?
+# install $new_venv or its requirements
+pyenv activate "$new_venv" || return $?
 if [[ -f setup.py ]]; then
     python setup.py develop || return $?
-elif [[ -f requirements.txt ]]; then
+else
+    # Must be here
     pip install -r requirements.txt || return $?
 fi
 
 # PyQt4 to be after pip requirements.txt since may contain dependencies
 # in the requirements.txt. There can't be a dependency on PyQt4 so can be last.
-if grep -s -q '# *PyQt4' requirements.txt; then
+if need_install PyQt4 1; then
+    local qt=
     local qmake=
-    for qmake in {$QMAKE-not-found} "$VIRTUAL_ENV/bin/qmake" /usr/lib64/qt4/bin/qmake; do
+    for qt in "$VIRTUAL_ENV" /usr/local/qt-4.* /opt/local /usr/lib64/qt4; do
+        qmake=$qt/bin/qmake
         if [[ -x $qmake ]]; then
             break
         fi
@@ -125,13 +144,18 @@ if grep -s -q '# *PyQt4' requirements.txt; then
             tar xzf "$tgz"
             rm -f "$tgz"
             cd *
+            # Need to see if static is required
             python configure.py "$@"
             make
             make install
         }
-        build_qt_pkg sip --incdir="$VIRTUAL_ENV/include"
+        if need_install sip 1; then
+            build_qt_pkg sip --incdir="$VIRTUAL_ENV/include"
+        fi
         build_qt_pkg PyQt4 --confirm-license -q "$qmake"
     ) || return $?
+
 fi
 
+# PROMPT_COMMAND will set venv after this command exits
 bivio_pyenv_deactivate
