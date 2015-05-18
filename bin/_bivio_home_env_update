@@ -11,8 +11,8 @@ if [[ ! $force ]]; then
     fi
     # Avoid infinite loops by touching sentinel first
     touch .
-    if [[ $(git ls-files --modified --deleted) ]]; then
-        # Don't update if files are modified
+    if [[ $(git ls-files --modified --deleted 2>/dev/null) ]]; then
+        # Don't update if files unstaged changes
         exit 1
     fi
 fi
