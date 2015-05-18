@@ -1,6 +1,6 @@
 ### User home environment for Bivio development
 
-Install in your home directory:
+To install in your home directory:
 
 ```
 curl -s -L https://raw.githubusercontent.com/biviosoftware/home-env/master/install.sh | bash
