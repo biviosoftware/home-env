@@ -2,8 +2,18 @@ if bivio_not_src_home_env; then
     return
 fi
 
-export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$(perl -e 'printf(q{80%02d}, (`id -u` =~ /(\d+)/)[0] * 2 % 100)')}
+if [[ $PS1 && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
+    echo "Sourcing: ~/.bashrc" 1>&2
+    . ~/.bashrc
+    return
+fi
+
+
+export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$((8000 + $(id -u) * 2 % 100))}
 export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
+
+# Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
+export NODE_TLS_REJECT_UNAUTHORIZED=0
 
 if [[ -z $BIVIO_HOST_NAME ]]; then
     if [[ $HOSTNAME == apa3.bivio.biz ]]; then
@@ -26,7 +36,6 @@ if type -f bu &>/dev/null; then
             fi
         done
     fi
-
     if [[ $BIVIO_DEFAULT_BCONF ]]; then
         eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
 
@@ -147,7 +156,7 @@ gup() {
 }
 
 http() {
-    python2 -m SimpleHTTPServer $BIVIO_HTTPD_PORT
+    python2 -m SimpleHTTPServer "$BIVIO_HTTPD_PORT"
 }
 
 mocha() {
@@ -165,6 +174,3 @@ up() {
 vssh() {
     bivio_vagrant_ssh "$@"
 }
-
-# Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
-export NODE_TLS_REJECT_UNAUTHORIZED=0

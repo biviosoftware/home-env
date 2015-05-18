@@ -19,7 +19,6 @@ for repo in home-env \
     $( [[ $no_perl ]] || echo perl-Bivio javascript-Bivio perl-ProjEx ) \
     ; do
     if [[ -d $repo ]]; then
-	echo "Pulling from existing remote $repo"
         (
             cd "$repo"
             git pull -q

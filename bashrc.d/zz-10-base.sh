@@ -1,5 +1,6 @@
+export BIVIO_SRC_HOME_ENV=~/src/biviosoftware/home-env
 bivio_not_src_home_env() {
-    local d=~/src/biviosoftware/home-env
+    local d=$BIVIO_SRC_HOME_ENV
     if [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]; then
         return 0
     fi

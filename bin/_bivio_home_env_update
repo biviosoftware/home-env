@@ -1,0 +1,23 @@
+#!/bin/bash
+#
+# Update home-env files if out of date
+#
+if perl -e "exit(-M '$BIVIO_SRC_HOME_ENV' > 1 && 1)"; then
+    exit 1
+fi
+# Avoid infinite loops by touching sentinel first
+touch "$BIVIO_SRC_HOME_ENV"
+
+set -e
+cd "$BIVIO_SRC_HOME_ENV"
+if [[ $(git ls-files --modified --deleted) ]]; then
+    # Don't update if files are modified
+    exit 1
+fi
+git pull -q
+if [[ .git/FETCH_HEAD -ot $BIVIO_SRC_HOME_ENV ]]; then
+    exit 1
+fi
+echo "Updating: $BIVIO_SRC_HOME_ENV" 1>&2
+bash install.sh
+exit 0
