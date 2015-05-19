@@ -3,10 +3,12 @@
 # Avoid recursion on scripts called from ~/.bashrc
 unset BASH_ENV
 for f in \
+    ~/.pre_bivio_bashrc \
     ~/.pre.bashrc \
     /etc/bashrc \
     ~/src/*/home-env/bashrc.d/*.sh \
     ~/.post.bashrc \
+    ~/.post_bivio_bashrc \
     ; do
     test -f $f && . $f
 done
