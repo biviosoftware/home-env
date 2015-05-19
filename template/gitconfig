@@ -3,8 +3,8 @@
 	name = <git-user>
 	email = <git-email>
 [core]
-	excludesfile = <home-dir>/.gitignore_global
+	excludesfile = ~/.gitignore_global
 	pager =
-# Set if git 2.x
-#[push]
-#        default = simple
+# If not git 2.x, you may have to comment these out
+[push]
+        default = simple
