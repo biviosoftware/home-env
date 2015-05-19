@@ -5,7 +5,7 @@
 of a rich development environment.
 
 These files are policy rich so that we can all get on with our jobs. That's
-how we do things at Bivio: _agree_and_automate_. If you don't agree,
+how we do things at Bivio: _agree and automate_. If you don't agree,
 don't use this module.
 
 The maintenance of all the files is on GitHub so you can fix anything
