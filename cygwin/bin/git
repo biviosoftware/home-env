@@ -1,0 +1,5 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+$ENV{SHELLOPTS} =~ s{:?igncr}{};
+exec('git.exe', map(m{/cygdrive/(\w)(.*)} ? "$1:$2" : $_, @ARGV));

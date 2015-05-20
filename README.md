@@ -58,9 +58,11 @@ You'll get the latest editions to `home-env` automatically.
 
 #### Cygwin
 
-You need to bring in: emacs, curl, diffutils, and git. Don't install the windows
-git, because it has its own bash, and it doesn't behave nicely with SHELLOPTS or
-/cygdrive/c.
+You need to bring in: emacs and curl.
+
+You need to install the [Windows git](https://git-scm.com/download/win),
+and make sure it is in your system environment path in the control panel.
+There is a ~/bin/git which does "the right thing" to make git work right.
 
 #### pyenv
 
