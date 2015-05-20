@@ -64,6 +64,20 @@ You need to install the [Windows git](https://git-scm.com/download/win),
 and make sure it is in your system environment path in the control panel.
 There is a ~/bin/git which does "the right thing" to make git work right.
 
+You may need to setup an `/etc/passwd`. You'll know this if `~` (tilde) is not expanding to `$HOME`.
+
+For a user "joe", you would do something like:
+
+```bash
+if [[ ! -e /etc/passwd ]]; then
+    getent passwd joe > /etc/passwd
+fi
+perl -pi.bak -e 's{/home/joe}{/cygdrive/c/Users/joe}' /etc/passwd
+```
+
+TODO(robnagler) automate this
+
+
 #### pyenv
 
 There are default `bivio_pyenv_2` and `bivio_pyenv_3` that change the
