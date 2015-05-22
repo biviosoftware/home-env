@@ -1,1 +1,1 @@
-(load-file "~/src/biviosoftware/home-env/dot-emacs")
+(load-file "~/src/biviosoftware/home-env/dot/emacs")

@@ -6,7 +6,7 @@
 biviosoftware=~/src/biviosoftware
 
 is_cygwin=
-if [[ ! $(uname) =~ CYGWIN ]]; then
+if [[ $(uname) =~ CYGWIN ]]; then
     is_cygwin=1
 fi
 
