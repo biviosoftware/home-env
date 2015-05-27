@@ -101,6 +101,7 @@ if need_install pykern; then
         cd ~/src/radiasoft/pykern
         bivio_pyenv_deactivate
         pyenv activate "$new_venv"
+        pip install -r requirements.txt
         python setup.py develop
     ) || return $?
 fi
