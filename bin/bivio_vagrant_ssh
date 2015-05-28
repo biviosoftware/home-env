@@ -144,7 +144,7 @@ user_msg 'Extracting virtual machine ssh command ... (may take a few seconds)'
 vagrant ssh -c 'sleep 2' > $ssh_err_file 2>&1 < /dev/null &
 child=$!
 declare -i i=0
-while (( $i < 6 )); do
+while (( $i < 10 )); do
     ssh_cmd=$(ps axww | grep ' ssh vagrant@.*sleep' | grep -v ' grep ')
     if [[ $ssh_cmd ]]; then
         break
@@ -158,7 +158,7 @@ fi
 
 i=0
 while ps "$child" &>/dev/null; do
-    if (( $i > 5 )); then
+    if (( $i > 10 )); then
         kill -9 "$child"
         err_exit 'Remote process had to be killed:' "$ssh_err_file"
     fi
