@@ -70,7 +70,12 @@ need_install() {
         return 1
     fi
     if [[ ! $required ]]; then
-        pkg=$(egrep "^$p" requirements.txt 2>/dev/null || true)
+        local pat="^$p"
+        if [[ $p == PyQt4 ]]; then
+            # PyQt4 cannot be listed (see discussion below)
+            pat="^#?$p"
+        fi
+        pkg=$(egrep "$pat" requirements.txt 2>/dev/null || true)
         if [[ ! $pkg ]]; then
             return 1
         fi
@@ -117,7 +122,7 @@ fi
 
 # PyQt4 to be after pip requirements.txt since may contain dependencies
 # in the requirements.txt. There can't be a dependency on PyQt4 so can be last.
-if need_install PyQt4 1; then
+if need_install PyQt4; then
     local qt=
     local qmake=
     for qt in "$VIRTUAL_ENV" /usr/local/qt-4.* /opt/local /usr/lib64/qt4; do
