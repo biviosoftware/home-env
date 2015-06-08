@@ -21,5 +21,5 @@ if [[ Darwin == $(uname) && $_bivio_pyenv_global_version =~ ^2\. ]]; then
     export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
 fi
 
-pyenv install "$_bivio_pyenv_global_version"
+PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "$_bivio_pyenv_global_version"
 pyenv global "$_bivio_pyenv_global_version"
