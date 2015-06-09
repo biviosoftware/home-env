@@ -193,6 +193,7 @@ if [[ -z $CVSROOT ]]; then
 fi
 
 for f in \
+    /usr/lib64/openmpi/bin \
     /usr/local/cuda/bin \
     $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
     /usr/local/bin \
