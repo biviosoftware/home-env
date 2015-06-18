@@ -97,7 +97,7 @@ u\"\"\"?
 \"\"\"
 from __future__ import absolute_import, division, print_function, unicode_literals
 from io import open
-from pykern.pkdebug import pkdc, pkdi, pkdp
+from pykern.pkdebug import pkdc, pkdp
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
