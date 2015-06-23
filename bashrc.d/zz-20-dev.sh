@@ -129,6 +129,7 @@ bivio_pyenv_3() {
     bivio_pyenv_global 3.4.2
 }
 
+
 gcl() {
     local r=$1
     if ! [[ $r =~ / ]]; then
@@ -137,8 +138,8 @@ gcl() {
     git clone "https://github.com/$r"
 }
 
-gco() {
-    git commit -am "$@"
+ghead() {
+    git checkout HEAD "$@"
 }
 
 gpu() {
