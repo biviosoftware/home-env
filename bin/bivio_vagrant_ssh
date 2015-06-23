@@ -114,7 +114,7 @@ fi
 echo 'Downloading VirtualBox guest software'
 rm -f "$iso"
 curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
-mount -t iso9660 -o loop,rw "$iso" /mnt
+mount -t iso9660 -o loop "$iso" /mnt
 
 # Returns false even when it succeeds, if the reload fails (next),
 # then the guest additions didn't get added right (or something else
