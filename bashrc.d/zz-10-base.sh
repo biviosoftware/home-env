@@ -32,7 +32,8 @@ export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
 export VAGRANT_NO_COLOR=true
-export LOGNAME=${LOGNAME:-$(logname)}
+export USER=${USER:-$(id -u -n)}
+export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 
 # python pip installs in /tmp, which doesn't work if the package is large
