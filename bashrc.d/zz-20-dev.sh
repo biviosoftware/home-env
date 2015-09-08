@@ -122,11 +122,11 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_2() {
-    bivio_pyenv_global 2.7.8
+    bivio_pyenv_global 2.7.10
 }
 
 bivio_pyenv_3() {
-    bivio_pyenv_global 3.4.2
+    bivio_pyenv_global 3.4.3
 }
 
 
