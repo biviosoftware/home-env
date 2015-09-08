@@ -123,7 +123,7 @@
         (set-process-window-size process (window-height) (window-width))))))
 
 (setq comint-password-prompt-regexp
-      (concat "[pP]assphrase: \\|[pP]assword: \\|"
+      (concat "\\s-[pP]assphrase: \\|\\s-[pP]assword: \\|"
 	      comint-password-prompt-regexp))
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)
