@@ -151,6 +151,14 @@ gst() {
     git status -s "$@"
 }
 
+gtag() {
+    local tag=$1
+    git tag -d "$tag"
+    git push origin :refs/tags/"$tag"
+    git tag "$tag"
+    git push --tags
+}
+
 gup() {
     git pull "$@"
     git fetch --tags
