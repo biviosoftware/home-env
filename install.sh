@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# curl -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
+# curl -s -S -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
 # For development, do this:
 #
 biviosoftware=~/src/biviosoftware
