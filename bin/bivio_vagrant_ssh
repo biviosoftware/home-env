@@ -99,16 +99,26 @@ clean_up() {
 trap clean_up EXIT
 
 set -e
-#TODO(robnagler) Is this robust enough?
-rpms=$(rpm -qa | grep VirtualBox || true)
-if [[ $rpms ]]; then
-    yum remove -y -q $rpms || true
-fi
-
-if [[ ! $(type -p tar) ]]; then
-    # VBoxLinuxAdditions.run assumes tar is available.
-    # BTW: You don't get a sensible error when it isn't installed.
-    yum install -y -q tar
+if [[ $(type -p yum) ]]; then
+    #TODO(robnagler) Is this robust enough?
+    rpms=( $(rpm -qa 2>/dev/null | grep VirtualBox || true) )
+    if [[ $rpms ]]; then
+        yum remove -y -q "${rpms[@]}" || true
+    fi
+    if [[ ! $(type -p tar) ]]; then
+        # VBoxLinuxAdditions.run assumes tar is available.
+        # BTW: You don't get a sensible error when it isn't installed.
+        yum install -y -q tar
+    fi
+elif [[ $(type -p dpkg) ]]; then
+    dpkg=( $(dpkg --get-selections 2>/dev/null \
+        | perl -n -e 'm{^(virtualbox-\S+)\s*install$} && print $1, "\n"' \
+        || true) )
+    if [[ $dpkg ]]; then
+        dpkg --purge "${dpkg[@]}"
+    fi
+else
+    echo "Unknown OS so can't uninstall existing guest software"
 fi
 
 echo 'Downloading VirtualBox guest software'
@@ -119,8 +129,8 @@ mount -t iso9660 -o loop "$iso" /mnt
 # Returns false even when it succeeds, if the reload fails (next),
 # then the guest additions didn't get added right (or something else
 # is wrong). Sometimes this prompts, but if it does, ignore it as we
-# can't make this that robust. If there is no ~/RadTrack, then we will
-# have a failure anyway.
+# can't make this that robust.
+
 sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
 umount /mnt
 rm -f "$iso"
@@ -129,7 +139,9 @@ EOF
         err_exit 'Upgrade failed. See output'
     fi
     user_msg 'Rebooting virtual machine... (may take a few minutes)'
-    vagrant reload
+    vagrant halt
+    $vagrantfile_fixup
+    vagrant up
     check_vm_state
     if [[ ! $is_running ]]; then
         err_exit 'Unable to reload VM (see above)'
