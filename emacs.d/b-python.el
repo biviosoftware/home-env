@@ -90,7 +90,7 @@
   "inserts a template for a python module."
   (goto-char (point-min))
   (insert "# -*- coding: utf-8 -*-
-\"\"\"?
+u\"\"\"?
 
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
