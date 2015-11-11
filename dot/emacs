@@ -1,7 +1,7 @@
 ; -*-emacs-lisp-*-
 (let
     ;; Reversed, because add-to-list inserts in front of list
-  ((dirs '("~/src/biviosoftware/home-env/emacs.d" "~/emacs")))
+  ((dirs '("~/src/biviosoftware/home-env/emacs.d" "~/emacs" "~/.emacs.d/lisp")))
   (dolist (p dirs)
     (add-to-list 'load-path p)))
 (ignore-errors
