@@ -40,8 +40,9 @@ exec_ssh() {
 # Normal case up front so runs the fastest
 check_vm_state
 if [[ $is_running && $ssh_cmd \
-            && $last_vm_boot == $VMStateChangeTime \
-            && $host_version == $guest_version ]]; then
+    && $last_vm_boot == $VMStateChangeTime \
+    && $host_version == $guest_version \
+]]; then
     exec_ssh "$@"
 fi
 
@@ -85,7 +86,7 @@ fi
 if [[ $guest_version != $host_version ]]; then
     user_msg 'VirtualBox guest software needs updating ... (may take tens of minutes)'
     update_script=.vbox-guest-update.sh
-    vagrant ssh -c "dd of='$update_script'; sudo host_version='$host_version' bash '$update_script'" <<'EOF'
+    vagrant ssh -c "dd of='$update_script'; sudo host_version='$host_version' bash '$update_script'" <<'EOF' 2>&1 | tee -a "$ssh_err_file"
 rm -f "${BASH_SOURCE[0]}"
 iso=VBoxGuestAdditions_$host_version.iso
 
@@ -105,11 +106,12 @@ if [[ $(type -p yum) ]]; then
     if [[ $rpms ]]; then
         yum remove -y -q "${rpms[@]}" || true
     fi
-    if [[ ! $(type -p tar) ]]; then
-        # VBoxLinuxAdditions.run assumes tar is available.
-        # BTW: You don't get a sensible error when it isn't installed.
-        yum install -y -q tar
-    fi
+    for f in kernel-devel gcc tar; do
+        if [[ $(rpm -q $f 2>&1) =~ not.installed ]]; then
+            echo "Installing $f"
+            yum install -y -q $f
+        fi
+    done
 elif [[ $(type -p dpkg) ]]; then
     dpkg=( $(dpkg --get-selections 2>/dev/null \
         | perl -n -e 'm{^(virtualbox-\S+)\s*install$} && print $1, "\n"' \
@@ -124,6 +126,7 @@ fi
 echo 'Downloading VirtualBox guest software'
 rm -f "$iso"
 curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
+umount /mnt 2>&1 || true
 mount -t iso9660 -o loop "$iso" /mnt
 
 # Returns false even when it succeeds, if the reload fails (next),
@@ -132,10 +135,17 @@ mount -t iso9660 -o loop "$iso" /mnt
 # can't make this that robust.
 
 sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
-umount /mnt
-rm -f "$iso"
+err=$(egrep  '^make: .* Error [0-9]+$' /var/log/vboxadd-install.log)
+# Vbox video build fails. We'll ignore it here, because either the
+# reload works or it doesn't. The video driver isn't essential.
+# https://forums.virtualbox.org/viewtopic.php?f=3&t=69567
+if [[ $err && ! ( -s /etc/centos-release && $err =~ vboxvideo ) ]]; then
+    tail -50 /var/log/vboxadd-install.log
+    echo 'ERROR: Build failed' 1>&2
+    exit 1
+fi
 EOF
-    if (( $? != 0 )); then
+    if [[ $? != 0 || $(grep '^ERROR' "$ssh_err_file") ]]; then
         err_exit 'Upgrade failed. See output'
     fi
     user_msg 'Rebooting virtual machine... (may take a few minutes)'
@@ -153,7 +163,7 @@ fi
 
 user_msg 'Extracting virtual machine ssh command ... (may take a few seconds)'
 
-vagrant ssh -c 'sleep 2' > $ssh_err_file 2>&1 < /dev/null &
+vagrant ssh -c 'sleep 2' > "$ssh_err_file" 2>&1 < /dev/null &
 child=$!
 declare -i i=0
 while (( $i < 10 )); do
