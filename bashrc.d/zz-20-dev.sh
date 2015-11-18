@@ -18,7 +18,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 if [[ -z $BIVIO_HOST_NAME ]]; then
     if [[ $HOSTNAME == apa3.bivio.biz ]]; then
         BIVIO_HOST_NAME=dev.bivio.biz
-    elif type -p ifconfig &> /dev/null; then
+    elif type -t ifconfig &> /dev/null; then
 	eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
 	if [[ -z $BIVIO_HOST_NAME ]]; then
 	    BIVIO_HOST_NAME=$(hostname)
@@ -27,7 +27,7 @@ if [[ -z $BIVIO_HOST_NAME ]]; then
     export BIVIO_HOST_NAME
 fi
 
-if type -f bu &>/dev/null; then
+if type -t bu &>/dev/null; then
     if [[ -z $BIVIO_DEFAULT_BCONF ]]; then
         for x in Artisans::BConf Bivio::DefaultBConf; do
             if perl -M$x -e 1 &>/dev/null; then
