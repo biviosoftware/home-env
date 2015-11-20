@@ -55,7 +55,7 @@ ssh_err_file=.vagrant/.bivio_vagrant_ssh.log
 
 err_exit() {
     user_msg "$1"
-    if [[ ! -z $ssh_err_file ]]; then
+    if [[ ! -s $ssh_err_file ]]; then
         cat "$ssh_err_file"
     fi
     exit 1
