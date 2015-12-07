@@ -1,7 +1,6 @@
 ; Copyright (c) 2014 bivio Software, Inc.  All rights reserved.
 (provide 'b-python)
 (require 'python)
-(load-library "mmm-rst-python")
 
 (defvar b-python-copyright-owner "Bivio Software, Inc."
   "*Who owns the copyrights for templates")
@@ -113,8 +112,8 @@ from pykern.pkdebug import pkdc, pkdp
 (add-hook 'python-mode-hook
 	  '(lambda ()
 	     (set (make-local-variable 'compile-command)
-		  (b-python-compile-command))
-             (mmm-mode)))
+		  (b-python-compile-command))))
+
 
 (progn
   (define-key python-mode-map "\C-c\C-m" 'compile)
