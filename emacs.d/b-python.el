@@ -27,14 +27,14 @@
 (defun b-python-indent-context-docstring (orig-fun &rest args)
   "Keep indent inside docstrings to non-empty previous line.
 See http://stackoverflow.com/a/32059968/3075806 for explanation."
-  (let ((res (apply orig-fun args)))  ; Get the original result
+  (let ((res (apply orig-fun args)))
     (pcase res
-      (`(:inside-string . ,start)  ; When inside a string
-       `(:inside-string . ,(save-excursion  ; Find a point in previous non-empty line
-                             (beginning-of-line)
-                             (backward-sexp)
+      (`(:inside-string . ,start)
+       `(:inside-string . ,(save-excursion
+                             (re-search-backward "[^[:space:]]")
+                             (back-to-indentation)
                              (point))))
-      (_ res))))  ; Otherwise, return the result as is
+      (_ res))))
 (advice-add 'python-indent-context :around #'b-python-indent-context-docstring)
 
 (defun b-python-file-type nil
