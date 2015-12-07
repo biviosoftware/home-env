@@ -12,7 +12,7 @@
   "Returns a string compile-command."
   (concat
    (cond
-    ((string-equal "pytest" (b-python-file-type)) "py.test ")
+    ((string-equal "pytest" (b-python-file-type)) "pykern pytest ")
     (t "python "))
    (if (buffer-file-name)
        (file-name-nondirectory (buffer-file-name))
@@ -23,6 +23,19 @@
   (format "Copyright (c) %s %s  All Rights Reserved."
 	  (format-time-string "%Y" (current-time))
 	  b-python-copyright-owner))
+
+(defun b-python-indent-context-docstring (orig-fun &rest args)
+  "Keep indent inside docstrings to non-empty previous line.
+See http://stackoverflow.com/a/32059968/3075806 for explanation."
+  (let ((res (apply orig-fun args)))  ; Get the original result
+    (pcase res
+      (`(:inside-string . ,start)  ; When inside a string
+       `(:inside-string . ,(save-excursion  ; Find a point in previous non-empty line
+                             (beginning-of-line)
+                             (backward-sexp)
+                             (point))))
+      (_ res))))  ; Otherwise, return the result as is
+(advice-add 'python-indent-context :around #'b-python-indent-context-docstring)
 
 (defun b-python-file-type nil
   "Returns module or pytest"
@@ -95,7 +108,6 @@ u\"\"\"?
 :license: " b-python-license "
 \"\"\"
 from __future__ import absolute_import, division, print_function
-from pykern.pkdebug import pkdc, pkdp
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
