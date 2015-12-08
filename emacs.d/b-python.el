@@ -31,7 +31,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
     (pcase res
       (`(:inside-string . ,start)
        `(:inside-string . ,(save-excursion
-                             (re-search-backward "[^[:space:]]")
+                             (re-search-backward "[^[:space:]\n]")
                              (back-to-indentation)
                              (point))))
       (_ res))))
