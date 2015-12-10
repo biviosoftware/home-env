@@ -100,16 +100,20 @@ clean_up() {
 trap clean_up EXIT
 
 set -e
-if [[ $(type -p yum) ]]; then
+if [[ $(type -p yum) || $(type -p dnf) ]]; then
+    yum=yum
+    if [[ $(type -p dnf) ]]; then
+        yum=dnf
+    fi
     #TODO(robnagler) Is this robust enough?
     rpms=( $(rpm -qa 2>/dev/null | grep VirtualBox || true) )
     if [[ $rpms ]]; then
-        yum remove -y -q "${rpms[@]}" || true
+        $yum remove -y -q "${rpms[@]}" || true
     fi
     for f in kernel-devel gcc tar; do
         if [[ $(rpm -q $f 2>&1) =~ not.installed ]]; then
             echo "Installing $f"
-            yum install -y -q $f
+            $yum install -y -q $f
         fi
     done
 elif [[ $(type -p dpkg) ]]; then
