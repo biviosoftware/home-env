@@ -107,7 +107,7 @@
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
-(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
 (add-hook 'find-file-hook
 	  (lambda ()
