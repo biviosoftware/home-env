@@ -35,7 +35,8 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
                              (back-to-indentation)
                              (point))))
       (_ res))))
-(advice-add 'python-indent-context :around #'b-python-indent-context-docstring)
+(if (boundp 'advice-add)
+    (advice-add 'python-indent-context :around #'b-python-indent-context-docstring))
 
 (defun b-python-file-type nil
   "Returns module or pytest"
