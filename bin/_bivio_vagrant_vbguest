@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# host_version=x.y.z _bivio_vagrant_vbguest
+#
+iso=VBoxGuestAdditions_$host_version.iso
+
+clean_up() {
+    set +e
+    trap - EXIT
+    cd
+    umount /mnt &> /dev/null
+    rm -f "$iso"
+}
+trap clean_up EXIT
+
+set -e
+if [[ $(type -p yum) || $(type -p dnf) ]]; then
+    yum=yum
+    if [[ $(type -p dnf) ]]; then
+        yum=dnf
+    fi
+    #TODO(robnagler) Is this robust enough?
+    rpms=( $(rpm -qa 2>/dev/null | grep VirtualBox || true) )
+    if [[ $rpms ]]; then
+        $yum remove -y -q "${rpms[@]}" || true
+    fi
+    for f in kernel-devel gcc tar; do
+        if [[ $(rpm -q $f 2>&1) =~ not.installed ]]; then
+            echo "Installing $f"
+            $yum install -y -q $f
+        fi
+    done
+elif [[ $(type -p dpkg) ]]; then
+    dpkg=( $(dpkg --get-selections 2>/dev/null \
+        | perl -n -e 'm{^(virtualbox-\S+)\s*install$} && print $1, "\n"' \
+        || true) )
+    if [[ $dpkg ]]; then
+        dpkg --purge "${dpkg[@]}"
+    fi
+else
+    echo "Unknown OS so can't uninstall existing guest software"
+fi
+
+echo 'Downloading VirtualBox guest software'
+rm -f "$iso"
+curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
+umount /mnt 2>&1 || true
+mount -t iso9660 -o loop "$iso" /mnt
+
+# Returns false even when it succeeds, if the reload fails (next),
+# then the guest additions didn't get added right (or something else
+# is wrong). Sometimes this prompts, but if it does, ignore it as we
+# can't make this that robust.
+
+sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
+err=$(egrep  '^make: .* Error [0-9]+$' /var/log/vboxadd-install.log)
+# Vbox video build fails. We'll ignore it here, because either the
+# reload works or it doesn't. The video driver isn't essential.
+# https://forums.virtualbox.org/viewtopic.php?f=3&t=69567
+if [[ $err && ! ( -s /etc/centos-release && $err =~ vboxvideo ) ]]; then
+    tail -50 /var/log/vboxadd-install.log
+    echo 'ERROR: Build failed' 1>&2
+    exit 1
+fi
