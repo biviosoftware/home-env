@@ -109,6 +109,8 @@
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
+(defvar bivio-delete-trailing-whitespace t)
+; (setq bivio-delete-trailing-whitespace nil)
 (add-hook 'find-file-hook
 	  (lambda ()
             (let ((case-fold-search t))
