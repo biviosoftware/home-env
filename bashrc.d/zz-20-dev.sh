@@ -138,6 +138,10 @@ gcl() {
     git clone "https://github.com/$r"
 }
 
+gchmod() {
+    git update-index --chmod=+x "$@"
+}
+
 ghead() {
     git checkout HEAD "$@"
 }
