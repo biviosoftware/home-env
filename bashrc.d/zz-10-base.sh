@@ -27,7 +27,7 @@ for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivi
 done
 unset f
 
-umask o-rwx
+umask g-w,o-rwx
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
