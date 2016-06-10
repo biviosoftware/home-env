@@ -138,7 +138,7 @@ fi
 g() {
     local x="$1"
     shift
-    grep -Ir --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+    grep -iIr --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
