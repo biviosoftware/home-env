@@ -133,9 +133,12 @@ bivio_pyenv_3() {
 gcl() {
     local r=$1
     if ! [[ $r =~ / ]]; then
-	r="$(basename $(pwd))/$r"
+	r=$(basename "$(pwd)")/$r
     fi
-    git clone "https://github.com/$r"
+    if ! [[ $r =~ :// ]]; then
+        r=https://github.com/$r
+    fi
+    git clone "$r"
 }
 
 gchmod() {
