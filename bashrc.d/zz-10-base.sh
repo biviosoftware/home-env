@@ -27,7 +27,7 @@ for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivi
 done
 unset f
 
-umask o-rwx
+umask g-w,o-rwx
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
@@ -246,9 +246,8 @@ if [[ -f ~/.ssh/ssh_agent ]]; then
 fi
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
-    export PAGER=cat
-    export EDITOR=$(type -p emacsclient)
-    export NODE_NO_READLINE=1
+    # It's probably dumb, but force to be sure
+    export TERM=dumb
 
     dirs() {
         echo "$DIRSTACK"
@@ -260,9 +259,16 @@ if [[ $INSIDE_EMACS =~ comint ]]; then
 else
     export PAGER=$(type -p less)
     export EDITOR=$(type -p emacs)
+
     e() {
         emacs "$@"
     }
+fi
+if [[ $TERM == dumb ]]; then
+    export EDITOR=$(type -p emacsclient)
+    export NODE_NO_READLINE=1
+    export PAGER=cat
+    export SYSTEMD_COLOR=0
 fi
 
 which() {
