@@ -41,7 +41,7 @@ exec_ssh() {
 check_vm_state
 if [[ $is_running && $ssh_cmd \
     && $last_vm_boot == $VMStateChangeTime \
-    && $host_version == $guest_version \
+    && ( $host_version == $guest_version || -n $vbguest_plugin_warning ) \
 ]]; then
     exec_ssh "$@"
 fi
@@ -83,86 +83,17 @@ if [[ ! $is_running ]]; then
     fi
 fi
 
-if [[ $guest_version != $host_version ]]; then
-    user_msg 'VirtualBox guest software needs updating ... (may take tens of minutes)'
-    update_script=.vbox-guest-update.sh
-    vagrant ssh -c "dd of='$update_script'; sudo host_version='$host_version' bash '$update_script'" <<'EOF' 2>&1 | tee -a "$ssh_err_file"
-rm -f "${BASH_SOURCE[0]}"
-iso=VBoxGuestAdditions_$host_version.iso
+if [[ $guest_version != $host_version && -z $vbguest_plugin_warning ]]; then
+    vbguest_plugin_warning=1
+    user_msg 'VirtualBox guest software is out of date; try installing:
 
-clean_up() {
-    set +e
-    trap - EXIT
-    cd
-    umount /mnt &> /dev/null
-    rm -f "$iso"
-}
-trap clean_up EXIT
+  vagrant plugin install vagrant-vbguest
 
-set -e
-if [[ $(type -p yum) || $(type -p dnf) ]]; then
-    yum=yum
-    if [[ $(type -p dnf) ]]; then
-        yum=dnf
-    fi
-    #TODO(robnagler) Is this robust enough?
-    rpms=( $(rpm -qa 2>/dev/null | grep VirtualBox || true) )
-    if [[ $rpms ]]; then
-        $yum remove -y -q "${rpms[@]}" || true
-    fi
-    for f in kernel-devel gcc tar; do
-        if [[ $(rpm -q $f 2>&1) =~ not.installed ]]; then
-            echo "Installing $f"
-            $yum install -y -q $f
-        fi
-    done
-elif [[ $(type -p dpkg) ]]; then
-    dpkg=( $(dpkg --get-selections 2>/dev/null \
-        | perl -n -e 'm{^(virtualbox-\S+)\s*install$} && print $1, "\n"' \
-        || true) )
-    if [[ $dpkg ]]; then
-        dpkg --purge "${dpkg[@]}"
-    fi
-else
-    echo "Unknown OS so can't uninstall existing guest software"
-fi
+or update your Vagrantfile:
 
-echo 'Downloading VirtualBox guest software'
-rm -f "$iso"
-curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
-umount /mnt 2>&1 || true
-mount -t iso9660 -o loop "$iso" /mnt
-
-# Returns false even when it succeeds, if the reload fails (next),
-# then the guest additions didn't get added right (or something else
-# is wrong). Sometimes this prompts, but if it does, ignore it as we
-# can't make this that robust.
-
-sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
-err=$(egrep  '^make: .* Error [0-9]+$' /var/log/vboxadd-install.log)
-# Vbox video build fails. We'll ignore it here, because either the
-# reload works or it doesn't. The video driver isn't essential.
-# https://forums.virtualbox.org/viewtopic.php?f=3&t=69567
-if [[ $err && ! ( -s /etc/centos-release && $err =~ vboxvideo ) ]]; then
-    tail -50 /var/log/vboxadd-install.log
-    echo 'ERROR: Build failed' 1>&2
-    exit 1
-fi
-EOF
-    if [[ $? != 0 || $(grep '^ERROR' "$ssh_err_file") ]]; then
-        err_exit 'Upgrade failed. See output'
-    fi
-    user_msg 'Rebooting virtual machine... (may take a few minutes)'
-    vagrant halt
-    $vagrantfile_fixup
-    vagrant up
-    check_vm_state
-    if [[ ! $is_running ]]; then
-        err_exit 'Unable to reload VM (see above)'
-    fi
-    if [[ $guest_version != $host_version ]]; then
-        err_exit 'Unable to update VirtualBox guest software.'
-    fi
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox", disabled: true
+  config.vbguest.auto_update = false
+'
 fi
 
 user_msg 'Extracting virtual machine ssh command ... (may take a few seconds)'
@@ -203,6 +134,7 @@ ssh_cmd=$(echo "$ssh_cmd" | perl -p -e 's/(?<=-i )(.+?)(?= -o)/"$1"/')
 cat > "$state_file" <<EOF
 ssh_cmd=(exec $ssh_cmd)
 last_vm_boot='$VMStateChangeTime'
+vbguest_plugin_warning=$vbguest_plugin_warning
 EOF
 . "$state_file"
 
