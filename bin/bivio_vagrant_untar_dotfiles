@@ -4,7 +4,7 @@
 #
 main() {
     echo Installing: /vagrant/dotfiles.tar
-    tar xf /vagrant/dotfiles.tar -C ~
+    tar xpf /vagrant/dotfiles.tar -C ~
     chmod 700 ~/.ssh
 }
 
