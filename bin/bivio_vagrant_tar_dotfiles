@@ -28,4 +28,4 @@ main() {
     echo Created: /vagrant/dotfiles.tar
 }
 
-main()
+main
