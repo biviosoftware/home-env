@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+# Untar files
+#
+main() {
+    echo Installing: /vagrant/dotfiles.tar
+    tar xf - -C ~ /vagrant/dotfiles.tar
+    chmod 700 ~/.ssh
+}
+
+main()
