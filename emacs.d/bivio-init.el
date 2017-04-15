@@ -14,7 +14,7 @@
 (require 'shell)
 (require 'mmm-mode)
 ;;; remove after emacs 23 is gone
-(ignore-errors (require 'js))
+(ignore-errors (require 'web-mode))
 (ignore-errors (require 'espresso))
 (ignore-errors (require 'java-mode))
 
@@ -92,18 +92,17 @@
 
 (define-key java-mode-map "\C-c\C-m" 'compile)
 
-(add-hook 'js-mode
-	  '(lambda ()
-	     (setq js-indent-level 2)
-	     (setq js-expr-indent-offset 0)
-	     (define-key js-mode-map "\C-c\C-m" 'compile)
-	     (set (make-local-variable 'compile-command)
-		  (setq compile-command
-			(concat
-			 (if (string-match-p "/test/" (buffer-file-name))
-			     "mocha "
-			     "node ")
-			 (file-name-nondirectory buffer-file-name))))))
+(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . web-mode))
+
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
@@ -355,6 +354,10 @@ From the window at the lower right corner, select the one at the upper left."
  '(mmm-output-submode-face ((t (:background nil))))
  '(mmm-special-submode-face ((t (:background nil))))
  '(mmm-code-submode-face ((t (:background nil))))
+ '(web-mode-html-tag-face ((t (:foreground "blue"))))
+ '(web-mode-html-tag-bracket-face ((t (:foreground "blue"))))
+ '(web-mode-html-attr-name-face ((t (:foreground "cyan"))))
+ '(web-mode-html-attr-value-face ((t (:foreground "violet"))))
  '(rst-level-1 ((t nil)))
  )
 
