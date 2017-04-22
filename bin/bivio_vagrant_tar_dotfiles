@@ -1,0 +1,31 @@
+#!/bin/bash
+#
+# Tar up dot files
+#
+main() {
+    local f
+    local -a dotfiles
+    for f in \
+        .asciinema \
+        .aws \
+        .docker \
+        .emacs.d/lisp \
+        .gitconfig \
+        .gnupg \
+        .hgrc \
+        .netrc \
+        .pypirc \
+        .ssh/id_rsa \
+        .ssh/id_rsa.pub \
+        .{post,pre}_bivio_bashrc \
+        bconf.d \
+    ; do
+        if [[ -r ~/$f ]]; then
+            dotfiles+=( $f )
+        fi
+    done
+    tar cf - -C ~ "${dotfiles[@]}" > /vagrant/dotfiles.tar
+    echo Created: /vagrant/dotfiles.tar
+}
+
+main

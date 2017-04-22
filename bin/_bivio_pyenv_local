@@ -70,7 +70,7 @@ need_install() {
         return 1
     fi
     if [[ ! $required ]]; then
-        local pat="^$p"
+        local pat="^$p|/$p.git"
         if [[ $p == PyQt4 ]]; then
             # PyQt4 cannot be listed (see discussion below)
             pat="^#?$p"
@@ -153,6 +153,10 @@ if need_install PyQt4; then
             # Need to see if static is required
             python configure.py "$@"
             make
+            # You will see this, which apparently doesn't matter:
+            # install: cannot create regular file
+            #   ‘/usr/lib64/qt4/plugins/designer/libpyqt4.so’: Permission denied
+            # make[1]: [install_target] Error 1 (ignored)
             make install
         }
         if need_install sip 1; then

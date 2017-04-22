@@ -5,7 +5,7 @@
 #
 if [[ ! -d ~/.pyenv ]]; then
     bivio_path_insert ~/.pyenv/bin 1
-    curl -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+    curl -s -S -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
     # Newer versions of patch do not like relative file names. Give this warning:
     # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
     # Updating the patches this way fixes the problem
@@ -21,5 +21,5 @@ if [[ Darwin == $(uname) && $_bivio_pyenv_global_version =~ ^2\. ]]; then
     export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
 fi
 
-pyenv install "$_bivio_pyenv_global_version"
+PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "$_bivio_pyenv_global_version"
 pyenv global "$_bivio_pyenv_global_version"

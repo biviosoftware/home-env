@@ -23,12 +23,21 @@ time for detailed documentation now.
 
 To install in your home directory:
 
-```
+```sh
 curl -s -L https://raw.githubusercontent.com/biviosoftware/home-env/master/install.sh | bash
 ```
 
 After installing, your old dot-files will me moved to `*.old`, and minimalistic
 dot-files will be linked to `~/src/biviosoftware/home-env`.
+
+If you plan on developing with [Bivio's Perl platform](https://github.com/biviosoftware/perl-Bivio),
+you should export `want_perl=`, e.g.
+
+```sh
+curl -s -L https://raw.githubusercontent.com/biviosoftware/home-env/master/install.sh | want_perl=1 bash
+```
+
+Perl is not necessary to use Bivio's home environment.
 
 #### Customizing
 

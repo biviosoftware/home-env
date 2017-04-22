@@ -18,7 +18,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0
 if [[ -z $BIVIO_HOST_NAME ]]; then
     if [[ $HOSTNAME == apa3.bivio.biz ]]; then
         BIVIO_HOST_NAME=dev.bivio.biz
-    elif type -p ifconfig &> /dev/null; then
+    elif type -t ifconfig &> /dev/null; then
 	eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
 	if [[ -z $BIVIO_HOST_NAME ]]; then
 	    BIVIO_HOST_NAME=$(hostname)
@@ -27,7 +27,7 @@ if [[ -z $BIVIO_HOST_NAME ]]; then
     export BIVIO_HOST_NAME
 fi
 
-if type -f bu &>/dev/null; then
+if type -t bu &>/dev/null; then
     if [[ -z $BIVIO_DEFAULT_BCONF ]]; then
         for x in Artisans::BConf Bivio::DefaultBConf; do
             if perl -M$x -e 1 &>/dev/null; then
@@ -122,23 +122,30 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_2() {
-    bivio_pyenv_global 2.7.8
+    bivio_pyenv_global 2.7.10
 }
 
 bivio_pyenv_3() {
-    bivio_pyenv_global 3.4.2
+    bivio_pyenv_global 3.4.3
 }
 
 gcl() {
     local r=$1
     if ! [[ $r =~ / ]]; then
-	r="$(basename $(pwd))/$r"
+	r=$(basename "$(pwd)")/$r
     fi
-    git clone "https://github.com/$r"
+    if ! [[ $r =~ ^[a-z]+:/ ]]; then
+        r=https://github.com/$r
+    fi
+    git clone "$r"
 }
 
-gco() {
-    git commit -am "$@"
+gchmod() {
+    git update-index --chmod=+x "$@"
+}
+
+ghead() {
+    git checkout HEAD "$@"
 }
 
 gpu() {
@@ -148,6 +155,14 @@ gpu() {
 
 gst() {
     git status -s "$@"
+}
+
+gtag() {
+    local tag=$1
+    git tag -d "$tag"
+    git push origin :refs/tags/"$tag"
+    git tag "$tag"
+    git push --tags
 }
 
 gup() {

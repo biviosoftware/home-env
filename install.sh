@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# curl -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
+# curl -s -S -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
 # For development, do this:
 #
 biviosoftware=~/src/biviosoftware
@@ -16,7 +16,7 @@ mkdir -p "$biviosoftware"
 cd "$biviosoftware"
 
 for repo in home-env \
-    $( [[ $no_perl ]] || echo perl-Bivio javascript-Bivio perl-ProjEx ) \
+    $( [[ $want_perl ]] && echo perl-Bivio javascript-Bivio perl-ProjEx ) \
     ; do
     if [[ -d $repo ]]; then
         (
@@ -36,7 +36,7 @@ for f in ~/.??* ~/bin/*; do
     fi
 done
 
-if [[ ! $no_perl ]]; then
+if [[ $want_perl ]]; then
     mkdir -p ../perl
 
     for perl in Bivio ProjEx; do

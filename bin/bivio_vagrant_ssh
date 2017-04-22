@@ -40,8 +40,9 @@ exec_ssh() {
 # Normal case up front so runs the fastest
 check_vm_state
 if [[ $is_running && $ssh_cmd \
-            && $last_vm_boot == $VMStateChangeTime \
-            && $host_version == $guest_version ]]; then
+    && $last_vm_boot == $VMStateChangeTime \
+    && ( $host_version == $guest_version || -n $vbguest_plugin_warning ) \
+]]; then
     exec_ssh "$@"
 fi
 
@@ -54,7 +55,7 @@ ssh_err_file=.vagrant/.bivio_vagrant_ssh.log
 
 err_exit() {
     user_msg "$1"
-    if [[ ! -z $ssh_err_file ]]; then
+    if [[ ! -s $ssh_err_file ]]; then
         cat "$ssh_err_file"
     fi
     exit 1
@@ -82,66 +83,22 @@ if [[ ! $is_running ]]; then
     fi
 fi
 
-if [[ $guest_version != $host_version ]]; then
-    user_msg 'VirtualBox guest software needs updating ... (may take tens of minutes)'
-    update_script=.vbox-guest-update.sh
-    vagrant ssh -c "dd of='$update_script'; sudo host_version='$host_version' bash '$update_script'" <<'EOF'
-rm -f "${BASH_SOURCE[0]}"
-iso=VBoxGuestAdditions_$host_version.iso
+if [[ $guest_version != $host_version && -z $vbguest_plugin_warning ]]; then
+    vbguest_plugin_warning=1
+    user_msg 'VirtualBox guest software is out of date; try installing:
 
-clean_up() {
-    set +e
-    trap - EXIT
-    cd
-    umount /mnt &> /dev/null
-    rm -f "$iso"
-}
-trap clean_up EXIT
+  vagrant plugin install vagrant-vbguest
 
-set -e
-#TODO(robnagler) Is this robust enough?
-rpms=$(rpm -qa | grep VirtualBox || true)
-if [[ $rpms ]]; then
-    yum remove -y -q $rpms || true
-fi
+or update your Vagrantfile:
 
-if [[ ! $(type -p tar) ]]; then
-    # VBoxLinuxAdditions.run assumes tar is available.
-    # BTW: You don't get a sensible error when it isn't installed.
-    yum install -y -q tar
-fi
-
-echo 'Downloading VirtualBox guest software'
-rm -f "$iso"
-curl --progress-bar -L -O "http://download.virtualbox.org/virtualbox/$host_version/$iso"
-mount -t iso9660 -o loop,rw "$iso" /mnt
-
-# Returns false even when it succeeds, if the reload fails (next),
-# then the guest additions didn't get added right (or something else
-# is wrong). Sometimes this prompts, but if it does, ignore it as we
-# can't make this that robust. If there is no ~/RadTrack, then we will
-# have a failure anyway.
-sh /mnt/VBoxLinuxAdditions.run < /dev/null || true
-umount /mnt
-rm -f "$iso"
-EOF
-    if (( $? != 0 )); then
-        err_exit 'Upgrade failed. See output'
-    fi
-    user_msg 'Rebooting virtual machine... (may take a few minutes)'
-    vagrant reload
-    check_vm_state
-    if [[ ! $is_running ]]; then
-        err_exit 'Unable to reload VM (see above)'
-    fi
-    if [[ $guest_version != $host_version ]]; then
-        err_exit 'Unable to update VirtualBox guest software.'
-    fi
+  config.vm.synced_folder ".", "/vagrant", type: "virtualbox", disabled: true
+  config.vbguest.auto_update = false
+'
 fi
 
 user_msg 'Extracting virtual machine ssh command ... (may take a few seconds)'
 
-vagrant ssh -c 'sleep 2' > $ssh_err_file 2>&1 < /dev/null &
+vagrant ssh -c 'sleep 2' > "$ssh_err_file" 2>&1 < /dev/null &
 child=$!
 declare -i i=0
 while (( $i < 10 )); do
@@ -177,6 +134,7 @@ ssh_cmd=$(echo "$ssh_cmd" | perl -p -e 's/(?<=-i )(.+?)(?= -o)/"$1"/')
 cat > "$state_file" <<EOF
 ssh_cmd=(exec $ssh_cmd)
 last_vm_boot='$VMStateChangeTime'
+vbguest_plugin_warning=$vbguest_plugin_warning
 EOF
 . "$state_file"
 

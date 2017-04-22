@@ -53,6 +53,16 @@
 (if (fboundp 'menu-bar-mode)
     (menu-bar-mode -1))
 
+;;; Hack to check if running in vagrant, and need to add "redraw"
+;;; See: http://emacs.stackexchange.com/questions/9512/why-does-the-buffer-get-garbled
+(if (and
+     (file-accessible-directory-p "/vagrant")
+     (not (string-match-p
+           "^1\n"
+           (ignore-errors
+             (shell-command-to-string "grep -c '^core id[[:space:]]*:' /proc/cpuinfo")))))
+    (add-hook 'isearch-update-post-hook 'redraw-display))
+
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
 (if (file-readable-p "/bin/bash")
@@ -97,8 +107,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
-(add-to-list 'auto-mode-alist '("\\.yml$" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
+(defvar bivio-delete-trailing-whitespace t)
+; (setq bivio-delete-trailing-whitespace nil)
 (add-hook 'find-file-hook
 	  (lambda ()
             (let ((case-fold-search t))
@@ -123,7 +135,7 @@
         (set-process-window-size process (window-height) (window-width))))))
 
 (setq comint-password-prompt-regexp
-      (concat "[pP]assphrase: \\|[pP]assword: \\|"
+      (concat "\\s-[pP]assphrase: \\|\\s-[pP]assword: \\|"
 	      comint-password-prompt-regexp))
 (add-hook 'comint-output-filter-functions
 	  'comint-watch-for-password-prompt)

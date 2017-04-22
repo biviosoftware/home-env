@@ -1,7 +1,6 @@
 ; Copyright (c) 2014 bivio Software, Inc.  All rights reserved.
 (provide 'b-python)
 (require 'python)
-(load-library "mmm-rst-python")
 
 (defvar b-python-copyright-owner "Bivio Software, Inc."
   "*Who owns the copyrights for templates")
@@ -24,6 +23,20 @@
   (format "Copyright (c) %s %s  All Rights Reserved."
 	  (format-time-string "%Y" (current-time))
 	  b-python-copyright-owner))
+
+(defun b-python-indent-context-docstring (orig-fun &rest args)
+  "Keep indent inside docstrings to non-empty previous line.
+See http://stackoverflow.com/a/32059968/3075806 for explanation."
+  (let ((res (apply orig-fun args)))
+    (pcase res
+      (`(:inside-string . ,start)
+       `(:inside-string . ,(save-excursion
+                             (re-search-backward "[^[:space:]\n]")
+                             (back-to-indentation)
+                             (point))))
+      (_ res))))
+(if (boundp 'advice-add)
+    (advice-add 'python-indent-context :around #'b-python-indent-context-docstring))
 
 (defun b-python-file-type nil
   "Returns module or pytest"
@@ -95,8 +108,7 @@ u\"\"\"?
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
 \"\"\"
-from __future__ import absolute_import, division, print_function, unicode_literals
-from io import open
+from __future__ import absolute_import, division, print_function
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
@@ -113,8 +125,8 @@ from io import open
 (add-hook 'python-mode-hook
 	  '(lambda ()
 	     (set (make-local-variable 'compile-command)
-		  (b-python-compile-command))
-             (mmm-mode)))
+		  (b-python-compile-command))))
+
 
 (progn
   (define-key python-mode-map "\C-c\C-m" 'compile)

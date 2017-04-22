@@ -27,12 +27,13 @@ for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivi
 done
 unset f
 
-umask o-rwx
+umask g-w,o-rwx
 export LS_COLORS=
 export USER_LS_COLORS=
 export PROMPT_COMMAND=
 export VAGRANT_NO_COLOR=true
-export LOGNAME=${LOGNAME:-$(logname)}
+export USER=${USER:-$(id -u -n)}
+export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 
 # python pip installs in /tmp, which doesn't work if the package is large
@@ -137,7 +138,7 @@ fi
 g() {
     local x="$1"
     shift
-    grep -Ir --exclude='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+    grep -iIr --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
@@ -193,6 +194,7 @@ if [[ -z $CVSROOT ]]; then
 fi
 
 for f in \
+    /usr/lib64/openmpi/bin \
     /usr/local/cuda/bin \
     $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
     /usr/local/bin \
@@ -244,9 +246,8 @@ if [[ -f ~/.ssh/ssh_agent ]]; then
 fi
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
-    export PAGER=cat
-    export EDITOR=$(type -p emacsclient)
-    export NODE_NO_READLINE=1
+    # It's probably dumb, but force to be sure
+    export TERM=dumb
 
     dirs() {
         echo "$DIRSTACK"
@@ -258,9 +259,16 @@ if [[ $INSIDE_EMACS =~ comint ]]; then
 else
     export PAGER=$(type -p less)
     export EDITOR=$(type -p emacs)
+
     e() {
         emacs "$@"
     }
+fi
+if [[ $TERM == dumb ]]; then
+    export EDITOR=$(type -p emacsclient)
+    export NODE_NO_READLINE=1
+    export PAGER=cat
+    export SYSTEMD_COLOR=0
 fi
 
 which() {
