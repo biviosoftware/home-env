@@ -320,6 +320,10 @@ From the window at the lower right corner, select the one at the upper left."
  ;; '(font-lock-type-face ((t (:foreground "cyan"))))
  ;; '(font-lock-variable-name-face ((t (:foreground "green"))))
 
+;; Allow rpm spec *.include files to set rpm
+(custom-set-variables
+ '(safe-local-variable-values (quote ((eval sh-set-shell "rpm" nil nil)))))
+
 (custom-set-faces
  ;;; (what-cursor-position) \C-u \C-x = verbose details about face under cursor
  ;;; (list-colors-display)  colors available to emacs
