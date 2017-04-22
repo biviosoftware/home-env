@@ -1,7 +1,0 @@
-machine github.com
-login USERID
-password PASSWORD
-
-machine gist.github.com
-login USERID
-password PASSWORD

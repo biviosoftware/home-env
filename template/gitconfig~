@@ -1,6 +1,0 @@
-[user]
-	name = USERID
-	email = GITHUBEMAIL
-[core]
-	excludesfile = /Users/nagler/.gitignore_global
-	pager =
