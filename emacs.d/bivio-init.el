@@ -25,24 +25,26 @@
 (put 'eval-expression 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (setq
- next-line-add-newlines nil
- case-replace t
  case-fold-search t
- visible-bell t
- highlight-nonselected-windows nil
- term-term-name "eterm"
- ring-bell-function 'ignore
- truncate-partial-width-windows nil
+ case-replace t
+ completion-auto-help 'lazy
  completion-ignore-case t
- read-file-name-completion-ignore-case t
- read-buffer-completion-ignore-case t
- large-file-warning-threshold 100000000
- history-delete-duplicates t
- indent-line-function 'indent-relative-maybe
+ dabbrev-abbrev-char-regexp "\\sw\\|\\s_"
  dabbrev-case-fold-search t
  dabbrev-case-replace nil
- dabbrev-abbrev-char-regexp "\\sw\\|\\s_"
  font-lock-maximum-decoration t
+ highlight-nonselected-windows nil
+ history-delete-duplicates t
+ indent-line-function 'indent-relative-maybe
+ large-file-warning-threshold 100000000
+ next-line-add-newlines nil
+ pcomplete-ignore-case t
+ read-buffer-completion-ignore-case t
+ read-file-name-completion-ignore-case t
+ ring-bell-function 'ignore
+ term-term-name "eterm"
+ truncate-partial-width-windows nil
+ visible-bell t
  )
 (blink-cursor-mode -1)
 (set-cursor-color "red")
@@ -92,16 +94,22 @@
 
 (define-key java-mode-map "\C-c\C-m" 'compile)
 
-(add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.tsx?\\'" . web-mode))
+(if (fboundp 'web-mode)
+    (progn
+      (setq web-mode-code-indent-offset 4)
+      (setq web-mode-css-indent-offset 4)
+      (setq web-mode-markup-indent-offset 4)
+      (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . web-mode))
+      (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))))
 
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
