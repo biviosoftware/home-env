@@ -206,6 +206,10 @@ for f in \
 done
 unset f
 
+if [[ -d /usr/lib64/openmpi/lib ]]; then
+    export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+fi
+
 if [[ $EUID == 0 || $USER == cvs ]]; then
     export CVSREAD=true
 fi
