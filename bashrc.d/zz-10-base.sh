@@ -204,11 +204,12 @@ for f in \
     ; do
     bivio_path_insert "$f"
 done
-unset f
 
-if [[ -d /usr/lib64/openmpi/lib ]]; then
-    export LD_LIBRARY_PATH=/usr/lib64/openmpi/lib${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+f=/usr/lib64/openmpi/lib
+if [[ -d $f && ! ( :$LD_LIBRARY_PATH: =~ :$f: ) ]]; then
+    export LD_LIBRARY_PATH=$f${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
+unset f
 
 if [[ $EUID == 0 || $USER == cvs ]]; then
     export CVSREAD=true
