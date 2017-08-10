@@ -99,7 +99,7 @@ if bivio class info Bivio::BConf >& /dev/null; then
         bivio "$@"
     }
 
-    if [[ ~/src/biviosofware/perl-Bivio ]]; then
+    if [[ -d ~/src/biviosofware/perl-Bivio ]]; then
         bu() {
             bivio test unit "${@-.}"
         }
