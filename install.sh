@@ -39,17 +39,19 @@ done
 if [[ $want_perl ]]; then
     mkdir -p ../perl
 
-    for perl in Bivio ProjEx; do
-        if [[ -L ../perl/$perl ]]; then
-            rm "../perl/$perl"
+    for p in Bivio ProjEx; do
+        if [[ -L ../perl/$p ]]; then
+            rm "../perl/$p"
         fi
-        ln -s "../biviosoftware/perl-$perl" "../perl/$perl"
+        ln -s "../biviosoftware/perl-$p" "../perl/$p"
     done
 
-    if [[ ! -x ~/bin/bivio ]]; then
-        ln -s ~/src/biviosoftware/perl-Bivio/Util/bivio ~/bin/bivio
-        chmod +x ~/bin/bivio
-    fi
+    for p in bivio b-env; do
+        if [[ ! -x ~/bin/$p ]]; then
+            ln -s ~/src/biviosoftware/perl-Bivio/Util/"$p" ~/bin/"$p"
+            chmod +x ~/bin/$p
+        fi
+    done
 fi
 
 cd home-env
