@@ -98,68 +98,6 @@ if [[ -n $PS1 ]]; then
     bivio_prompt_command
 fi
 
-if bivio class info Bivio::BConf >& /dev/null; then
-    b() {
-        bivio "$@"
-    }
-
-    if [[ -d ~/src/biviosoftware/perl-Bivio ]]; then
-        bu() {
-            bivio test unit "${@-.}"
-        }
-
-        ba() {
-            bivio test acceptance "${@-.}"
-        }
-    fi
-
-    if [[ $EUID == 0 ]]; then
-        bconf() {
-            if [[ -r /etc/$1.bconf ]]; then
-                export BCONF="/etc/$1.bconf"
-            else
-                echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
-                return 1
-            fi
-            bivio_ps1 $1
-        }
-
-        bi() {
-            local p="$1"
-            shift
-            if [[ -f /etc/$p.bconf ]]; then
-                p="perl-app-$p"
-            fi
-            bivio release install "$p" "$@"
-        }
-
-        bihs() {
-            bivio release install_host_stream
-        }
-    fi
-fi
-
-g() {
-    local x="$1"
-    shift
-    grep -iIr --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
-        "$x" "${@-.}" 2>/dev/null
-}
-
-gp() {
-    local x="$1"
-    shift
-    g --include '*.btest' \
-	--include '*.bunit' \
-	--include '*.t' \
-	--include '*.pm' \
-	--include '*.pl' \
-	--include '*.PL' \
-	--include '*.py' \
-        "$x" "${@-.}" |
-	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
-}
-
 bivio_path_dedup() {
     export PATH=$(perl -e 'print(join(q{:}, grep(!$x{$_}++, split(/:/, $ENV{PATH}))))')
 }
@@ -250,6 +188,68 @@ if [[ -f ~/.ssh/ssh_agent ]]; then
 	fi
     fi
 fi
+
+if bivio class info Bivio::BConf >& /dev/null; then
+    b() {
+        bivio "$@"
+    }
+
+    if [[ -d ~/src/biviosoftware/perl-Bivio ]]; then
+        bu() {
+            bivio test unit "${@-.}"
+        }
+
+        ba() {
+            bivio test acceptance "${@-.}"
+        }
+    fi
+
+    if [[ $EUID == 0 ]]; then
+        bconf() {
+            if [[ -r /etc/$1.bconf ]]; then
+                export BCONF="/etc/$1.bconf"
+            else
+                echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
+                return 1
+            fi
+            bivio_ps1 $1
+        }
+
+        bi() {
+            local p="$1"
+            shift
+            if [[ -f /etc/$p.bconf ]]; then
+                p="perl-app-$p"
+            fi
+            bivio release install "$p" "$@"
+        }
+
+        bihs() {
+            bivio release install_host_stream
+        }
+    fi
+fi
+
+g() {
+    local x="$1"
+    shift
+    grep -iIr --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+        "$x" "${@-.}" 2>/dev/null
+}
+
+gp() {
+    local x="$1"
+    shift
+    g --include '*.btest' \
+	--include '*.bunit' \
+	--include '*.t' \
+	--include '*.pm' \
+	--include '*.pl' \
+	--include '*.PL' \
+	--include '*.py' \
+        "$x" "${@-.}" |
+	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
+}
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
     # It's probably dumb, but force to be sure
