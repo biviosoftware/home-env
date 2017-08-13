@@ -36,6 +36,10 @@ export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 
+if [[ -z $PERLLIB && -d ~/src/perl ]]; then
+    export PERLLIB=$HOME/src/perl
+fi
+
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
 if [[ ! $TMPDIR && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
@@ -228,9 +232,6 @@ if [[ -d $HOME/src/java ]]; then
     bivio_classpath_append $JAVA_ROOT
 fi
 
-if [[ -z $PERLLIB && -d ~/src/perl ]]; then
-    export PERLLIB=$HOME/src/perl
-fi
 export FTP_PASSIVE=1
 
 if [[ -f ~/.ssh/ssh_agent ]]; then
