@@ -36,7 +36,7 @@ for f in ~/.??* ~/bin/*; do
     fi
 done
 
-if [[ $want_perl ]]; then
+if [[ -n $want_perl ]]; then
     mkdir -p ../perl
 
     for p in Bivio ProjEx; do
@@ -46,7 +46,7 @@ if [[ $want_perl ]]; then
         ln -s "../biviosoftware/perl-$p" "../perl/$p"
     done
 
-    for p in bivio b-env; do
+    for p in bivio b-env b-sendmail-http; do
         if [[ ! -x ~/bin/$p ]]; then
             ln -s ~/src/biviosoftware/perl-Bivio/Util/"$p" ~/bin/"$p"
             chmod +x ~/bin/$p
@@ -103,9 +103,14 @@ done
 cd
 
 # npmrc may contain credentials so need to append
-if grep -q -s '^color' .npmrc; then
-    : ok
-else
+if ! grep -q -s '^color' .npmrc; then
     echo 'color = false' >> .npmrc
     chmod 600 .npmrc
+fi
+
+if [[ -n $want_perl && ! -d ~/btest-mail ]]; then
+    (
+        . ~/bashrc
+        bivio dev setup
+    )
 fi
