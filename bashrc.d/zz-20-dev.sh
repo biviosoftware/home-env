@@ -100,6 +100,20 @@ _bivio_pyenv_source() {
     return $res
 }
 
+_bivio_pyenv_version() {
+    local v=$1
+    local ve=$2
+    # This line stops a warning from the pyenv installer
+    bivio_path_insert ~/.pyenv/bin 1
+    . ~/.bashrc
+    bivio_pyenv_global "$v"
+    . ~/.bashrc
+    pip install --upgrade pip
+    pip install --upgrade setuptools tox
+    pyenv virtualenv "$v" "$ve"
+    pyenv global "$ve"
+}
+
 bivio_pyenv_deactivate() {
     if [[ $PYENV_ACTIVATE ]]; then
         # so safe to deactivate any time
@@ -122,11 +136,11 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_2() {
-    bivio_pyenv_global 2.7.12
+    _bivio_pyenv_version 2.7.12 py2
 }
 
 bivio_pyenv_3() {
-    bivio_pyenv_global 3.4.3
+    _bivio_pyenv_version 3.4.3 py3
 }
 
 gcl() {
