@@ -100,12 +100,26 @@ for f in gitconfig netrc; do
     fi
 done
 
+docker_config=~/.docker/config.json
+if [[ ! -r $docker_config_json ]]; then
+    d=$(dirname "$docker_config")
+    mkdir -p "$d"
+    chmod 700 "$d"
+    cp $PWD/template/docker-config.json "$docker_config"
+    chmod 600 "$docker_config"
+fi
+
 cd
 
 # npmrc may contain credentials so need to append
 if ! grep -q -s '^color' .npmrc; then
     echo 'color = false' >> .npmrc
     chmod 600 .npmrc
+fi
+
+# append detachKeys if not there
+if ! grep -q -s detachKeys "$docker_config"; then
+    perl -pi -e 's/(?<=^\{)/\n  "detachKeys": "ctrl-],q",/' "$docker_config"
 fi
 
 if [[ -n $want_perl && ! -d ~/btest-mail ]]; then
