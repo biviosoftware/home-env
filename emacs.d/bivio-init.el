@@ -13,6 +13,7 @@
 (require 'css-mode)
 (require 'shell)
 (require 'mmm-mode)
+(require 'uniquify)
 ;;; remove after emacs 23 is gone
 (ignore-errors (require 'web-mode))
 (ignore-errors (require 'espresso))
@@ -49,6 +50,7 @@
 (blink-cursor-mode -1)
 (set-cursor-color "red")
 (setq-default indent-tabs-mode nil)
+(setq uniquify-buffer-name-style 'forward)
 
 (if (fboundp 'ansi-color-for-comint-mode-off)
     (ansi-color-for-comint-mode-off))
