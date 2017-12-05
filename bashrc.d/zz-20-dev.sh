@@ -136,11 +136,11 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_2() {
-    _bivio_pyenv_version 2.7.12 py2
+    _bivio_pyenv_version 2.7.14 py2
 }
 
 bivio_pyenv_3() {
-    _bivio_pyenv_version 3.4.3 py3
+    _bivio_pyenv_version 3.6.3 py3
 }
 
 gcl() {
