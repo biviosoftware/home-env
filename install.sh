@@ -9,7 +9,7 @@ fi
 
 #POSIT: duplicate code in zz-10-base.sh
 if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
-    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ||  -e /etc/centos-release ]]; then
+    if [[ -e /etc/centos-release ]]; then
         export BIVIO_WANT_PERL=1
     else
         export BIVIO_WANT_PERL=
