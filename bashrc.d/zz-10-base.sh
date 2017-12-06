@@ -36,10 +36,6 @@ export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 
-if [[ -z $PERLLIB && -d ~/src/perl ]]; then
-    export PERLLIB=$HOME/src/perl
-fi
-
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
 if [[ ! $TMPDIR && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
@@ -189,44 +185,60 @@ if [[ -f ~/.ssh/ssh_agent ]]; then
     fi
 fi
 
-if bivio class info Bivio::BConf >& /dev/null; then
-    b() {
-        bivio "$@"
-    }
-
-    if [[ -d ~/src/biviosoftware/perl-Bivio ]]; then
-        bu() {
-            bivio test unit "${@-.}"
-        }
-
-        ba() {
-            bivio test acceptance "${@-.}"
-        }
+#POSIT: duplicate code in install.sh
+if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
+    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ||  -e /etc/centos-release ]]; then
+        export BIVIO_WANT_PERL=1
+    else
+        export BIVIO_WANT_PERL=
     fi
 
-    if [[ $EUID == 0 ]]; then
-        bconf() {
-            if [[ -r /etc/$1.bconf ]]; then
-                export BCONF="/etc/$1.bconf"
-            else
-                echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
-                return 1
-            fi
-            bivio_ps1 $1
+fi
+
+if [[ -n $BIVIO_WANT_PERL ]]; then
+    if [[ -z $PERLLIB && -d ~/src/perl ]]; then
+        export PERLLIB=$HOME/src/perl
+    fi
+
+    if bivio class info Bivio::BConf >& /dev/null; then
+        b() {
+            bivio "$@"
         }
 
-        bi() {
-            local p="$1"
-            shift
-            if [[ -f /etc/$p.bconf ]]; then
-                p="perl-app-$p"
-            fi
-            bivio release install "$p" "$@"
-        }
+        if [[ -d ~/src/biviosoftware/perl-Bivio ]]; then
+            bu() {
+                bivio test unit "${@-.}"
+            }
 
-        bihs() {
-            bivio release install_host_stream
-        }
+            ba() {
+                bivio test acceptance "${@-.}"
+            }
+        fi
+
+        if [[ $EUID == 0 ]]; then
+            bconf() {
+                if [[ -r /etc/$1.bconf ]]; then
+                    export BCONF="/etc/$1.bconf"
+                else
+                    echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
+                    return 1
+                fi
+                bivio_ps1 $1
+            }
+
+            bi() {
+                local p="$1"
+                shift
+                if [[ -f /etc/$p.bconf ]]; then
+                    p="perl-app-$p"
+                fi
+                bivio release install "$p" "$@"
+            }
+
+            bihs() {
+                bivio release install_host_stream
+            }
+        fi
     fi
 fi
 

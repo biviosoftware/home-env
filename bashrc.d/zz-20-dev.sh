@@ -9,42 +9,44 @@ if [[ $PS1 && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
 fi
 
 
-export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$((8000 + $(id -u) * 2 % 100))}
-export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
-
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
 export NODE_TLS_REJECT_UNAUTHORIZED=0
 
-if [[ -z $BIVIO_HOST_NAME ]]; then
-    if [[ $HOSTNAME == apa3.bivio.biz ]]; then
-        BIVIO_HOST_NAME=dev.bivio.biz
-    elif type -t ifconfig &> /dev/null; then
-	eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
-	if [[ -z $BIVIO_HOST_NAME ]]; then
-	    BIVIO_HOST_NAME=$(hostname)
-	fi
-    fi
-    export BIVIO_HOST_NAME
-fi
+if [[ -n $BIVIO_WANT_PERL ]]; then
+    export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$((8000 + $(id -u) * 2 % 100))}
+    export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
 
-if type -t bu &>/dev/null; then
-    if [[ -z $BIVIO_DEFAULT_BCONF ]]; then
-        for x in Artisans::BConf Bivio::DefaultBConf; do
-            if perl -M$x -e 1 &>/dev/null; then
-                export BIVIO_DEFAULT_BCONF=$x
-                break
+    if [[ -z $BIVIO_HOST_NAME ]]; then
+        if [[ $HOSTNAME == apa3.bivio.biz ]]; then
+            BIVIO_HOST_NAME=dev.bivio.biz
+        elif type -t ifconfig &> /dev/null; then
+	    eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
+	    if [[ -z $BIVIO_HOST_NAME ]]; then
+	        BIVIO_HOST_NAME=$(hostname)
+	    fi
+        fi
+        export BIVIO_HOST_NAME
+    fi
+
+    if type -t bu &>/dev/null; then
+        if [[ -z $BIVIO_DEFAULT_BCONF ]]; then
+            for x in Artisans::BConf Bivio::DefaultBConf; do
+                if perl -M$x -e 1 &>/dev/null; then
+                    export BIVIO_DEFAULT_BCONF=$x
+                    break
+                fi
+            done
+        fi
+        if [[ $BIVIO_DEFAULT_BCONF ]]; then
+            eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
+
+            #TODO(robnagler): backwards compatibility for bashrc_b_env_aliases
+            b_ps1() {
+                bivio_ps1 "$@"
+            }
+            if b_env pet Bivio/PetShop; then
+                cd - &> /dev/null
             fi
-        done
-    fi
-    if [[ $BIVIO_DEFAULT_BCONF ]]; then
-        eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
-
-        #TODO(robnagler): backwards compatibility for bashrc_b_env_aliases
-        b_ps1() {
-            bivio_ps1 "$@"
-        }
-        if b_env pet Bivio/PetShop; then
-            cd - &> /dev/null
         fi
     fi
 fi

@@ -3,6 +3,20 @@
 # curl -s -S -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
 # For development, do this:
 #
+if [[ -r ~/.pre_bivio_bashrc ]]; then
+    source ~/.pre_bivio_bashrc
+fi
+
+#POSIT: duplicate code in zz-10-base.sh
+if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
+    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ||  -e /etc/centos-release ]]; then
+        export BIVIO_WANT_PERL=1
+    else
+        export BIVIO_WANT_PERL=
+    fi
+
+fi
+
 biviosoftware=~/src/biviosoftware
 
 is_cygwin=
@@ -11,12 +25,11 @@ if [[ $(uname) =~ CYGWIN ]]; then
 fi
 
 mkdir -p ~/bin
-
 mkdir -p "$biviosoftware"
 cd "$biviosoftware"
 
 for repo in home-env \
-    $( [[ $want_perl ]] && echo perl-Bivio javascript-Bivio perl-ProjEx ) \
+    $( [[ -n $BIVIO_WANT_PERL ]] && echo perl-Bivio javascript-Bivio perl-ProjEx ) \
     ; do
     if [[ -d $repo ]]; then
         (
@@ -36,9 +49,8 @@ for f in ~/.??* ~/bin/*; do
     fi
 done
 
-if [[ -n $want_perl ]]; then
+if [[ -n $BIVIO_WANT_PERL ]]; then
     mkdir -p ../perl
-
     for p in Bivio ProjEx; do
         if [[ -L ../perl/$p ]]; then
             rm "../perl/$p"
@@ -122,7 +134,7 @@ if ! grep -q -s detachKeys "$docker_config"; then
     perl -pi -e 's/(?<=^\{)/\n  "detachKeys": "ctrl-],q",/' "$docker_config"
 fi
 
-if [[ -n $want_perl && ! -d ~/btest-mail ]]; then
+if [[ -n $BIVIO_WANT_PERL && ! -d ~/btest-mail ]]; then
     (
         . ~/bashrc
         bivio dev setup
