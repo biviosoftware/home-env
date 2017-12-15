@@ -74,6 +74,8 @@
       (setq
        shell-file-name "/bin/bash"
        shell-command-switch "-lc")
+      (require 'bash-completion)
+      (bash-completion-setup)
       (add-hook
        'shell-mode-hook
        (lambda (&optional arg)

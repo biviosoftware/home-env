@@ -263,6 +263,10 @@ gp() {
 	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
 }
 
+radia_run() {
+    curl http://radia.run | bash -s "$@"
+}
+
 if [[ $INSIDE_EMACS =~ comint ]]; then
     # It's probably dumb, but force to be sure
     export TERM=dumb
