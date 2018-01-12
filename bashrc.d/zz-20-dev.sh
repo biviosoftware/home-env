@@ -142,7 +142,7 @@ bivio_pyenv_2() {
 }
 
 bivio_pyenv_3() {
-    _bivio_pyenv_version 3.6.3 py3
+    _bivio_pyenv_version 3.6.4 py3
 }
 
 gcl() {
