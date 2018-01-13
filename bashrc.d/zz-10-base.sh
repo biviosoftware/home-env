@@ -117,20 +117,6 @@ bivio_classpath_append() {
     fi
 }
 
-export CVSUMASK=07
-if [[ -z $CVSROOT ]]; then
-    if [[ -d /home/cvs/CVSROOT ]]; then
-	# We're on the CVS server
-	export CVSROOT=/home/cvs
-    elif [[ $HOSTNAME =~ (dfw1|apa3|apa11|apa1)(\.|$) ]]; then
-	# direct connect
-	export CVSROOT=":pserver:$LOGNAME@locker.bivio.biz:/home/cvs"
-    else
-	# We're remote and do SSH tunneling
-	export CVSROOT=":pserver:$LOGNAME@localhost:/home/cvs"
-    fi
-fi
-
 for f in \
     /usr/lib64/openmpi/bin \
     /usr/local/cuda/bin \
@@ -148,10 +134,6 @@ if [[ -d $f && ! ( :$LD_LIBRARY_PATH: =~ :$f: ) ]]; then
     export LD_LIBRARY_PATH=$f${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
 unset f
-
-if [[ $EUID == 0 || $USER == cvs ]]; then
-    export CVSREAD=true
-fi
 
 export JAVA_HOME=/usr/lib/jvm/java
 #java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore

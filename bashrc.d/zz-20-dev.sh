@@ -194,14 +194,6 @@ mocha() {
     command mocha "$@" | perl -p -e 's/\e.*?m//g'
 }
 
-nup() {
-    cvs -n up 2>/dev/null|egrep '^[A-Z] |^\? .*\.(pm|bview|gif|jpg|t|PL|btest|bunit|bconf|msg|css|js|png|psd|pdf|spec|xml|java)$'
-}
-
-up() {
-    cvs up -Pd
-}
-
 vssh() {
     bivio_vagrant_ssh "$@"
 }
