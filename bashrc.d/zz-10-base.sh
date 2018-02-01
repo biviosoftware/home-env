@@ -42,6 +42,12 @@ if [[ ! $TMPDIR && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
     export TMPDIR=${TMPDIR-/var/tmp}
 fi
 
+if [[ -z $TZ && -e /etc/localtime ]]; then
+    # Tested on CentOS 7, and it does have the localtime stat problem
+    # https://blog.packagecloud.io/eng/2017/02/21/set-environment-variable-save-thousands-of-system-calls/
+    export TZ=:/etc/localtime
+fi
+
 dirs() {
     local f
     local -i i=0
