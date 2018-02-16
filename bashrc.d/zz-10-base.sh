@@ -57,6 +57,10 @@ dirs() {
     done
 }
 
+bivio_in_docker() {
+    grep -s -q cpuset:/docker /proc/self/cgroup >& /dev/null
+}
+
 bivio_ps1() {
     if [[ -z $PS1 ]]; then
         return
@@ -68,7 +72,7 @@ bivio_ps1() {
     if [[ $USER != $LOGNAME ]]; then
         x="$x\u";
     fi
-    if [[ ! -f /.dockerinit && $DISPLAY != :0 ]]; then
+    if ! bivio_in_docker && [[ $DISPLAY != :0 ]]; then
         x="$x@\h"
     fi
     PS1="$x \W]$bivio_ps1_suffix"
@@ -140,6 +144,12 @@ if [[ -d $f && ! ( :$LD_LIBRARY_PATH: =~ :$f: ) ]]; then
     export LD_LIBRARY_PATH=$f${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
 unset f
+
+if bivio_in_docker; then
+    # https://github.com/radiasoft/devops/issues/132
+    # https://github.com/open-mpi/ompi/issues/3270
+    export OMPI_MCA_btl=self,sm,tcp
+fi
 
 export JAVA_HOME=/usr/lib/jvm/java
 #java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore
