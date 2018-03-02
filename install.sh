@@ -3,6 +3,7 @@
 # curl -s -S -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
 # For development, do this:
 #
+set -euo pipefail
 if [[ -r ~/.pre_bivio_bashrc ]]; then
     source ~/.pre_bivio_bashrc
 fi
@@ -114,12 +115,9 @@ for f in gitconfig netrc; do
 done
 
 docker_config=~/.docker/config.json
-if [[ ! -r $docker_config_json ]]; then
-    d=$(dirname "$docker_config")
-    mkdir -p "$d"
-    chmod 700 "$d"
-    cp $PWD/template/docker-config.json "$docker_config"
-    chmod 600 "$docker_config"
+if [[ ! -r $docker_config ]]; then
+    install -d -m 700 "$(dirname "$docker_config")"
+    install -m 600 $PWD/template/docker-config.json "$docker_config"
 fi
 
 cd
