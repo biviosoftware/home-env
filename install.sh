@@ -140,5 +140,6 @@ if [[ -n $BIVIO_WANT_PERL && ! -d ~/btest-mail ]]; then
         # might error out, because we don't have a db yet
         bivio dev setup
         bivio project link_facade_files
+        true
     ) >& /dev/null
 fi
