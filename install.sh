@@ -137,8 +137,8 @@ if [[ -n $BIVIO_WANT_PERL && ! -d ~/btest-mail ]]; then
     (
         set +u +e +o pipefail
         . ~/.bashrc
-        set -e
+        # might error out, because we don't have a db yet
         bivio dev setup
         bivio project link_facade_files
-    )
+    ) >& /dev/null
 fi
