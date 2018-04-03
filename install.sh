@@ -5,7 +5,9 @@
 #
 set -euo pipefail
 if [[ -r ~/.pre_bivio_bashrc ]]; then
+    set +euo pipefail
     source ~/.pre_bivio_bashrc
+    set -euo pipefail
 fi
 
 #POSIT: duplicate code in zz-10-base.sh
