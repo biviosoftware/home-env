@@ -13,7 +13,7 @@ fi
 #POSIT: duplicate code in zz-10-base.sh
 if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
     # See zz-10-base.sh
-    if [[ -e /etc/centos-release && $(perl -MGMP::Mpf -e 1 2>&1) == '' ]]; then
+    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ]]; then
         export BIVIO_WANT_PERL=1
     else
         export BIVIO_WANT_PERL=
