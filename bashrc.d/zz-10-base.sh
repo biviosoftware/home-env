@@ -187,8 +187,7 @@ fi
 if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
     # If someone set these vars, they expect to do perl development
     # or only on centos if GMP for perl is installed (only if BOP is installed).
-    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x}
-       || (-e /etc/centos-release && $(perl -MGMP::Mpf -e 1 2>&1) == '') ]]; then
+    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ]]; then
         export BIVIO_WANT_PERL=1
     else
         export BIVIO_WANT_PERL=
