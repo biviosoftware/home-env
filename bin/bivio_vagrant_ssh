@@ -102,11 +102,12 @@ vagrant ssh -c 'sleep 2' > "$ssh_err_file" 2>&1 < /dev/null &
 child=$!
 declare -i i=0
 while (( $i < 10 )); do
-    ssh_cmd=$(ps axww | grep ' ssh vagrant@.*sleep' | grep -v ' grep ')
+    ssh_cmd=$(ps axww | grep '( |bin/)ssh vagrant@.*sleep' | grep -v ' grep ')
     if [[ $ssh_cmd ]]; then
         break
     fi
     sleep 1
+    i+=1
 done
 
 if [[ ! $ssh_cmd ]]; then
