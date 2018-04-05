@@ -98,15 +98,18 @@ fi
 
 user_msg 'Extracting virtual machine ssh command ... (may take a few seconds)'
 
-vagrant ssh -c 'sleep 2' > "$ssh_err_file" 2>&1 < /dev/null &
+vagrant ssh -c 'sleep 3' > "$ssh_err_file" 2>&1 < /dev/null &
 child=$!
 declare -i i=0
+ssh_cmd=
+ssh_re='( |/)(ssh vagrant@127.*) -t bash'
 while (( $i < 10 )); do
-    ssh_cmd=$(ps axww | grep ' ssh vagrant@.*sleep' | grep -v ' grep ')
-    if [[ $ssh_cmd ]]; then
+    if [[ $(ps axww | grep '[b]ash.*sleep 3') =~ $ssh_re ]]; then
+        ssh_cmd=${BASH_REMATCH[2]}
         break
     fi
     sleep 1
+    i+=1
 done
 
 if [[ ! $ssh_cmd ]]; then
@@ -124,12 +127,8 @@ while ps "$child" &>/dev/null; do
 done
 rm -f "$ssh_err_file"
 
-ssh_cmd=${ssh_cmd#* ssh }
-# Obviously only works with Unix hosts
-ssh_cmd="ssh ${ssh_cmd% -t bash -l*}"
 # FATAL outputs nothing on error so switch to ERROR
 ssh_cmd=${ssh_cmd/LogLevel=FATAL/LogLevel=ERROR}
-ssh_cmd=$(echo "$ssh_cmd" | perl -p -e 's/(?<=-i )(.+?)(?= -o)/"$1"/')
 
 cat > "$state_file" <<EOF
 ssh_cmd=(exec $ssh_cmd)
