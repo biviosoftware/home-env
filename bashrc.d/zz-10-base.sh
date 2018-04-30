@@ -264,7 +264,7 @@ gp() {
 }
 
 radia_run() {
-    curl http://radia.run | bash -s "$@"
+    curl -s -S -L http://radia.run | bash -s "$@"
 }
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
