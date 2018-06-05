@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+radia_notebook_main() {
+    case "${1:-help}" in
+        srbright18)
+            mkdir -p ~/jupyter
+            curl -L -S -s -o ~/jupyter/srbright18.ipynb \
+                https://github.com/radiasoft/srbright18/raw/master/jupyter/paperCalcs/calculationBenchmarking.ipynb
+            echo 'srbright18 notebook downloaded to ~/jupyter'
+            ;;
+        help)
+            echo 'please supply a notebook name, e.g. "srbright18"' 1>&2
+            return 1
+            ;;
+    esac
+}
+
+radia_notebook_main "$@"
