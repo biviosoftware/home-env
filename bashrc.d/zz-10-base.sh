@@ -264,7 +264,7 @@ gp() {
 }
 
 radia_run() {
-    curl -s -S -L http://radia.run | bash -s "$@"
+    curl -s -S -L "${install_server:-https://depot.radiasoft.org}/index.sh" | bash -s "$@"
 }
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
