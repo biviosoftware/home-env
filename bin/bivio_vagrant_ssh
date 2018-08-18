@@ -85,7 +85,7 @@ fi
 
 if [[ $guest_version != $host_version && -z $vbguest_plugin_warning ]]; then
     vbguest_plugin_warning=1
-    user_msg 'VirtualBox guest software is out of date; try installing:
+    user_msg "VirtualBox guest software ($guest_version != $host_version"') is out of date; try installing:
 
   vagrant plugin install vagrant-vbguest
 
