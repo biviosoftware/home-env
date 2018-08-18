@@ -264,7 +264,11 @@ gp() {
 }
 
 radia_run() {
-    curl -s -S -L "${install_server:-https://depot.radiasoft.org}/index.sh" | bash -s "$@"
+    local u=${install_server:-}
+    if [[ ! $u || $u == github ]]; then
+        u=https://depot.radiasoft.org
+    fi
+    curl -s -S -L "$u/index.sh" | bash -s "$@"
 }
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
