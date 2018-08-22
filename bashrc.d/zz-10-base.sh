@@ -268,7 +268,7 @@ radia_run() {
     if [[ ! $u || $u == github ]]; then
         u=https://depot.radiasoft.org
     fi
-    curl -s -S -L "$u/index.sh" | bash -s "$@"
+    curl -s -S -L "$u/index.sh" | bash -l -s "$@"
 }
 
 if [[ $INSIDE_EMACS =~ comint ]]; then
