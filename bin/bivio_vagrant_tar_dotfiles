@@ -20,11 +20,11 @@ main() {
         .{post,pre}_bivio_bashrc \
         bconf.d \
     ; do
-        if [[ -r ~/$f ]]; then
+        if [[ -r "$HOME"/$f ]]; then
             dotfiles+=( $f )
         fi
     done
-    tar cf - -C ~ "${dotfiles[@]}" > /vagrant/dotfiles.tar
+    tar cf - -C "$HOME" "${dotfiles[@]}" > /vagrant/dotfiles.tar
     echo Created: /vagrant/dotfiles.tar
 }
 

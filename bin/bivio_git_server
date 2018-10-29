@@ -40,9 +40,9 @@ repo_dir=$root_dir/repo
 conf_dir=$root_dir/conf
 
 cd "$repo_dir"
-for git in ~/src/*/*/.git; do
+for git in "$HOME"/src/*/*/.git; do
     (cd $git; git update-server-info)
-    r=$(dirname "${git#~/src/}")
+    r=$(dirname "${git#$HOME/src/}")
     mkdir -p "$r"
     ln -s "$git" "$r.git"
     raw=$(dirname "$git")
@@ -99,5 +99,5 @@ EOF
 
 ln -s /etc/httpd/modules .
 ln -s . run
-echo read-only git server "http://$host:$port" serving ~/src
+echo read-only git server "http://$host:$port" serving "$HOME"/src
 exec /usr/sbin/httpd -f "$conf_dir/httpd.conf" -d "$conf_dir" -X

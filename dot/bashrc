@@ -2,13 +2,14 @@
 (set -o igncr) &>/dev/null && set -o igncr && export SHELLOPTS # ignore cr
 # Avoid recursion on scripts called from ~/.bashrc
 unset BASH_ENV
+# DEPRECATED: .pre.bashrc and .post.bashrc: use .pre_bivio_bashrc and .post_bivio_bashrc
 for f in \
-    ~/.pre_bivio_bashrc \
-    ~/.pre.bashrc \
+    "$HOME"/.pre_bivio_bashrc \
+    "$HOME"/.pre.bashrc \
     /etc/bashrc \
-    ~/src/*/home-env/bashrc.d/*.sh \
-    ~/.post.bashrc \
-    ~/.post_bivio_bashrc \
+    "$HOME"/src/*/home-env/bashrc.d/*.sh \
+    "$HOME"/.post.bashrc \
+    "$HOME"/.post_bivio_bashrc \
     ; do
     test -f $f && . $f
 done

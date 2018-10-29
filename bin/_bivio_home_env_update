@@ -4,6 +4,10 @@
 #
 force=$1
 set -e
+if [[ ! -w $HOME ]]; then
+    # Can't update if $HOME is not writable (see download/installers/container-run)
+    exit 1
+fi
 cd "$BIVIO_SRC_HOME_ENV"
 if [[ ! $force ]]; then
     if perl -e "exit(-M '.' > 1 && 1)"; then

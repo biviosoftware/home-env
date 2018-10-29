@@ -93,17 +93,17 @@ fi
 
 # install pykern always from local copy
 if need_install pykern; then
-    if [[ ! -d ~/src/radiasoft/pykern ]]; then
+    if [[ ! -d "$HOME"/src/radiasoft/pykern ]]; then
         (
             set -e
-            mkdir -p ~/src/radiasoft
-            cd ~/src/radiasoft
+            mkdir -p "$HOME"/src/radiasoft
+            cd "$HOME"/src/radiasoft
             git clone ${BIVIO_GIT_SERVER-https://github.com}/radiasoft/pykern.git
         ) || return $?
     fi
     (
         set -e
-        cd ~/src/radiasoft/pykern
+        cd "$HOME"/src/radiasoft/pykern
         bivio_pyenv_deactivate
         pyenv activate "$new_venv"
         pip install -r requirements.txt
@@ -141,7 +141,7 @@ if need_install PyQt4; then
             local tgz=$1.tar.gz
             shift
             # Put tmp local to user
-            local tmp=~/tmp/build_qt_pkg
+            local tmp="$HOME"/tmp/build_qt_pkg
             trap "cd; rm -rf '$tmp'" EXIT
             rm -rf "$tmp"
             mkdir -p "$tmp"

@@ -3,8 +3,8 @@ if bivio_not_src_home_env; then
 fi
 
 if [[ $PS1 && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
-    echo "Sourcing: ~/.bashrc" 1>&2
-    . ~/.bashrc
+    echo "Sourcing: $HOME/.bashrc" 1>&2
+    . "$HOME"/.bashrc
     return
 fi
 
@@ -51,10 +51,16 @@ if [[ -n $BIVIO_WANT_PERL ]]; then
     fi
 fi
 
-if [[ -d ~/.pyenv/bin ]]; then
-    bivio_path_insert ~/.pyenv/bin
+if [[ -d "$HOME"/.pyenv/bin ]]; then
+    bivio_path_insert "$HOME"/.pyenv/bin
     if [[ function != $(type -t pyenv) ]]; then
-        eval "$(pyenv init -)"
+        _no_rehash=
+        if [[ -w $HOME/.pyenv/shims ]]; then
+            # If we can't update shims, then can't rehash (see download/installers/container-run)
+            _no_rehash=--no-rehash
+        fi
+        eval "$(pyenv init - $_no_rehash)"
+        unset _no_rehash
         # pyenv init always inserts shims in the path
         bivio_path_dedup
     fi
@@ -63,7 +69,7 @@ if [[ -d ~/.pyenv/bin ]]; then
     fi
     if [[ $PS1 ]]; then
         bivio_pyenv_virtualenv_hook() {
-            if [[ function != $(type -t pyenv) || ! -x ~/.pyenv/bin/pyenv ]]; then
+            if [[ function != $(type -t pyenv) || ! -x "$HOME"/.pyenv/bin/pyenv ]]; then
                 export PROMPT_COMMAND=bivio_prompt_command
                 return
             fi
@@ -106,10 +112,10 @@ _bivio_pyenv_version() {
     local v=$1
     local ve=$2
     # This line stops a warning from the pyenv installer
-    bivio_path_insert ~/.pyenv/bin 1
-    . ~/.bashrc
+    bivio_path_insert "$HOME"/.pyenv/bin 1
+    . "$HOME"/.bashrc
     bivio_pyenv_global "$v"
-    . ~/.bashrc
+    . "$HOME"/.bashrc
     pip install --upgrade pip
     pip install --upgrade setuptools tox
     pyenv virtualenv "$v" "$ve"
@@ -124,7 +130,7 @@ bivio_pyenv_deactivate() {
     # This needs to be cleared for auto-de/activation to work again
     unset VIRTUAL_ENV
     # Remove global version
-    rm -f ~/.pyenv/version
+    rm -f "$HOME"/.pyenv/version
 }
 
 bivio_pyenv_global() {

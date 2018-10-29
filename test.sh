@@ -1,6 +1,6 @@
 #!/bin/bash
 set -x
-. ~/.bashrc
+. "$HOME"/.bashrc
 
 shopt -s nullglob
 for f in test/*.sh; do

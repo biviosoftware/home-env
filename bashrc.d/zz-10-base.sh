@@ -1,4 +1,4 @@
-export BIVIO_SRC_HOME_ENV=~/src/biviosoftware/home-env
+export BIVIO_SRC_HOME_ENV="$HOME"/src/biviosoftware/home-env
 bivio_not_src_home_env() {
     local d=$BIVIO_SRC_HOME_ENV
     if [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]; then
@@ -134,7 +134,7 @@ for f in \
     /usr/local/bin \
     /opt/local/bin \
     $( [[ $EUID == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin) \
-    ~/bin \
+    "$HOME"/bin \
     ; do
     bivio_path_insert "$f"
 done
@@ -166,15 +166,15 @@ fi
 
 export FTP_PASSIVE=1
 
-if [[ -f ~/.ssh/ssh_agent ]]; then
-    . ~/.ssh/ssh_agent > /dev/null
+if [[ -f "$HOME"/.ssh/ssh_agent ]]; then
+    . "$HOME"/.ssh/ssh_agent > /dev/null
     if [[ -n "$PS1" ]]; then
         if ! ps ${SSH_AGENT_PID-0} 2>&1 | grep -s -q ssh-agent; then
 	    # Start a daemon and add
-	    ssh-agent > ~/.ssh/ssh_agent
-	    . ~/.ssh/ssh_agent
+	    ssh-agent > "$HOME"/.ssh/ssh_agent
+	    . "$HOME"/.ssh/ssh_agent
 	    ssh-add
-            x=~/.vagrant.d/insecure_private_key
+            x="$HOME"/.vagrant.d/insecure_private_key
             if [[ -f $x  ]]; then
                 ssh-add $x
             fi
@@ -196,7 +196,7 @@ if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
 fi
 
 if [[ -n $BIVIO_WANT_PERL ]]; then
-    if [[ -z $PERLLIB && -d ~/src/perl ]]; then
+    if [[ -z $PERLLIB && -d "$HOME"/src/perl ]]; then
         export PERLLIB=$HOME/src/perl
     fi
 
@@ -205,7 +205,7 @@ if [[ -n $BIVIO_WANT_PERL ]]; then
             bivio "$@"
         }
 
-        if [[ -d ~/src/biviosoftware/perl-Bivio ]]; then
+        if [[ -d "$HOME"/src/biviosoftware/perl-Bivio ]]; then
             bu() {
                 bivio test unit "${@-.}"
             }
