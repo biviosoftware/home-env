@@ -55,7 +55,7 @@ if [[ -d "$HOME"/.pyenv/bin ]]; then
     bivio_path_insert "$HOME"/.pyenv/bin
     if [[ function != $(type -t pyenv) ]]; then
         _no_rehash=
-        if [[ -w $HOME/.pyenv/shims ]]; then
+        if [[ ! -w $HOME/.pyenv/shims ]]; then
             # If we can't update shims, then can't rehash (see download/installers/container-run)
             _no_rehash=--no-rehash
         fi
