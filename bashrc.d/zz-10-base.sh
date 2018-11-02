@@ -38,7 +38,7 @@ unset BCONF
 
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
-if [[ ! $TMPDIR && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
+if [[ ! ${TMPDIR:-} && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
     export TMPDIR=${TMPDIR-/var/tmp}
 fi
 
@@ -72,7 +72,7 @@ bivio_ps1() {
     if [[ $USER != $LOGNAME ]]; then
         x="$x\u";
     fi
-    if ! bivio_in_docker && [[ $DISPLAY != :0 ]]; then
+    if ! bivio_in_docker && [[ ${DISPLAY:-} != :0 ]]; then
         x="$x@\h"
     fi
     PS1="$x \W]$bivio_ps1_suffix"
@@ -110,7 +110,7 @@ bivio_path_dedup() {
 
 bivio_path_insert() {
     local dir="$1"
-    local ignore_not_exist="$2"
+    local ignore_not_exist="${2:-}"
     if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$PATH: =~ :$dir: ) ]]; then
 	export PATH="$dir:$PATH"
     fi
