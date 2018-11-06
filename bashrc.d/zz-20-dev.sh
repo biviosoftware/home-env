@@ -74,7 +74,7 @@ if [[ -d "$HOME"/.pyenv/bin ]]; then
                 return
             fi
             _pyenv_virtualenv_hook
-            if [[ -z $VIRTUAL_ENV ]]; then
+            if [[ ! ${VIRTUAL_ENV:-} ]]; then
                 bivio_ps1 $(pyenv global)
             else
                 bivio_ps1 $(basename "$VIRTUAL_ENV")
@@ -148,7 +148,7 @@ bivio_pyenv_2() {
 }
 
 bivio_pyenv_3() {
-    _bivio_pyenv_version 3.6.4 py3
+    _bivio_pyenv_version 3.6.6 py3
 }
 
 gcl() {
