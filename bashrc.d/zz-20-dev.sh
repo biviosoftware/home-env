@@ -4,7 +4,7 @@ fi
 
 if [[ $PS1 && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
     echo "Sourcing: $HOME/.bashrc" 1>&2
-    . "$HOME"/.bashrc
+    source "$HOME"/.bashrc
     return
 fi
 
@@ -113,13 +113,21 @@ _bivio_pyenv_version() {
     local ve=$2
     # This line stops a warning from the pyenv installer
     bivio_path_insert "$HOME"/.pyenv/bin 1
-    . "$HOME"/.bashrc
+    local flags=$-
+    set +eu
+    source "$HOME"/.bashrc
     bivio_pyenv_global "$v"
-    . "$HOME"/.bashrc
+    source "$HOME"/.bashrc
     pip install --upgrade pip
     pip install --upgrade setuptools tox
     pyenv virtualenv "$v" "$ve"
     pyenv global "$ve"
+    if [[ $flags =~ e ]]; then
+        set -e
+    fi
+    if [[ $flags =~ u ]]; then
+        set -u
+    fi
 }
 
 bivio_pyenv_deactivate() {
