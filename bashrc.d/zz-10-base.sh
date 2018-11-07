@@ -42,7 +42,7 @@ if [[ ! ${TMPDIR:-} && $(df /tmp 2>&1 | tail -1) =~ tmpfs ]]; then
     export TMPDIR=${TMPDIR-/var/tmp}
 fi
 
-if [[ -z $TZ && -e /etc/localtime ]]; then
+if [[ ! ${TZ:-} && -e /etc/localtime ]]; then
     # Tested on CentOS 7, and it does have the localtime stat problem
     # https://blog.packagecloud.io/eng/2017/02/21/set-environment-variable-save-thousands-of-system-calls/
     export TZ=:/etc/localtime
@@ -62,11 +62,11 @@ bivio_in_docker() {
 }
 
 bivio_ps1() {
-    if [[ -z $PS1 ]]; then
+    if [[ ! ${PS1:-} ]]; then
         return
     fi
     local x='['
-    if [[ -n $1 ]]; then
+    if [[ ${1+1} ]]; then
         x="$x$1;"
     fi
     if [[ $USER != $LOGNAME ]]; then
@@ -78,9 +78,9 @@ bivio_ps1() {
     PS1="$x \W]$bivio_ps1_suffix"
 }
 
-if [[ -n $PS1 ]]; then
+if [[ ${PS1:-} ]]; then
     bivio_prompt_command() {
-        case $TERM in
+        case ${TERM:-} in
         xterm*)
             printf "\033]0;%s@%s:%s\007" "${USER}" "${HOSTNAME%%.*}" "${PWD/#$HOME/~}"
             ;;
@@ -91,12 +91,12 @@ if [[ -n $PS1 ]]; then
             ;;
         esac
     }
-    if [[ $EUID == 0 ]]; then
+    if [[ ${EUID:-} == 0 ]]; then
         bivio_ps1_suffix='# '
     else
         bivio_ps1_suffix='$ '
     fi
-    if [[ $TERM != dumb ]]; then
+    if [[ ${TERM:-} != dumb ]]; then
         stty quit '^_'
     fi
     PS1="\W$bivio_ps1_suffix"
@@ -122,8 +122,8 @@ bivio_path_remove() {
 
 bivio_classpath_append() {
     local jar="$1"
-    if [[ ! ( :$CLASSPATH: =~ :$jar: ) ]]; then
-	export CLASSPATH=$CLASSPATH${CLASSPATH+:}$jar
+    if [[ ! ( :${CLASSPATH:-}: =~ :$jar: ) ]]; then
+	export CLASSPATH=${CLASSPATH:-}${CLASSPATH+:}$jar
     fi
 }
 
@@ -133,14 +133,14 @@ for f in \
     $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
     /usr/local/bin \
     /opt/local/bin \
-    $( [[ $EUID == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin) \
+    $( [[ ${EUID:-} == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin) \
     "$HOME"/bin \
     ; do
     bivio_path_insert "$f"
 done
 
 f=/usr/lib64/openmpi/lib
-if [[ -d $f && ! ( :$LD_LIBRARY_PATH: =~ :$f: ) ]]; then
+if [[ -d $f && ! ( :${LD_LIBRARY_PATH:-}: =~ :$f: ) ]]; then
     export LD_LIBRARY_PATH=$f${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
 fi
 unset f
@@ -166,9 +166,9 @@ fi
 
 export FTP_PASSIVE=1
 
-if [[ -f "$HOME"/.ssh/ssh_agent ]]; then
+if [[ -f $HOME/.ssh/ssh_agent ]]; then
     . "$HOME"/.ssh/ssh_agent > /dev/null
-    if [[ -n "$PS1" ]]; then
+    if [[ ${PS1:-} ]]; then
         if ! ps ${SSH_AGENT_PID-0} 2>&1 | grep -s -q ssh-agent; then
 	    # Start a daemon and add
 	    ssh-agent > "$HOME"/.ssh/ssh_agent
@@ -195,8 +195,8 @@ if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
 
 fi
 
-if [[ -n $BIVIO_WANT_PERL ]]; then
-    if [[ -z $PERLLIB && -d "$HOME"/src/perl ]]; then
+if [[ ${BIVIO_WANT_PERL:-} ]]; then
+    if [[ ! ${PERLLIB:-} && -d "$HOME"/src/perl ]]; then
         export PERLLIB=$HOME/src/perl
     fi
 
@@ -205,7 +205,7 @@ if [[ -n $BIVIO_WANT_PERL ]]; then
             bivio "$@"
         }
 
-        if [[ -d "$HOME"/src/biviosoftware/perl-Bivio ]]; then
+        if [[ -d $HOME/src/biviosoftware/perl-Bivio ]]; then
             bu() {
                 bivio test unit "${@-.}"
             }
@@ -215,7 +215,7 @@ if [[ -n $BIVIO_WANT_PERL ]]; then
             }
         fi
 
-        if [[ $EUID == 0 ]]; then
+        if [[ ${EUID:-} == 0 ]]; then
             bconf() {
                 if [[ -r /etc/$1.bconf ]]; then
                     export BCONF="/etc/$1.bconf"
@@ -271,7 +271,7 @@ radia_run() {
     curl -s -S -L "$u/index.sh" | bash -l -s "$@"
 }
 
-if [[ $INSIDE_EMACS =~ comint ]]; then
+if [[ ${INSIDE_EMACS:-} =~ comint ]]; then
     # It's probably dumb, but force to be sure
     export TERM=dumb
 
@@ -290,7 +290,7 @@ else
         emacs "$@"
     }
 fi
-if [[ $TERM == dumb ]]; then
+if [[ ${TERM:-} == dumb ]]; then
     export EDITOR=$(type -p emacsclient)
     export NODE_NO_READLINE=1
     export PAGER=cat
