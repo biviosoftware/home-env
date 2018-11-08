@@ -52,6 +52,8 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
 fi
 
 if [[ -d $HOME/.pyenv/bin ]]; then
+    # Avoid warning "prompt changing will be removed from future release"
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     bivio_path_insert "$HOME"/.pyenv/bin
     if [[ function != $(type -t pyenv || true) ]]; then
         _no_rehash=
@@ -98,7 +100,7 @@ _bivio_pyenv_source() {
     _bivio_pyenv_source_stack+=($source)
     (
         set -e
-        . $source
+        source $source
     )
     local res=$?
     _bivio_pyenv_source_stack=${_bivio_pyenv_source_stack[@]/$source/}
