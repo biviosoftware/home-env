@@ -169,7 +169,12 @@ gcl() {
     if ! [[ $r =~ ^[a-z]+:/ ]]; then
         r=https://github.com/$r
     fi
-    git clone "$r"
+    local b=$(basename "$r" .git)
+    if [[ -r $b ]]; then
+        (cd $b && git pull)
+    else
+        git clone "$r"
+    fi
 }
 
 gchmod() {
