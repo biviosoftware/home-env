@@ -4,7 +4,7 @@
 # usage: . $0
 #
 if [[ ! -d "$HOME"/.pyenv/versions/$_bivio_pyenv_global_version ]]; then
-    . _bivio_pyenv_install
+    bivio_not_strict_cmd source _bivio_pyenv_install
 else
     pyenv global "$_bivio_pyenv_global_version"
 fi

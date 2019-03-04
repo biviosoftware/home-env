@@ -48,6 +48,18 @@ if [[ ! ${TZ:-} && -e /etc/localtime ]]; then
     export TZ=:/etc/localtime
 fi
 
+bivio_not_strict_cmd() {
+    local flags=$-
+    set +eu
+    "$@"
+    if [[ $flags =~ e ]]; then
+        set -e
+    fi
+    if [[ $flags =~ u ]]; then
+        set -u
+    fi
+}
+
 dirs() {
     local f
     local -i i=0
@@ -167,12 +179,12 @@ fi
 export FTP_PASSIVE=1
 
 if [[ -f $HOME/.ssh/ssh_agent ]]; then
-    . "$HOME"/.ssh/ssh_agent > /dev/null
+    source "$HOME"/.ssh/ssh_agent > /dev/null
     if [[ ${PS1:-} ]]; then
         if ! ps ${SSH_AGENT_PID-0} 2>&1 | grep -s -q ssh-agent; then
 	    # Start a daemon and add
 	    ssh-agent > "$HOME"/.ssh/ssh_agent
-	    . "$HOME"/.ssh/ssh_agent
+	    source "$HOME"/.ssh/ssh_agent
 	    ssh-add
             x="$HOME"/.vagrant.d/insecure_private_key
             if [[ -f $x  ]]; then

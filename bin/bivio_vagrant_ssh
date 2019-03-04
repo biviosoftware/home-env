@@ -11,7 +11,7 @@ state_file=.vagrant/.bivio_vagrant_ssh.sh
 
 # Load stored state
 if [[ -r $state_file ]]; then
-    . "$state_file" 2>/dev/null
+    source "$state_file" 2>/dev/null
 fi
 
 # Computed host version

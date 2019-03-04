@@ -5,7 +5,7 @@
 #
 if [[ ! -d "$HOME"/.pyenv ]]; then
     bivio_path_insert "$HOME"/.pyenv/bin 1
-    curl -s -S -L https://raw.githubusercontent.com/yyuu/pyenv-installer/master/bin/pyenv-installer | bash
+    curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
     # Newer versions of patch do not like relative file names. Give this warning:
     # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
     # Updating the patches this way fixes the problem
@@ -13,13 +13,7 @@ if [[ ! -d "$HOME"/.pyenv ]]; then
 fi
 
 # Reset the environment
-. "$HOME"/.bashrc
-
-# 3.x doesn't build with CFLAGS. See https://github.com/yyuu/pyenv/issues/298
-if [[ Darwin == $(uname) && $_bivio_pyenv_global_version =~ ^2\. ]]; then
-    local CFLAGS
-    export CFLAGS=-I$(xcrun --show-sdk-path)/usr/include
-fi
+source "$HOME"/.bashrc
 
 PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "$_bivio_pyenv_global_version"
 pyenv global "$_bivio_pyenv_global_version"

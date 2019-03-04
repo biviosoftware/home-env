@@ -1,8 +1,8 @@
 #!/bin/bash
 set -x
-. "$HOME"/.bashrc
+source "$HOME"/.bashrc
 
 shopt -s nullglob
 for f in test/*.sh; do
-    . $f
+    source $f
 done

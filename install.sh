@@ -4,9 +4,9 @@
 # For development, do this:
 #
 set -euo pipefail
-if [[ -r ~/.pre_bivio_bashrc ]]; then
+if [[ -r "$HOME"/.pre_bivio_bashrc ]]; then
     set +euo pipefail
-    source ~/.pre_bivio_bashrc
+    source "$HOME"/.pre_bivio_bashrc
     set -euo pipefail
 fi
 
@@ -21,14 +21,14 @@ if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
 
 fi
 
-biviosoftware=~/src/biviosoftware
+biviosoftware="$HOME"/src/biviosoftware
 
 is_cygwin=
 if [[ $(uname) =~ CYGWIN ]]; then
     is_cygwin=1
 fi
 
-mkdir -p ~/bin
+mkdir -p "$HOME"/bin
 mkdir -p "$biviosoftware"
 cd "$biviosoftware"
 
@@ -47,7 +47,7 @@ done
 
 # Check for dead links from previous install before this install in case
 # we moved a file
-for f in ~/.??* ~/bin/*; do
+for f in "$HOME"/.??* "$HOME"/bin/*; do
     if [[ -L $f && ! -e $f ]]; then
         rm "$f"
     fi
@@ -63,9 +63,9 @@ if [[ -n $BIVIO_WANT_PERL ]]; then
     done
 
     for p in bivio b-env b-sendmail-http; do
-        if [[ ! -x ~/bin/$p ]]; then
-            ln -s ~/src/biviosoftware/perl-Bivio/Util/"$p" ~/bin/"$p"
-            chmod +x ~/bin/$p
+        if [[ ! -x "$HOME"/bin/$p ]]; then
+            ln -s "$HOME"/src/biviosoftware/perl-Bivio/Util/"$p" "$HOME"/bin/"$p"
+            chmod +x "$HOME"/bin/$p
         fi
     done
 fi
@@ -87,9 +87,9 @@ for f in {bin,dot}/*; do
     fi
     if [[ $src =~ bin/ ]]; then
         chmod +x "$src"
-        dst=~/$f
+        dst="$HOME"/$f
     else
-        dst=~/.${f#dot/}
+        dst="$HOME"/.${f#dot/}
     fi
     if [ -e "$dst" ]; then
         if cmp --silent "$dst" "$src"; then
@@ -102,7 +102,7 @@ for f in {bin,dot}/*; do
 done
 
 for f in gitconfig netrc; do
-    dst=~/.$f
+    dst="$HOME"/.$f
     if [[ -e $dst ]]; then
         continue
     fi
@@ -116,7 +116,7 @@ for f in gitconfig netrc; do
     fi
 done
 
-docker_config=~/.docker/config.json
+docker_config="$HOME"/.docker/config.json
 if [[ ! -r $docker_config ]]; then
     install -d -m 700 "$(dirname "$docker_config")"
     install -m 600 $PWD/template/docker-config.json "$docker_config"
@@ -135,10 +135,10 @@ if ! grep -q -s detachKeys "$docker_config"; then
     perl -pi -e 's/(?<=^\{)/\n  "detachKeys": "ctrl-],q",/' "$docker_config"
 fi
 
-if [[ -n $BIVIO_WANT_PERL && ! -d ~/btest-mail ]]; then
+if [[ -n $BIVIO_WANT_PERL && ! -d "$HOME"/btest-mail ]]; then
     (
-        set +u +e +o pipefail
-        . ~/.bashrc
+        set +euo pipefail
+        source "$HOME"/.bashrc
         # might error out, because we don't have a db yet
         bivio dev setup
         bivio project link_facade_files
