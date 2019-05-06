@@ -151,7 +151,7 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_2() {
-    _bivio_pyenv_version 2.7.14 py2
+    _bivio_pyenv_version 2.7.16 py2
 }
 
 bivio_pyenv_3() {
