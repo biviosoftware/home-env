@@ -15,6 +15,6 @@ for f in \
     "$HOME"/src/*/home-env/bashrc.d/*.sh \
     "$HOME"/.post_bivio_bashrc \
     ; do
-    test -f $f && . $f
+    test -f $f && source $f
 done
 unset f
