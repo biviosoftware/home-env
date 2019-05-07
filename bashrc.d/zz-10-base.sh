@@ -116,6 +116,21 @@ if [[ ${PS1:-} ]]; then
     bivio_prompt_command
 fi
 
+bivio_classpath_append() {
+    local jar="$1"
+    if [[ ! ( :${CLASSPATH:-}: =~ :$jar: ) ]]; then
+	export CLASSPATH=${CLASSPATH:-}${CLASSPATH+:}$jar
+    fi
+}
+
+bivio_ld_library_path_insert() {
+    local dir="$1"
+    local ignore_not_exist="${2:-}"
+    if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$LD_LIBRARY_PATH: =~ :$dir: ) ]]; then
+	export LD_LIBRARY_PATH="$dir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    fi
+}
+
 bivio_path_dedup() {
     export PATH=$(perl -e 'print(join(q{:}, grep(!$x{$_}++, split(/:/, $ENV{PATH}))))')
 }
@@ -132,29 +147,26 @@ bivio_path_remove() {
     export PATH=$(perl -e 'print(join(q{:}, grep($_ ne $ARGV[0], split(/:/, $ENV{PATH}))))' "$1")
 }
 
-bivio_classpath_append() {
-    local jar="$1"
-    if [[ ! ( :${CLASSPATH:-}: =~ :$jar: ) ]]; then
-	export CLASSPATH=${CLASSPATH:-}${CLASSPATH+:}$jar
-    fi
-}
-
 for f in \
     /usr/lib64/openmpi/bin \
     /usr/local/cuda/bin \
-    $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null) \
+    $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null || true) \
     /usr/local/bin \
     /opt/local/bin \
-    $( [[ ${EUID:-} == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin) \
+    $( [[ ${EUID:-} == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin ) \
     "$HOME"/bin \
+    "$HOME"/.local/bin \
     ; do
     bivio_path_insert "$f"
 done
 
-f=/usr/lib64/openmpi/lib
-if [[ -d $f && ! ( :${LD_LIBRARY_PATH:-}: =~ :$f: ) ]]; then
-    export LD_LIBRARY_PATH=$f${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
-fi
+for f in \
+    /usr/lib64/openmpi/lib \
+    "$HOME"/.local/lib \
+    ; do
+    bivio_ld_library_path_insert "$f"
+done
+
 unset f
 
 if bivio_in_docker; then
