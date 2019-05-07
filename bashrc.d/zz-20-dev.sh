@@ -215,3 +215,7 @@ mocha() {
 vssh() {
     bivio_vagrant_ssh "$@"
 }
+
+for f in $(ls -d "$HOME"/.local/etc/bashrc.d/*.sh 2>/dev/null || true); do
+    bivio_not_strict_cmd source "$f"
+done
