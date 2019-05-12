@@ -17,9 +17,7 @@ unset BASH_ENV
 
 _bivio_bashrc_init() {
     # Source the files while avoiding recursion
-    if [[ ! ${_bivio_bashrc_init_seen:-} ]]; then
-        declare -i _bivio_bashrc_init_seen
-    fi
+    declare -i _bivio_bashrc_init_seen=${_bivio_bashrc_init_seen:-0}
     _bivio_bashrc_init_seen+=1
     if (( _bivio_bashrc_init_seen > 3 )); then
         echo "$HOME/.bashrc: sourced in an infinite recursion, exiting 'source'" 1>&2
