@@ -20,7 +20,7 @@ _bivio_bashrc_init() {
     declare -i _bivio_bashrc_init_seen=${_bivio_bashrc_init_seen:-0}
     _bivio_bashrc_init_seen+=1
     if (( _bivio_bashrc_init_seen > 3 )); then
-        echo "$HOME/.bashrc: sourced in an infinite recursion, exiting 'source'" 1>&2
+        echo "$HOME/.bashrc: sourced in an infinite recursion ($_bivio_bashrc_init_seen), exiting 'source'" 1>&2
         return
     fi
     local f
