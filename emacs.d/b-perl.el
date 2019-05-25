@@ -1,22 +1,20 @@
 ;;;  Copyright (c) 2004-2007 bivio Software, Inc.  All rights reserved.
-;;; 
+;;;
 ;;;  Visit http://www.bivio.biz for more info.
-;;;  
+;;;
 ;;;  This library is free software; you can redistribute it and/or modify
 ;;;  it under the terms of the GNU Lesser General Public License as
 ;;;  published by the Free Software Foundation; either version 2.1 of the
 ;;;  License, or (at your option) any later version.
-;;;  
+;;;
 ;;;  This library is distributed in the hope that it will be useful, but
 ;;;  WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;;  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ;;;  Lesser General Public License for more details.
-;;;  
+;;;
 ;;;  You should have received a copy of the GNU Lesser General Public
 ;;;  License along with this library;  If not, you may get a copy from:
 ;;;  http://www.opensource.org/licenses/lgpl-license.html
-;;;  
-;;;  $Id: b-perl.el,v 1.79 2013/01/10 05:49:11 nagler Exp $
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -130,7 +128,7 @@ or b-perl-template-:
   (find-file-other-window
    (b-perl-file-name-from-module
     (shell-command-to-string
-     (concat 
+     (concat
       (b-perl-env)
       "bivio class qualified_name "
       (thing-at-point 'b-perl-module)
@@ -147,7 +145,7 @@ or b-perl-template-:
       (re-search-forward
        (concat "^       "  builtin  "\\( \\|$\\)"))))
   (other-window -1))
-  
+
 (defun b-perl-btest-last-log (arg)
   "Finds last log for the btest in the buffer"
   (interactive "P")
@@ -156,7 +154,7 @@ or b-perl-template-:
 	     arg
 	     (read-string "Case tag: " (thing-at-point 'b-perl-word)))))
     (dired-other-window
-     (concat 
+     (concat
       "log/"
       (file-name-sans-extension
        (file-name-nondirectory (buffer-file-name)))))
@@ -165,7 +163,7 @@ or b-perl-template-:
 	(progn
 	  (goto-char (point-min))
 	  (re-search-forward (concat "-" tag "$")))
-      (progn 
+      (progn
 	(goto-char (point-max))
 	(forward-line -2)
 	(end-of-line)))
@@ -223,9 +221,9 @@ or b-perl-template-:
        (upcase name)
        ")"
        (if value (concat " = " value) "")
-       ";\n") 
+       ";\n")
     (if value (insert value))))
-  
+
 (defun b-perl-do-insert-method (name body type)
     (goto-char (point-max))
     (re-search-backward "^1;$")
@@ -264,7 +262,7 @@ or b-perl-template-:
   (re-search-forward "^use ")
   (re-search-forward "^$")
   (insert "b_use('" module "');\n"))
-  
+
 (defconst b-perl-word-chars "A-Za-z0-9_:")
 (put 'b-perl-word 'end-op
      (lambda () (skip-chars-forward b-perl-word-chars)))
@@ -299,7 +297,7 @@ You may include a qualifier in the name, e.g.
    f some_factory
    p _some_private
    s some_static
- 
+
 Otherwise, inserts in the methods section."
   (interactive)
   (let
@@ -349,7 +347,7 @@ usage: bivio "
     (file-name-sans-extension (file-name-nondirectory (buffer-file-name)))
     " [options] command [args..]
 commands
-  @@ -- 
+  @@ --
 EOF")
 			   'CONSTANT))
 
@@ -432,7 +430,7 @@ EOF")
     # @@
     return;"
 			   type))
-	  
+
 
 (defun b-perl-insert-method-internal_initialize (name type)
   (b-perl-do-insert-method name "
@@ -501,7 +499,7 @@ or
 				  (string-to-list base))))
 	 (concat "b_use('" name "')"))
 	t)))
-  
+
 (defun b-perl-insert-variable-a ()
   (b-perl-do-insert-variable "A" "b_use('Type.Amount')"))
 
@@ -510,13 +508,13 @@ or
 
 (defun b-perl-insert-variable-dt ()
   (b-perl-do-insert-variable "DT" "b_use('Type.DateTime')"))
-  
+
 (defun b-perl-insert-variable-idi ()
   (b-perl-do-insert-variable "IDI" "__PACKAGE__->instance_data_index"))
-  
+
 (defun b-perl-insert-variable-lq ()
   (b-perl-do-insert-variable "LQ" "b_use('SQL.ListQuery')"))
-  
+
 (defun b-perl-module-from-file-name (name)
   "find the /perl/ part and use all names after as package components.  Replaces / with ::."
   (setq name (file-name-sans-extension name))
@@ -558,70 +556,11 @@ or
    (intern-soft
     (concat "b-perl-template-" (or (file-name-extension buffer-file-name) "")))))
 
-;TODO: update the copyright on the file on first modification
-(defun b-perl-template- nil
-  "inserts a template for a perl program"
-  (interactive)
-  (let
-      ((name (read-string "program name: "
-			  (file-name-sans-extension (buffer-name))))
-       (class (read-string "calls ShellUtil.")))
-    (b-set-copyright-owner)
-    (insert "#!perl -w
-# " (b-copyright) "
-# $Id" "$
-use strict;
-
-=head1 NAME
-
-" name " - calls ShellUtil." class "
-
-=head1 SYNOPSIS
-
-" name " [options] command [args...]
-
-=head1 DESCRIPTION
-
-See ShellUtil. " class "
-
-=cut
-
-#=IMPORTS
-use Bivio::ShellUtil;
-
-#=VARIABLES
-Bivio::ShellUtil->required_main(" class " => @ARGV);
-
-=head1 SEE ALSO
-
-ShellUtil." class "
-
-=head1 COPYRIGHT
-
-" (b-copyright) "
-
-=head1 VERSION
-
-$Id" "$
-
-=cut
-
-#" "Local Variables:
-#mode:cperl
-#End:
-")
-    (re-search-backward "^=head1 NAME")
-    (forward-line 2)
-    (end-of-line)
-    (save-excursion
-      (cperl-find-pods-heres))))
-
 (defun b-perl-template-btest nil
   "inserts a template for an acceptance test"
   (interactive)
   (b-set-copyright-owner)
   (insert "# " (b-copyright) "
-# $Id" "$
 test_setup('" (car (b-perl-which-project (buffer-file-name))) "');
 "))
 
@@ -630,7 +569,6 @@ test_setup('" (car (b-perl-which-project (buffer-file-name))) "');
   (interactive)
   (b-set-copyright-owner)
   (insert "# " (b-copyright) "
-# $Id" "$
 ")
   ;;; template-table elements: (file-suffix template &optional post-function)
   (let* ((template-table '(("List" "ListModel();
@@ -673,7 +611,7 @@ test_setup('" (car (b-perl-which-project (buffer-file-name))) "');
 [
     from_literal => [
         '' => UNDEF(),
-	
+
     ],
 ];
 " (lambda ()
@@ -686,7 +624,7 @@ test_setup('" (car (b-perl-which-project (buffer-file-name))) "');
                 (file-name-nondirectory (buffer-file-name))))
 
 	 (filetype
-	  (or (first (member 
+	  (or (first (member
 	      (progn (string-match "\\(....\\)[0-9]*$" basename)
                       (match-string 1 basename))
 		 (mapcar 'car template-table)))
@@ -703,7 +641,6 @@ test_setup('" (car (b-perl-which-project (buffer-file-name))) "');
   (interactive)
   (b-set-copyright-owner)
   (insert "# " (b-copyright) "
-# $Id" "$
 view_parent('base');
 view_put(
     base_content => Prose('put-content-here'),
@@ -747,7 +684,6 @@ class."
 		 "")))
     (b-set-copyright-owner)
     (insert "# " (b-copyright) "
-# $Id" "$
 package " name ";
 use strict;
 use Bivio::Base"
@@ -835,7 +771,7 @@ our($VERSION) = sprintf('%d.%02d', q$Revision" ": 0.0$ =~ /\\d+/g);
 
 (defun b-perl-bunit-next-error-buf (name)
   "Creates name from point to mark"
-  (let 
+  (let
       ((value (buffer-substring (mark) (point)))
        (fn (concat ".b-perl-bunit-next-error-buf-" name)))
     (save-excursion
