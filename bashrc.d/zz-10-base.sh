@@ -131,6 +131,10 @@ bivio_ld_library_path_insert() {
     fi
 }
 
+bivio_ld_library_path_remove() {
+    export LD_LIBRARY_PATH=$(perl -e 'print(join(q{:}, grep($_ ne $ARGV[0], split(/:/, $ENV{LD_LIBRARY_PATH}))))' "$1")
+}
+
 bivio_path_dedup() {
     export PATH=$(perl -e 'print(join(q{:}, grep(!$x{$_}++, split(/:/, $ENV{PATH}))))')
 }
@@ -147,8 +151,17 @@ bivio_path_remove() {
     export PATH=$(perl -e 'print(join(q{:}, grep($_ ne $ARGV[0], split(/:/, $ENV{PATH}))))' "$1")
 }
 
+# various mpi directories
+if [[ -x /usr/local/bin/mpiexec ]]; then
+    export BIVIO_MPI_PREFIX=/usr/local
+elif [[ -x /usr/lib64/mpich/bin/mpiexec ]]; then
+    export BIVIO_MPI_PREFIX=/usr/lib64/mpich
+elif [[ -x /usr/lib64/openmpi/bin/mpiexec ]]; then
+    export BIVIO_MPI_PREFIX=/usr/lib64/openmpi
+fi
+
 for f in \
-    /usr/lib64/openmpi/bin \
+    ${BIVIO_MPI_PREFIX:+$BIVIO_MPI_PREFIX/bin} \
     /usr/local/cuda/bin \
     $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null || true) \
     /usr/local/bin \
@@ -161,7 +174,7 @@ for f in \
 done
 
 for f in \
-    /usr/lib64/openmpi/lib \
+    ${BIVIO_MPI_PREFIX:+$BIVIO_MPI_PREFIX/lib} \
     "$HOME"/.local/lib \
     ; do
     bivio_ld_library_path_insert "$f"
@@ -169,7 +182,7 @@ done
 
 unset f
 
-if bivio_in_docker; then
+if bivio_in_docker && [[ ${BIVIO_MPI_PREFIX:-} =~ openmpi ]]; then
     # https://github.com/radiasoft/devops/issues/132
     # https://github.com/open-mpi/ompi/issues/3270
     export OMPI_MCA_btl=self,sm,tcp
