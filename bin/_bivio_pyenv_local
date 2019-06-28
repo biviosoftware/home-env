@@ -98,7 +98,11 @@ if need_install pykern; then
             set -e
             mkdir -p "$HOME"/src/radiasoft
             cd "$HOME"/src/radiasoft
-            git clone ${BIVIO_GIT_SERVER-https://github.com}/radiasoft/pykern.git
+            local u=https://github.com/radiasoft/pykern.git
+            if [[ ${install_server:-} ]]; then
+                u=$install_server/radiasoft/pykern/.git
+            fi
+            git clone "$u"
         ) || return $?
     fi
     (
