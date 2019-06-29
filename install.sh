@@ -83,8 +83,7 @@ fi
 cd home-env
 
 # Our file names don't have spaces so ok
-shopt -s nullglob
-for f in {bin,dot}/*; do
+for f in $(shopt -s nullglob; echo {bin,dot}/*); do
     src=$PWD/$f
     if [[ ! $(basename $src) =~ ^[_a-zA-Z][_a-zA-Z0-9-]+$ ]]; then
         # probably tilde or backup file
