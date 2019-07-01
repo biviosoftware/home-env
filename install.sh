@@ -46,7 +46,8 @@ for repo in home-env \
         )
     else
         u=https://github.com/biviosoftware/$repo.git
-        if [[ ${install_server:-} ]]; then
+        # For development
+        if [[ ${install_server:-} =~ 2916 ]]; then
             # NOTE: requires install
             u=$install_server/biviosoftware/$repo/.git
         fi
