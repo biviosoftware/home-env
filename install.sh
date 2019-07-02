@@ -1,7 +1,11 @@
 #!/bin/bash
 #
-# curl -s -S -L ${BIVIO_GIT_SERVER-https://raw.githubusercontent.com}/biviosoftware/home-env/master/bin/install.sh | bash
-# For development, do this:
+# radia_run home
+#
+# curl radia.run | bash -s home
+#
+# See https://github.com/radiasoft/download for development
+#
 #
 set -euo pipefail
 if [[ -r "$HOME"/.pre_bivio_bashrc ]]; then
@@ -11,9 +15,9 @@ if [[ -r "$HOME"/.pre_bivio_bashrc ]]; then
 fi
 
 #POSIT: duplicate code in zz-10-base.sh
-if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
+if [[ ! ${BIVIO_WANT_PERL+x} ]]; then
     # See zz-10-base.sh
-    if [[ -n ${BIVIO_HTTPD_PORT+x} || -n ${BIVIO_HOST_NAME+x} ]]; then
+    if [[ ${BIVIO_HTTPD_PORT+x} || ${BIVIO_HOST_NAME+x} ]]; then
         export BIVIO_WANT_PERL=1
     else
         export BIVIO_WANT_PERL=
@@ -33,7 +37,7 @@ mkdir -p "$biviosoftware"
 cd "$biviosoftware"
 
 for repo in home-env \
-    $( [[ -n $BIVIO_WANT_PERL ]] && echo perl-Bivio javascript-Bivio perl-ProjEx ) \
+    $( [[ $BIVIO_WANT_PERL ]] && echo perl-Bivio javascript-Bivio perl-ProjEx ) \
     ; do
     if [[ -d $repo ]]; then
         (
@@ -41,7 +45,14 @@ for repo in home-env \
             git pull -q
         )
     else
-        git clone -q "${BIVIO_GIT_SERVER-https://github.com}/biviosoftware/$repo.git"
+        u=https://github.com/biviosoftware/$repo.git
+        # For development
+        if [[ ${install_server:-} =~ 2916 ]]; then
+            # NOTE: requires install
+            u=$install_server/biviosoftware/$repo/.git
+        fi
+        git clone -q "$u"
+
     fi
 done
 
@@ -53,7 +64,7 @@ for f in "$HOME"/.??* "$HOME"/bin/*; do
     fi
 done
 
-if [[ -n $BIVIO_WANT_PERL ]]; then
+if [[ $BIVIO_WANT_PERL ]]; then
     mkdir -p ../perl
     for p in Bivio ProjEx; do
         if [[ -L ../perl/$p ]]; then
@@ -73,8 +84,7 @@ fi
 cd home-env
 
 # Our file names don't have spaces so ok
-shopt -s nullglob
-for f in {bin,dot}/*; do
+for f in $(shopt -s nullglob; echo {bin,dot}/*); do
     src=$PWD/$f
     if [[ ! $(basename $src) =~ ^[_a-zA-Z][_a-zA-Z0-9-]+$ ]]; then
         # probably tilde or backup file
