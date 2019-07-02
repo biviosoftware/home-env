@@ -119,10 +119,9 @@ _bivio_pyenv_version_do() {
     local ve=$2
     # This line stops a warning from the pyenv installer
     bivio_path_insert "$HOME"/.pyenv/bin 1
-    local flags=$-
-    source "$HOME"/.bashrc
-    bivio_pyenv_global "$v"
-    source "$HOME"/.bashrc
+    bivio_not_strict_cmd source "$HOME"/.bashrc
+    bivio_not_strict_cmd bivio_pyenv_global "$v"
+    bivio_not_strict_cmd source "$HOME"/.bashrc
     pip install --upgrade pip
     pip install --upgrade setuptools tox
     pyenv virtualenv "$v" "$ve"
