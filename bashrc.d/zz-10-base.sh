@@ -151,17 +151,11 @@ bivio_path_remove() {
     export PATH=$(perl -e 'print(join(q{:}, grep($_ ne $ARGV[0], split(/:/, $ENV{PATH}))))' "$1")
 }
 
-# various mpi directories
-if [[ -x /usr/local/bin/mpiexec ]]; then
-    export BIVIO_MPI_PREFIX=/usr/local
-elif [[ -x /usr/lib64/mpich/bin/mpiexec ]]; then
-    export BIVIO_MPI_PREFIX=/usr/lib64/mpich
-elif [[ -x /usr/lib64/openmpi/bin/mpiexec ]]; then
-    export BIVIO_MPI_PREFIX=/usr/lib64/openmpi
-fi
-
+# Give precedence to NERSC's shifter, but /opt/udiImage/modules/mpich/bin doesn't
+# seem to exist so probably moot. More important point is LD_LIBRARY_PATH (below)
 for f in \
-    ${BIVIO_MPI_PREFIX:+$BIVIO_MPI_PREFIX/bin} \
+    /usr/lib64/openmpi/bin \
+    /usr/lib64/mpich/bin \
     /usr/local/cuda/bin \
     $(ls -td /usr/java/{jdk*,jre*} /opt/IBMJava* 2>/dev/null || true) \
     /usr/local/bin \
@@ -169,13 +163,29 @@ for f in \
     $( [[ ${EUID:-} == 0 ]] && echo /sbin /usr/sbin /usr/local/sbin /opt/local/sbin ) \
     "$HOME"/bin \
     "$HOME"/.local/bin \
+    /opt/udiImage/modules/mpich/bin \
     ; do
     bivio_path_insert "$f"
 done
 
+# Resolve MPI lib. Give precedence to NERSC SHIFTER's lib
+unset BIVIO_MPI_LIB
 for f in \
-    ${BIVIO_MPI_PREFIX:+$BIVIO_MPI_PREFIX/lib} \
+    /opt/udiImage/modules/mpich/lib64 \
+    /usr/local/lib \
+    /usr/lib64/mpich/lib \
+    /usr/lib64/openmpi/lib
+do
+    bivio_ld_library_path_remove "$f"
+    if [[ ! ${BIVIO_MPI_LIB:-} && -d $f && $(shopt -s nullglob && echo $f/libmpi.so*) ]]; then
+        export BIVIO_MPI_LIB=$f
+    fi
+done
+
+# NERSC's SHIFTER has to have precedence in LD_LIBRARY_PATH
+for f in \
     "$HOME"/.local/lib \
+    ${BIVIO_MPI_LIB:-} \
     ; do
     bivio_ld_library_path_insert "$f"
 done
