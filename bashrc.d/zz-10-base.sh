@@ -13,11 +13,13 @@ if bivio_not_src_home_env; then
     return
 fi
 
-# Undo some stuff
-for f in $(compgen -a); do
-    unalias "$f"
-done
-unset f
+if [[ ! ${bivio_color:-} ]]; then
+    # Undo some stuff
+    for f in $(compgen -a); do
+        unalias "$f"
+    done
+    unset f
+fi
 
 # Undo bivio functions from /etc/bashrc.d
 for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivio_)'); do
@@ -28,10 +30,12 @@ done
 unset f
 
 umask g-w,o-rwx
-export LS_COLORS=
-export USER_LS_COLORS=
-export PROMPT_COMMAND=
-export VAGRANT_NO_COLOR=true
+if [[ ! ${bivio_color:-} ]]; then
+    export LS_COLORS=
+    export USER_LS_COLORS=
+    export PROMPT_COMMAND=
+    export VAGRANT_NO_COLOR=true
+fi
 export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
@@ -344,9 +348,11 @@ if [[ ${TERM:-} == dumb ]]; then
     export SYSTEMD_COLOR=0
 fi
 
-which() {
-    type "$@"
-}
+if [[ ! ${bivio_color:-} ]]; then
+    function which() {
+        type "$@"
+    }
+fi
 
 clean() {
     find . -name '*~' -exec rm {} \;
