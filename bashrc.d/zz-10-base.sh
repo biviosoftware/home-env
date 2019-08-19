@@ -300,7 +300,7 @@ g() {
         "$x" "${@-.}" 2>/dev/null
 }
 
-gp() {
+function gp() {
     local x="$1"
     shift
     g --include '*.btest' \
