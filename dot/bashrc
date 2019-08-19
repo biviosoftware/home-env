@@ -5,7 +5,7 @@
 #
 # How To Customize
 #
-# If you are running in RadiaSoft's Jupyter environemtn, create ~/jupyter/bashrc,
+# If you are running in RadiaSoft's Jupyter environment, create ~/jupyter/bashrc,
 # which will be saved between server starts.
 #
 # If you are running on a Mac or Linux, create ~/.pre_bivio_bashrc
