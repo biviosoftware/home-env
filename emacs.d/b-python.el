@@ -2,7 +2,7 @@
 (provide 'b-python)
 (require 'python)
 
-(defvar b-python-copyright-owner "Bivio Software, Inc."
+(defvar b-python-copyright-owner "RadiaSoft LLC."
   "*Who owns the copyrights for templates")
 
 (defvar b-python-license "http://www.apache.org/licenses/LICENSE-2.0.html"
