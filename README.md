@@ -35,7 +35,7 @@ dot-files will be linked to `~/src/biviosoftware/home-env`.
 You can specify pre and post files:
 
 * `~/.pre_bivio_bashrc` and `~/.post_bivio_bashrc`
-* `~/emacs/pre-bivio-init.el` and `~/emacs/post-bivio-init.el`
+* `~/.emacs.d/pre-bivio-init.el` and `~/.emacs.d/post-bivio-init.el`
 
 These will be executed before and after the Bivio init files.
 
