@@ -120,16 +120,17 @@
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
-(defvar bivio-delete-trailing-whitespace t)
-; (setq bivio-delete-trailing-whitespace nil)
+;(defvar bivio-delete-trailing-whitespace t)
+;(setq bivio-delete-trailing-whitespace nil)
 (add-hook 'find-file-hook
 	  (lambda ()
-            (let ((case-fold-search t))
-              (if (string-match-p "/src/biviosoftware/boldchat/" (buffer-file-name))
+            (let ((case-fold-search nil)
+                  (bn (or buffer-file-name "")))
+              (if (string-match-p "/Radia/\\|/SRW/" bn)
                   (set (make-local-variable 'tab-width) 4))
               (if (if (boundp 'bivio-delete-trailing-whitespace)
                       bivio-delete-trailing-whitespace
-                    (not (string-match-p "/wiki/\\w+$" (or buffer-file-name ""))))
+                    (not (string-match-p "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/" bn)))
                   (add-hook 'write-contents-functions
                             (lambda()
                               (save-excursion
@@ -280,7 +281,6 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key global-map "\177" 'backward-delete-char-untabify)
 
 (define-key minibuffer-local-completion-map " " 'minibuffer-complete-word)
-(global-set-key [(control _)] 'advertised-undo)
 
 ;;;; Control keys
 (define-key text-mode-map "\C-i" 'shift-right)
@@ -288,7 +288,6 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key global-map "\C-r" 'isearch-backward-regexp)
 (define-key global-map "\C-s" 'isearch-forward-regexp)
 (define-key global-map "\C-z" 'scroll-one-line-up)
-(define-key global-map "\C-_" 'advertised-undo)
 
 ;;;; Meta keys
 (define-key global-map "\M-c" 'backward-capitalize-word)
