@@ -85,6 +85,11 @@
          (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
          (define-key shell-mode-map "\C-cc" 'dirs)))))
 
+;;; https://github.com/syl20bnr/spacemacs/issues/6820#issuecomment-239665146
+;;; keep same window for starting shells or listing buffers
+(push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
+(push (cons "\\*Buffer List\\*" display-buffer--same-window-action) display-buffer-alist)
+
 
 (defalias 'perl-mode 'cperl-mode)
 (add-to-list

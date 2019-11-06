@@ -24,6 +24,9 @@
 	  (format-time-string "%Y" (current-time))
 	  b-python-copyright-owner))
 
+; don't double indent on a continuation
+(setq-default python-indent-def-block-scale 1)
+
 (defun b-python-indent-context-docstring (orig-fun &rest args)
   "Keep indent inside docstrings to non-empty previous line.
 See http://stackoverflow.com/a/32059968/3075806 for explanation."
@@ -46,38 +49,47 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
    ((string-match "\\.py$" (buffer-file-name)) "module")
    (t nil)))
 
-(defun b-python-flask-restart nil
-  "Start manage.py in the current python root"
+(defun b-python-sirepo-service-restart (service pyenv)
+  "Start sirepo service in project root"
   (interactive)
   (let
       ((prev-shell nil)
        (prev-buffer (current-buffer))
-       (dir (b-python-project-root)))
+       (dir (b-python-project-root))
+       (service-buffer-name (concat "*" service "-sirepo*"))
+       (shell-buffer-name "*shell*"))
     (progn
-      (message "Restarting flask")
+      (message "Restarting sirepo server")
 ;TODO(robnagler): Keep existing window just like compile command does
-      (if (get-buffer "*flask*")
+      (if (get-buffer service-buffer-name)
 	  (progn
-	    (set-buffer (get-buffer "*flask*"))
-	    (kill-buffer (get-buffer "*flask*"))
+	    (set-buffer (get-buffer service-buffer-name))
+	    (kill-buffer (get-buffer service-buffer-name))
 	    (set-buffer prev-buffer)))
-      (if (get-buffer "*shell*")
+      (if (get-buffer shell-buffer-name)
 	  (progn
-	    (set-buffer "*shell*")
+	    (set-buffer shell-buffer-name)
 	    (setq prev-shell (rename-buffer (generate-new-buffer-name "tmp")))
 	    (set-buffer prev-buffer)))
       (shell)
-      (set-buffer (get-buffer "*shell*"))
-      (rename-buffer "*flask*")
+      (set-buffer (get-buffer shell-buffer-name))
+      (rename-buffer service-buffer-name)
       (accept-process-output (get-buffer-process (current-buffer)))
-      (set-buffer (get-buffer "*flask*"))
-      (insert "cd " dir " && python manage.py runserver --host 0.0.0.0 --port 8000 --debug")
+      (set-buffer (get-buffer service-buffer-name))
+      (insert "cd " dir " && PYENV_VERSION=" pyenv " pyenv exec sirepo service " service "; stty -echo")
       (comint-send-input)
       (if prev-shell
 	  (progn
 	    (set-buffer (get-buffer prev-shell))
-	    (rename-buffer "*shell*"))))
+	    (rename-buffer shell-buffer-name))))
     (switch-to-buffer prev-buffer)))
+
+(defun b-python-server-restart nil
+  "Start manage.py in the current python root"
+  (interactive)
+  (if (string-match "/sirepo/" (buffer-file-name))
+      (b-python-sirepo-service-restart "http" "py2")))
+
 
 (defun b-python-project-root (&optional d)
   "Find project's root"
@@ -109,6 +121,8 @@ u\"\"\"?
 :license: " b-python-license "
 \"\"\"
 from __future__ import absolute_import, division, print_function
+from pykern.pkcollections import PKDict
+from pykern.pkdebug import pkdc, pkdlog, pkdp
 ")
   (goto-char (point-min))
   (re-search-forward "\\?"))
@@ -125,10 +139,10 @@ from __future__ import absolute_import, division, print_function
 (add-hook 'python-mode-hook
 	  '(lambda ()
 	     (set (make-local-variable 'compile-command)
-		  (b-python-compile-command))))
-
+		  (b-python-compile-command))
+             (abbrev-mode)))
 
 (progn
   (define-key python-mode-map "\C-c\C-m" 'compile)
-  (define-key python-mode-map "\C-ch" 'b-python-flask-restart)
+  (define-key python-mode-map "\C-ch" 'b-python-server-restart)
   (define-key python-mode-map "\C-ct" 'b-python-template))
