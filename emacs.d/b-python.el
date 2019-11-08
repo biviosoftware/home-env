@@ -57,14 +57,15 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
        (prev-buffer (current-buffer))
        (dir (b-python-project-root))
        (service-buffer-name (concat "*" service "-sirepo*"))
-       (shell-buffer-name "*shell*"))
+       (shell-buffer-name "*shell*")
+       (kill-buffer-query-functions nil))
     (progn
       (message "Restarting sirepo server")
 ;TODO(robnagler): Keep existing window just like compile command does
       (if (get-buffer service-buffer-name)
 	  (progn
 	    (set-buffer (get-buffer service-buffer-name))
-	    (kill-buffer (get-buffer service-buffer-name))
+            (kill-buffer (get-buffer service-buffer-name))
 	    (set-buffer prev-buffer)))
       (if (get-buffer shell-buffer-name)
 	  (progn
