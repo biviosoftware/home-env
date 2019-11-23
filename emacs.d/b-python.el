@@ -112,19 +112,21 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
    (intern-soft
     (concat "b-python-template-" (b-python-file-type)))))
 
-(defun b-python-template-module nil
+(defun b-python-template-module (&optional no-imports)
   "inserts a template for a python module."
   (goto-char (point-min))
-  (insert "# -*- coding: utf-8 -*-
+  (insert
+   (concat "# -*- coding: utf-8 -*-
 u\"\"\"?
 
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
 \"\"\"
 from __future__ import absolute_import, division, print_function
-from pykern.pkcollections import PKDict
+" (if no-imports ""
+"from pykern.pkcollections import PKDict
 from pykern.pkdebug import pkdc, pkdlog, pkdp
-")
+")))
   (goto-char (point-min))
   (re-search-forward "\\?"))
 
@@ -135,7 +137,7 @@ from pykern.pkdebug import pkdc, pkdlog, pkdp
     (goto-char (point-min))
     (insert "import pytest
 ")
-    (b-python-template-module)))
+    (b-python-template-module t)))
 
 (add-hook 'python-mode-hook
 	  '(lambda ()
