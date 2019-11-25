@@ -57,7 +57,10 @@ if [[ -d $HOME/.pyenv/bin ]]; then
     bivio_path_insert "$HOME"/.pyenv/bin
     if [[ function != $(type -t pyenv || true) ]]; then
         _no_rehash=
-        if [[ ! -w $HOME/.pyenv/shims ]]; then
+        # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
+        # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
+        # have an interactive shell, don't rehash.
+        if [[ ! -w $HOME/.pyenv/shims || ! ${PS1:-} ]]; then
             # If we can't update shims, then can't rehash (see download/installers/container-run)
             _no_rehash=--no-rehash
         fi
