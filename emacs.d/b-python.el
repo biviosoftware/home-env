@@ -12,7 +12,7 @@
   "Returns a string compile-command."
   (concat
    (cond
-    ((string-equal "pytest" (b-python-file-type)) "py.test ")
+    ((string-equal "pytest" (b-python-file-type)) "pykern test ")
     (t "python "))
    (if (buffer-file-name)
        (file-name-nondirectory (buffer-file-name))
