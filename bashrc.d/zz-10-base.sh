@@ -172,14 +172,19 @@ for f in \
     bivio_path_insert "$f"
 done
 
-# Resolve MPI lib. Give precedence to NERSC SHIFTER's lib
+# Remove LD paths that might have mpi. /usr/local/lib is in
+# /etc/ld.so.conf so remove it also. If libmpi exists in lib64,
+# BIVIO_MPI_LIB should be set to one of those, because that's
+# the value used in compiles, which doesn't happen in Shifter.
+# Give precedence to mpich, since that matches what Shifter
+# uses.
 unset BIVIO_MPI_LIB
 for f in \
-    /opt/udiImage/modules/mpich/lib64 \
-    /usr/local/lib \
     /usr/lib64/mpich/lib \
-    /usr/lib64/openmpi/lib
-do
+    /usr/lib64/openmpi/lib \
+    /usr/local/lib \
+    /opt/udiImage/modules/mpich/lib64 \
+    ; do
     bivio_ld_library_path_remove "$f"
     if [[ ! ${BIVIO_MPI_LIB:-} && -d $f && $(shopt -s nullglob && echo $f/libmpi.so*) ]]; then
         export BIVIO_MPI_LIB=$f
@@ -187,9 +192,12 @@ do
 done
 
 # NERSC's SHIFTER has to have precedence in LD_LIBRARY_PATH
+# but we also need BIVIO_MPI_LIB because it is where the
+# hdf5 and other libs are.
 for f in \
     "$HOME"/.local/lib \
     ${BIVIO_MPI_LIB:-} \
+    ${BIVIO_MPI_LIB:+/opt/udiImage/modules/mpich/lib64} \
     ; do
     bivio_ld_library_path_insert "$f"
 done
