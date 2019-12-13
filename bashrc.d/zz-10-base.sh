@@ -52,6 +52,10 @@ if [[ ! ${TZ:-} && -e /etc/localtime ]]; then
     export TZ=:/etc/localtime
 fi
 
+if [[ ${TERM:-} == screen.xterm-256color && -r /usr/share/terminfo/x/xterm-256color-screen ]]; then
+    export TERM=xterm-256color-screen
+fi
+
 bivio_not_strict_cmd() {
     local flags=$-
     set +eu
