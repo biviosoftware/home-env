@@ -39,6 +39,8 @@ fi
 export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
+# Darwin (Catalina onwards replaced bash with zsh) 
+export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
