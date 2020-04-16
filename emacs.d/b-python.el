@@ -13,10 +13,6 @@
   (concat
    (cond
     ((string-equal "pytest" (b-python-file-type)) "pykern test ")
-    ((save-excursion
-      (save-match-data
-        (goto-char (point-min))
-        (not (search-forward "from __future__" nil t)))) "PYENV_VERSION=py3 pyenv exec python ")
     (t "python "))
    (if (buffer-file-name)
        (file-name-nondirectory (buffer-file-name))
