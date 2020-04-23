@@ -1,3 +1,4 @@
 color=false
 progress=false
 spin=false
+prefix=~/.local
