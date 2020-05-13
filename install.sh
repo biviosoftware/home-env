@@ -150,7 +150,7 @@ if [[ -n $BIVIO_WANT_PERL && ! -d "$HOME"/btest-mail ]]; then
         set +euo pipefail
         source "$HOME"/.bashrc
         # might error out, because we don't have a db yet
-        bivio dev setup
+        bivio dev setup_all
         bivio project link_facade_files
         true
     ) >& /dev/null
