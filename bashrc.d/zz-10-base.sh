@@ -39,7 +39,7 @@ fi
 export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
-# Darwin (Catalina onwards replaced bash with zsh) 
+# Darwin (Catalina onwards replaced bash with zsh)
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # python pip installs in /tmp, which doesn't work if the package is large
@@ -219,14 +219,14 @@ fi
 export JAVA_HOME=/usr/lib/jvm/java
 #java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore
 # Get most recent java and any jars in /usr/java
-for f in $(ls /usr/java/*.jar 2> /dev/null); do
+for f in $(ls "$HOME"/.local/share/java/*.jar /usr/java/*.jar 2> /dev/null || true); do
     bivio_classpath_append $f
 done
 unset f
 
 if [[ -d $HOME/src/java ]]; then
     export JAVA_ROOT=$HOME/src/java
-    bivio_classpath_append $JAVA_ROOT
+    bivio_classpath_append "$JAVA_ROOT"
 fi
 
 export FTP_PASSIVE=1
