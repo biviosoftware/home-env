@@ -49,7 +49,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
    ((string-match "\\.py$" (buffer-file-name)) "module")
    (t nil)))
 
-(defun b-python-sirepo-service-restart (service pyenv)
+(defun b-python-sirepo-service-restart (service)
   "Start sirepo service in project root"
   (interactive)
   (let
@@ -77,7 +77,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
       (rename-buffer service-buffer-name)
       (accept-process-output (get-buffer-process (current-buffer)))
       (set-buffer (get-buffer service-buffer-name))
-      (insert "cd " dir " && PYENV_VERSION=" pyenv " pyenv exec sirepo service " service "; stty -echo")
+      (insert "cd " dir " && sirepo service " service "; stty -echo")
       (comint-send-input)
       (if prev-shell
 	  (progn
@@ -89,7 +89,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
   "Start manage.py in the current python root"
   (interactive)
   (if (string-match "/sirepo/" (buffer-file-name))
-      (b-python-sirepo-service-restart "http" "py2")))
+      (b-python-sirepo-service-restart "http")))
 
 
 (defun b-python-project-root (&optional d)
