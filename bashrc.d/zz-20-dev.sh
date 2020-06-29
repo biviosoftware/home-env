@@ -207,7 +207,7 @@ gup() {
 }
 
 http() {
-    python2 -m SimpleHTTPServer "$BIVIO_HTTPD_PORT"
+    python3 -m http.server "${BIVIO_HTTPD_PORT:-8000}"
 }
 
 mocha() {
