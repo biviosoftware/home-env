@@ -210,6 +210,8 @@ done
 
 unset f
 
+export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+
 if bivio_in_docker && [[ ${BIVIO_MPI_PREFIX:-} =~ openmpi ]]; then
     # https://github.com/radiasoft/devops/issues/132
     # https://github.com/open-mpi/ompi/issues/3270
