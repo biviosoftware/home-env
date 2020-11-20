@@ -29,7 +29,7 @@ for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivi
 done
 unset f
 
-umask g-w,o-rwx
+umask "${BIVIO_UMASK:-g-w,o-rwx}"
 if [[ ! ${bivio_color:-} ]]; then
     export LS_COLORS=
     export USER_LS_COLORS=
