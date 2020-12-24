@@ -15,5 +15,5 @@ fi
 # Reset the environment
 source "$HOME"/.bashrc
 
-PYTHON_CONFIGURE_OPTS="--enable-shared" pyenv install "$_bivio_pyenv_global_version"
+PYTHON_CONFIGURE_OPTS="${BIVIO_PYENV_VALGRIND:+--without-pymalloc --with-pydebug --with-valgrind} --enable-shared" pyenv install "$_bivio_pyenv_global_version"
 pyenv global "$_bivio_pyenv_global_version"
