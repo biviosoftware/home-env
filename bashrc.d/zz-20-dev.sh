@@ -9,8 +9,9 @@ if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; the
 fi
 
 
+#TODO(robnagler) I don't think this is needed any more
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
-export NODE_TLS_REJECT_UNAUTHORIZED=0
+# export NODE_TLS_REJECT_UNAUTHORIZED=0
 
 if [[ ${BIVIO_WANT_PERL:-} ]]; then
     export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$((8000 + $(id -u) * 2 % 100))}
