@@ -132,7 +132,7 @@ if [[ ! -r $docker_config ]]; then
     install -m 600 $PWD/template/docker-config.json "$docker_config"
 fi
 
-cd
+cd "$HOME"
 
 # npmrc may contain credentials so need to append
 if ! grep -q -s '^color' .npmrc; then
@@ -145,13 +145,42 @@ if ! grep -q -s detachKeys "$docker_config"; then
     perl -pi -e 's/(?<=^\{)/\n  "detachKeys": "ctrl-],q",/' "$docker_config"
 fi
 
-if [[ -n $BIVIO_WANT_PERL && ! -d "$HOME"/btest-mail ]]; then
-    (
-        set +euo pipefail
-        source "$HOME"/.bashrc
-        # might error out, because we don't have a db yet
-        bivio dev setup_all
-        bivio project link_facade_files
-        true
-    ) >& /dev/null
+if [[ $BIVIO_WANT_PERL ]]; then
+    if [[ ! -d "$HOME"/btest-mail ]]; then
+        (
+            set +euo pipefail
+            source "$HOME"/.bashrc
+            # might error out, because we don't have a db yet
+            bivio dev setup_all
+            bivio project link_facade_files
+            true
+        ) >& /dev/null
+    fi
+    if [[ ! -d src/biviosoftware/perl-Artisans ]]; then
+        (
+            cd src/biviosoftware
+            git clone -q https://github.com/biviosoftware/perl-Artisans
+            true
+        ) >& /dev/null
+    fi
+    if [[ -d src/biviosoftware/perl-Artisans ]]; then
+        mkdir -p src/perl
+        if [[ ! -L src/perl/Artisans ]]; then
+            ln -s ../biviosoftware/perl-Artisans src/perl/Artisans
+        fi
+        (
+            set +euo pipefail
+            source "$HOME"/.bashrc
+            cd "$HOME"/src/biviosoftware
+            for f in $(BCONF=$BIVIO_DEFAULT_BCONF bivio release list_projects_sh_except_bivio); do
+                if [[ ! -d perl-$f ]]; then
+                    echo "Cloning perl-$f"
+                    git clone -q https://github.com/biviosoftware/perl-$f
+                fi
+                if [[ ! -L $HOME/src/perl/$f ]]; then
+                    ln -s "../biviosoftware/perl-$f" "$HOME/src/perl/$f"
+                fi
+            done
+        )
+    fi
 fi

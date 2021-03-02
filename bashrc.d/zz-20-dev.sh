@@ -15,20 +15,9 @@ fi
 
 if [[ ${BIVIO_WANT_PERL:-} ]]; then
     export BIVIO_HTTPD_PORT=${BIVIO_HTTPD_PORT:-$((8000 + $(id -u) * 2 % 100))}
-    export BIVIO_IS_2014STYLE=${BIVIO_IS_2014STYLE:-0}
-
     if [[ ! ${BIVIO_HOST_NAME:-} ]]; then
-        if [[ ${HOSTNAME:-} == apa3.bivio.biz ]]; then
-            BIVIO_HOST_NAME=dev.bivio.biz
-        elif type -t ifconfig &> /dev/null; then
-	    eval $(ifconfig | perl -ne '/addr:10\.10\.10\.(\d+)/ && print(qq{BIVIO_HOST_NAME=z$1.bivio.biz})')
-	    if [[ ! ${BIVIO_HOST_NAME:-} ]]; then
-	        BIVIO_HOST_NAME=$(hostname)
-	    fi
-        fi
-        export BIVIO_HOST_NAME
+	export BIVIO_HOST_NAME=$(hostname)
     fi
-
     if type -t bu &>/dev/null; then
         if [[ ! ${BIVIO_DEFAULT_BCONF:-} ]]; then
             for x in Artisans::BConf Bivio::DefaultBConf; do
@@ -37,14 +26,10 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
                     break
                 fi
             done
+            unset x
         fi
         if [[ ${BIVIO_DEFAULT_BCONF:-} ]]; then
             eval "$(env BCONF=$BIVIO_DEFAULT_BCONF bivio dev bashrc_b_env_aliases)"
-
-            #TODO(robnagler): backwards compatibility for bashrc_b_env_aliases
-            b_ps1() {
-                bivio_ps1 "$@"
-            }
             if b_env pet Bivio/PetShop; then
                 cd - &> /dev/null
             fi

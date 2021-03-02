@@ -266,7 +266,6 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     if [[ ! ${PERLLIB:-} && -d "$HOME"/src/perl ]]; then
         export PERLLIB=$HOME/src/perl
     fi
-
     if bivio class info Bivio::BConf >& /dev/null; then
         b() {
             bivio "$@"
@@ -279,31 +278,6 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
 
             ba() {
                 bivio test acceptance "${@-.}"
-            }
-        fi
-
-        if [[ ${EUID:-} == 0 ]]; then
-            bconf() {
-                if [[ -r /etc/$1.bconf ]]; then
-                    export BCONF="/etc/$1.bconf"
-                else
-                    echo "Couldn't find BCONF=/etc/$1.bconf" 1>&2
-                    return 1
-                fi
-                bivio_ps1 $1
-            }
-
-            bi() {
-                local p="$1"
-                shift
-                if [[ -f /etc/$p.bconf ]]; then
-                    p="perl-app-$p"
-                fi
-                bivio release install "$p" "$@"
-            }
-
-            bihs() {
-                bivio release install_host_stream
             }
         fi
     fi
