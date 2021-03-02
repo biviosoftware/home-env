@@ -169,8 +169,6 @@ if [[ $BIVIO_WANT_PERL ]]; then
             ln -s ../biviosoftware/perl-Artisans src/perl/Artisans
         fi
         (
-            set +euo pipefail
-            source "$HOME"/.bashrc
             cd "$HOME"/src/biviosoftware
             for f in $(BCONF=$BIVIO_DEFAULT_BCONF bivio release list_projects_sh_except_bivio); do
                 if [[ ! -d perl-$f ]]; then
