@@ -3,14 +3,19 @@
 # Wraps pyenv install
 # usage: . $0
 #
-if [[ ! -d "$HOME"/.pyenv ]]; then
-    export PYENV_ROOT=$HOME/.pyenv
+if [[ ! $PYENV_ROOT ]]; then
+    echo 'You must set PYENV_ROOT in bashrc before calling' 1>&2
+    exit 1
+fi
+if [[ ! -d $PYENV_ROOT ]]; then
+    # works with pyenv 2+
     bivio_path_insert "$PYENV_ROOT"/bin 1
+    bivio_path_insert "$PYENV_ROOT"/shims 1
     curl -s -S -L https://pyenv.run | bash
     # Newer versions of patch do not like relative file names. Give this warning:
     # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
     # Updating the patches this way fixes the problem
-    find "$HOME"/.pyenv -name \*.patch -print0 | xargs -0 -n 100 perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}'
+    find "$PYENV_ROOT" -name \*.patch -print0 | xargs -0 -n 100 perl -pi -e 's{^(\+\+\+|--- |diff.* )\.\./}{$1}'
 fi
 
 # Reset the environment
