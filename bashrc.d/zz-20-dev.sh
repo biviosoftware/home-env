@@ -37,10 +37,11 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     fi
 fi
 
-if [[ -d $HOME/.pyenv/bin ]]; then
+# always set PYENV_ROOT, but allow user to override
+export PYENV_ROOT=${PYENV_ROOT:-$HOME/.pyenv}
+if [[ -d $PYENV_ROOT/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-    export PYENV_ROOT=$HOME/.pyenv
     bivio_path_insert "$PYENV_ROOT"/bin
     if [[ function != $(type -t pyenv || true) ]]; then
         if [[ $(pyenv --version) =~ pyenv.1 ]]; then
