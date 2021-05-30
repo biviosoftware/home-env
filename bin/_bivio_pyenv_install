@@ -4,8 +4,9 @@
 # usage: . $0
 #
 if [[ ! -d "$HOME"/.pyenv ]]; then
-    bivio_path_insert "$HOME"/.pyenv/bin 1
-    curl -s -S -L https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer | bash
+    export PYENV_ROOT=$HOME/.pyenv
+    bivio_path_insert "$PYENV_ROOT"/bin 1
+    curl -s -S -L https://pyenv.run | bash
     # Newer versions of patch do not like relative file names. Give this warning:
     # 'Ignoring potentially dangerous file name ../Python-2.7.8/Lib/site.py'
     # Updating the patches this way fixes the problem

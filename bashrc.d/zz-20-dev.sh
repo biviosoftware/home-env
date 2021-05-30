@@ -40,27 +40,36 @@ fi
 if [[ -d $HOME/.pyenv/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
-    bivio_path_insert "$HOME"/.pyenv/bin
+    export PYENV_ROOT=$HOME/.pyenv
+    bivio_path_insert "$PYENV_ROOT"/bin
     if [[ function != $(type -t pyenv || true) ]]; then
-        _no_rehash=
-        # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
-        # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
-        # have an interactive shell, don't rehash.
-        if [[ ! -w $HOME/.pyenv/shims || ! ${PS1:-} ]]; then
-            # If we can't update shims, then can't rehash (see download/installers/container-run)
-            _no_rehash=--no-rehash
+        if [[ $(pyenv --version) =~ pyenv.1 ]]; then
+            _no_rehash=
+            # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
+            # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
+            # have an interactive shell, don't rehash.
+            if [[ ! -w $PYENV_ROOT/shims || ! ${PS1:-} ]]; then
+                # If we can't update shims, then can't rehash (see download/installers/container-run)
+                _no_rehash=--no-rehash
+            fi
+            eval "$(pyenv init - $_no_rehash)"
+            unset _no_rehash
+            # pyenv init always inserts shims in the path
+            bivio_path_dedup
+        else
+            # pyenv 2 or greater
+            # simulation pyenv init --path, because it doesn't dedup, and bivio_path_insert does
+            # plus avoids WARNING: pyenv init -` no longer sets PATH
+            bivio_path_insert "$PYENV_ROOT"/shims
+            eval "$(pyenv init -)"
         fi
-        eval "$(pyenv init - $_no_rehash)"
-        unset _no_rehash
-        # pyenv init always inserts shims in the path
-        bivio_path_dedup
     fi
     if [[ function != $(type -t _pyenv_virtualenv_hook) ]]; then
         eval "$(pyenv virtualenv-init -)"
     fi
     if [[ ${PS1:-} ]]; then
         bivio_pyenv_virtualenv_hook() {
-            if [[ function != $(type -t pyenv) || ! -x $HOME/.pyenv/bin/pyenv ]]; then
+            if [[ function != $(type -t pyenv) || ! -x $PYENV_ROOT/bin/pyenv ]]; then
                 export PROMPT_COMMAND=bivio_prompt_command
                 return
             fi
@@ -107,7 +116,7 @@ _bivio_pyenv_version_do() {
     local v=$1
     local ve=$2
     # This line stops a warning from the pyenv installer
-    bivio_path_insert "$HOME"/.pyenv/bin 1
+    bivio_path_insert "$PYENV_ROOT"/bin 1
     bivio_not_strict_cmd source "$HOME"/.bashrc
     bivio_not_strict_cmd bivio_pyenv_global "$v"
     bivio_not_strict_cmd source "$HOME"/.bashrc
@@ -125,7 +134,7 @@ bivio_pyenv_deactivate() {
     # This needs to be cleared for auto-de/activation to work again
     unset VIRTUAL_ENV
     # Remove global version
-    rm -f "$HOME"/.pyenv/version
+    rm -f "$PYENV_ROOT"/version
 }
 
 bivio_pyenv_global() {
