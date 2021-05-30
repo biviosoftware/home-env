@@ -37,8 +37,8 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     fi
 fi
 
-# always set PYENV_ROOT, but allow user to override
-export PYENV_ROOT=${PYENV_ROOT:-$HOME/.pyenv}
+# always set PYENV_ROOT
+export PYENV_ROOT=$HOME/.pyenv
 if [[ -d $PYENV_ROOT/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
