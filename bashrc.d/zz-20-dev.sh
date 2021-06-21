@@ -2,13 +2,6 @@ if bivio_not_src_home_env; then
     return
 fi
 
-if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
-    echo "Sourcing: $HOME/.bashrc" 1>&2
-    bivio_not_strict_cmd source "$HOME"/.bashrc
-    return
-fi
-
-
 #TODO(robnagler) I don't think this is needed any more
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
 # export NODE_TLS_REJECT_UNAUTHORIZED=0
@@ -35,6 +28,12 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
             fi
         fi
     fi
+fi
+
+if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
+    echo "Sourcing: $HOME/.bashrc" 1>&2
+    bivio_not_strict_cmd source "$HOME"/.bashrc
+    return
 fi
 
 # always set PYENV_ROOT
