@@ -315,10 +315,8 @@ radia_run() {
 if [[ ${INSIDE_EMACS:-} =~ comint ]]; then
     # It's probably dumb, but force to be sure
     export TERM=dumb
-
-    dirs() {
-        echo "$DIRSTACK"
-    }
+    # older emacs used "dirs" now emacs uses "command dirs"
+    unset dirs
 
     e() {
         emacsclient --no-wait "$@"
