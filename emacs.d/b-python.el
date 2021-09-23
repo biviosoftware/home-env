@@ -122,7 +122,6 @@ u\"\"\"?
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
 \"\"\"
-from __future__ import absolute_import, division, print_function
 " (if no-imports ""
 "from pykern.pkcollections import PKDict
 from pykern.pkdebug import pkdc, pkdlog, pkdp
