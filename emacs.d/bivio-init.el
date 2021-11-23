@@ -152,6 +152,24 @@
       (unless (eq nil process)
         (set-process-window-size process (window-height) (window-width))))))
 
+(defun b-ffap-with-line ()
+  "Go to file under cursor possibly with line number."
+  (interactive)
+  (require 'ffap)
+  (let ((fname (with-no-warnings (ffap-file-at-point))))
+    (if fname
+	(let ((line (save-excursion
+		      (goto-char (point-at-eol))
+		      (and (re-search-backward "\\(?::\\|line \\)\\([0-9]+\\)"
+					       (line-beginning-position)
+					       t)
+			   (string-to-number (match-string 1))))))
+	  (with-no-warnings (find-file-at-point fname))
+	  (when line
+	    (goto-char (point-min))
+	    (forward-line (1- line))))
+      (user-error "File does not exist"))))
+
 (setq comint-password-prompt-regexp
       (concat "\\s-[pP]assphrase: \\|\\s-[pP]assword: \\|"
 	      comint-password-prompt-regexp))
@@ -334,6 +352,7 @@ From the window at the lower right corner, select the one at the upper left."
 (define-key ctl-x-map "\C-n" 'insert-buffer)
 (define-key ctl-x-map "\C-u" nil); DELETE
 (define-key ctl-x-map "\C-z" 'shrink-window)
+(define-key ctl-x-map "g" 'b-ffap-with-line)
 
 
 ;;;; VC keys
