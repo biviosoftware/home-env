@@ -10,3 +10,5 @@ radia-run-install.log
 .vscode/
 .ipynb_checkpoints/
 __pycache__/
+# Excel
+~$*
