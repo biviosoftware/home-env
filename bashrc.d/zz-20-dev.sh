@@ -2,13 +2,6 @@ if bivio_not_src_home_env; then
     return
 fi
 
-if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
-    echo "Sourcing: $HOME/.bashrc" 1>&2
-    bivio_not_strict_cmd source "$HOME"/.bashrc
-    return
-fi
-
-
 #TODO(robnagler) I don't think this is needed any more
 # Avoid "Error: DEPTH_ZERO_SELF_SIGNED_CERT" from Node.js
 # export NODE_TLS_REJECT_UNAUTHORIZED=0
@@ -37,6 +30,12 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     fi
 fi
 
+if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; then
+    echo "Sourcing: $HOME/.bashrc" 1>&2
+    bivio_not_strict_cmd source "$HOME"/.bashrc
+    return
+fi
+
 # always set PYENV_ROOT
 export PYENV_ROOT=$HOME/.pyenv
 if [[ -d $PYENV_ROOT/bin ]]; then
@@ -44,17 +43,16 @@ if [[ -d $PYENV_ROOT/bin ]]; then
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
     bivio_path_insert "$PYENV_ROOT"/bin
     if [[ function != $(type -t pyenv || true) ]]; then
+        _no_rehash=
+        # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
+        # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
+        # have an interactive shell, don't rehash.
+        if [[ ! -w $PYENV_ROOT/shims || ! ${PS1:-} ]]; then
+            # If we can't update shims, then can't rehash (see download/installers/container-run)
+            _no_rehash=--no-rehash
+        fi
         if [[ $(pyenv --version) =~ pyenv.1 ]]; then
-            _no_rehash=
-            # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
-            # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
-            # have an interactive shell, don't rehash.
-            if [[ ! -w $PYENV_ROOT/shims || ! ${PS1:-} ]]; then
-                # If we can't update shims, then can't rehash (see download/installers/container-run)
-                _no_rehash=--no-rehash
-            fi
             eval "$(pyenv init - $_no_rehash)"
-            unset _no_rehash
             # pyenv init always inserts shims in the path
             bivio_path_dedup
         else
@@ -62,8 +60,9 @@ if [[ -d $PYENV_ROOT/bin ]]; then
             # simulation pyenv init --path, because it doesn't dedup, and bivio_path_insert does
             # plus avoids WARNING: pyenv init -` no longer sets PATH
             bivio_path_insert "$PYENV_ROOT"/shims
-            eval "$(pyenv init -)"
+            eval "$(pyenv init - $_no_rehash)"
         fi
+        unset _no_rehash
     fi
     if [[ function != $(type -t _pyenv_virtualenv_hook) ]]; then
         eval "$(pyenv virtualenv-init -)"
