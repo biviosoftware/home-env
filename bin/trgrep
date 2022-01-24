@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#
+# $Id$
+#
+# Recursively search directories for text files for the pattern passed
+# on the command line.  If @DIRS is empty, use ".".  Skips SCCS/RCS
+# directories and symlinks.  Lists the files only with -l or prints
+# in grep format without it.  -i means ignore case. -z will additionally
+# uncompress and search in .Z or .gz files.
+#
+
+$list_names_only=0;
+$recurse=1;
+$zcat=0;
+while ($ARGV[0] =~ /^-/) {
+    $arg=shift(@ARGV);
+    if ($arg eq "-l")    { $list_names_only=1; }
+    elsif ($arg eq "-i") { $ignore_case=1; }
+    elsif ($arg eq "-r") { $recurse=1; }
+    elsif ($arg eq "-R") { $recurse=0; }
+    elsif ($arg eq "-z") { $zcat=1; }
+    else { &usage("Bad arg: $arg"); }
+}
+($pattern = shift(@ARGV)) || &usage("Must supply a pattern");
+@ARGV || push(@ARGV, './');
+$error = 0;
+$found = 0;
+for (@ARGV) {
+    m,.*/, && !$' || ($_ .= '/');
+    &find($_);
+}
+
+exit($error + !$found);
+
+#
+# SUBROUTINES
+#
+sub usage { # $MSG
+    ($prog = $0) =~ s,.*/,,;
+    print <<EOF;
+$prog: $_[$[]
+usage: $prog [options] perl-regex [dirs]
+	-l = display filenames only
+	-i = ignore case
+	-r = recurse through subdirectories (default)
+	-R = don't recurse through subdirectories
+        -z = also search in .Z and .gz compressed files
+EOF
+    exit(1);
+} # usage
+
+# Recursively search directories looking for text files not in SCCS|RCS
+# directories.  Also ignores special files
+sub find { # $DIR/
+    local($dir) = @_;
+    # global: $entry, FILE, DIR, $_
+    opendir(DIR, $dir) || (&warn("opendir $dir: $!\n"), return);
+    local(@files) = sort(grep(!/^\.\.?$/, readdir(DIR)));
+    close(DIR);
+    FILE: for (@files) {
+    	$entry = join('', $dir, $_);
+    	lstat($entry) || (&warn("lstat($entry): $!\n"), next FILE);
+	if(-l _) {
+	    # Skip links pointing to directories
+	    stat($entry) || (&warn("stat($entry): $!\n"), next FILE);
+	    -d _ && next FILE;
+	}
+    	-d _ &&	(!$recurse || /^(SCCS|RCS)$/ || &find(join('', $entry, '/')), 
+		 next FILE);
+    	-f _ || next FILE;
+    	# More efficient to do the open and then the -B check
+    	open(FILE, ($zcat && $entry =~ /\.(Z|gz)$/) ? 
+                   "zcat $entry |" : $entry) || 
+            (&warn("open $entry: $!\n"), next FILE);
+    	# -B will be true if FILE is empty
+	-B FILE && next FILE;
+
+	# Following special cases are for efficiency: are they worth it?
+	if ($list_names_only && $ignore_case) {
+	    # Search in a fast way (bailing out once the pattern is found)
+	    # NOTE: Doing /$pattern/o and then // in the loop, doesn't work.
+	    /$pattern/i
+	    	&& ((print $entry, "\n"), $found = 1, next FILE)
+		    while <FILE>;
+	} elsif ($list_names_only) { # no ignore case
+	    # Search in a fast way (bailing out once the pattern is found)
+	    # NOTE: Doing /$pattern/o and then // in the loop, doesn't work.
+	    /$pattern/o
+	    	&& ((print $entry, "\n"), $found = 1, next FILE)
+		    while <FILE>;
+	} elsif ($ignore_case) {
+	    while (<FILE>) {
+		chop($_);	# else $ won't work in patterns
+	        if (/$pattern/i) { # /oi doesn't work, perl 4.019
+		    $found=1;
+		    print "$entry:$.:$_\n";
+		}
+	    }
+	} else {
+	    while (<FILE>) {
+		chop($_);	# else $ won't work in patterns
+	        if (/$pattern/o) {
+		    $found=1;
+		    print "$entry:$.:$_\n";
+		}
+	    }
+	}
+    } continue {
+	close(FILE);
+    }
+} # find
+
+sub warn { # @MSG
+    $error = 1;
+    warn @_;
+} # warn
