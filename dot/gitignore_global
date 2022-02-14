@@ -8,6 +8,7 @@ ehthumbs.db
 Thumbs.db
 radia-run-install.log
 .vscode/
+.idea/
 .ipynb_checkpoints/
 __pycache__/
 # Excel
