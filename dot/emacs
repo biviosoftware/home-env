@@ -3,7 +3,10 @@
     ;; Reversed, because add-to-list inserts in front of list
   ((dirs '("~/src/biviosoftware/home-env/emacs.d" "~/emacs" "~/.emacs.d/lisp")))
   (dolist (p dirs)
-    (add-to-list 'load-path p)))
+    (add-to-list 'load-path p))
+    ;; add descendant dirs too
+    (let ((default-directory  (car dirs)))
+        (normal-top-level-add-subdirs-to-load-path)))
 (ignore-errors
     (require 'pre-bivio-init))
 (require 'bivio-init)
