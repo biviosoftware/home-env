@@ -199,10 +199,7 @@ or b-perl-template-:
       (rename-buffer "*httpd*")
       (accept-process-output (get-buffer-process (current-buffer)))
       (set-buffer (get-buffer "*httpd*"))
-      (insert
-       "ipcclean; "
-       env
-       " bivio httpd run")
+      (insert env " bivio httpd run")
       (comint-send-input)
       (if prev-shell
 	  (progn
