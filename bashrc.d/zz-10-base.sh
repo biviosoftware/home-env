@@ -208,6 +208,18 @@ for f in \
     bivio_ld_library_path_insert "$f"
 done
 
+# Used by RadiaSoft (RADIA) staff. Works on NERSC or JupyterHub
+if [[ ! ${RADIA_SCRATCH:-} ]]; then
+    if [[ ${SCRATCH:-} && -d $SCRATCH && -w $SCRATCH ]]; then
+        export RADIA_SCRATCH=$SCRATCH
+    elif [[ ${JUPYTERHUB_USER:-} ]]; then
+        f=$HOME/jupyter/StaffScratch/$JUPYTERHUB_USER
+        if [[ -d $f && -w $f ]]; then
+            export RADIA_SCRATCH=$f
+        fi
+    fi
+fi
+
 unset f
 
 export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
