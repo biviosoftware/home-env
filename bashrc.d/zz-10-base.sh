@@ -344,10 +344,16 @@ fi
 if [[ ${TERM:-} == dumb ]]; then
     export EDITOR=$(type -p emacsclient)
     export NODE_NO_READLINE=1
-    export PAGER=cat
+    export PAGER=$(type -p cat)
     export SYSTEMD_COLOR=0
 fi
-
+# See above for these
+if [[ ! ${EDITOR:-} ]]; then
+    unset EDITOR
+fi
+if [[ ! ${PAGER:-} ]]; then
+    unset PAGER
+fi
 if [[ ! ${bivio_color:-} ]]; then
     function which() {
         type "$@"
