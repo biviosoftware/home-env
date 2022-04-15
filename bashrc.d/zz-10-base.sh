@@ -324,28 +324,30 @@ radia_run() {
     curl -s -S -L "$u/index.sh" | bash -l -s "$@"
 }
 
-if [[ ${INSIDE_EMACS:-} =~ comint ]]; then
-    # It's probably dumb, but force to be sure
-    export TERM=dumb
-    # older emacs used "dirs" now emacs uses "command dirs"
-    unset dirs
+if [[ $(type -p emacs) && $(type -p emacsclient) ]]; then
+    if [[ ${INSIDE_EMACS:-} =~ comint ]]; then
+        # It's probably dumb, but force to be sure
+        export TERM=dumb
+        # older emacs used "dirs" now emacs uses "command dirs"
+        unset dirs
 
-    e() {
-        emacsclient --no-wait "$@"
-    }
-else
-    export PAGER=$(type -p less)
-    export EDITOR=$(type -p emacs)
+        e() {
+            emacsclient --no-wait "$@"
+        }
+    else
+        export PAGER=$(type -p less)
+        export EDITOR=$(type -p emacs)
 
-    e() {
-        emacs "$@"
-    }
-fi
-if [[ ${TERM:-} == dumb ]]; then
-    export EDITOR=$(type -p emacsclient)
-    export NODE_NO_READLINE=1
-    export PAGER=cat
-    export SYSTEMD_COLOR=0
+        e() {
+            emacs "$@"
+        }
+    fi
+    if [[ ${TERM:-} == dumb ]]; then
+        export EDITOR=$(type -p emacsclient)
+        export NODE_NO_READLINE=1
+        export PAGER=$(type -p cat)
+        export SYSTEMD_COLOR=0
+    fi
 fi
 
 if [[ ! ${bivio_color:-} ]]; then
