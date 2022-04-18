@@ -85,6 +85,36 @@ if [[ -d $PYENV_ROOT/bin ]]; then
     fi
 fi
 
+bivio_path_insert "$HOME/brew/bin"
+if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
+    export HOMEBREW_NO_EMOJI=1
+    export HOMEBREW_NO_COLOR=1
+fi
+
+bivio_brew_install() {
+    if [[ $(uname) != Darwin ]]; then
+        echo "Brew is only needed on Mac OS" 1>&2
+        return 1
+    fi
+    local d="$HOME/brew"
+    if ! mkdir "$d"; then
+        echo "$d already exists; homebrew is already installed" 1>&2
+        return 1
+    fi
+    if [[ $(type -p git) ]]; then
+        echo 'You need to install Xcode. Run:
+xcode-select --install
+' 1>&2
+        return 1
+    fi
+    curl -L -s S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
+    bivio_not_strict_cmd source "$HOME"/.bashrc
+    (
+        eval "$("$d"/bin/brew shellenv)"
+        brew update --force --quiet
+    )
+}
+
 _bivio_pyenv_source() {
     local source=$1
     # Avoid recursion
