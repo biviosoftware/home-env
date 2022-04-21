@@ -107,7 +107,7 @@ xcode-select --install
 ' 1>&2
         return 1
     fi
-    curl -L -s S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
+    curl -L -s -S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
     bivio_not_strict_cmd source "$HOME"/.bashrc
     (
         eval "$("$d"/bin/brew shellenv)"
