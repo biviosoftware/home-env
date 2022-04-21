@@ -101,7 +101,7 @@ bivio_brew_install() {
         echo "$d already exists; homebrew is already installed" 1>&2
         return 1
     fi
-    if [[ $(type -p git) ]]; then
+    if [[ ! $(type -p git) ]]; then
         echo 'You need to install Xcode. Run:
 xcode-select --install
 ' 1>&2
