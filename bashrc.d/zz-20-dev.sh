@@ -96,15 +96,15 @@ bivio_brew_install() {
         echo "Brew is only needed on Mac OS" 1>&2
         return 1
     fi
-    local d="$HOME/brew"
-    if ! mkdir "$d"; then
-        echo "$d already exists; homebrew is already installed" 1>&2
-        return 1
-    fi
     if [[ ! $(type -p git) ]]; then
         echo 'You need to install Xcode. Run:
 xcode-select --install
 ' 1>&2
+        return 1
+    fi
+    local d="$HOME/brew"
+    if ! mkdir "$d"; then
+        echo "$d already exists; homebrew is already installed" 1>&2
         return 1
     fi
     curl -L -s -S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
