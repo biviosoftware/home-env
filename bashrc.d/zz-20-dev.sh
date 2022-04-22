@@ -177,12 +177,18 @@ bivio_pyenv_local() {
     _bivio_pyenv_source _bivio_pyenv_local
 }
 
-bivio_pyenv_2() {
-    _bivio_pyenv_version 2.7.16 py2
-}
-
 bivio_pyenv_3() {
-    _bivio_pyenv_version 3.7.2 py3
+    local v=3.7.2
+    if [[ $(uname) == Darwin ]]; then
+        local x=$(sw_vers -productVersion)
+        x=( ${x//./} )
+        if (( ${x[0]} >= 12 )); then
+            # Monterey doesn't compile 3.7.2
+            # https://github.com/pyenv/pyenv/issues/2143#issuecomment-1072032647
+            v=3.10.3
+        fi
+    fi
+    _bivio_pyenv_version "$v" py3
 }
 
 gcl() {
