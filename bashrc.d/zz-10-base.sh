@@ -321,7 +321,7 @@ radia_run() {
     if [[ ! $u || $u == github ]]; then
         u=https://depot.radiasoft.org
     fi
-    curl -s -S -L "$u/index.sh" | bash -l -s "$@"
+    curl -s -S -L "$u/index.txt" | bash -l -s "$@"
 }
 
 if [[ $(type -p emacs) && $(type -p emacsclient) ]]; then
