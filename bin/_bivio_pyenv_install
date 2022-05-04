@@ -20,6 +20,24 @@ fi
 
 # Reset the environment
 source "$HOME"/.bashrc
-
-PYTHON_CONFIGURE_OPTS="${BIVIO_PYENV_VALGRIND:+--without-pymalloc --with-pydebug --with-valgrind} --enable-shared" pyenv install "$_bivio_pyenv_global_version"
+(
+    # https://github.com/pyenv/pyenv/issues/1740#issuecomment-1020965784
+    if [[ $(uname) == Darwin ]]; then
+        if [[ ! $(type -p brew) ]]; then
+            echo 'You need to install homebrew with this command:
+bivio_brew_install' 1>&2
+            exit 1
+        fi
+        for p in readline bzip2 zlib openssl; do
+            if ! brew list "$p" >& /dev/null; then
+                brew install "$p"
+            fi
+        done
+        export CFLAGS="-I$(brew --prefix openssl)/include -I$(brew --prefix bzip2)/include -I$(brew --prefix readline)/include -I$(xcrun --show-sdk-path)/usr/include"
+        export LDFLAGS="-L$(brew --prefix openssl)/lib -L$(brew --prefix readline)/lib -L$(brew --prefix zlib)/lib -L$(brew --prefix bzip2)/lib"
+    fi
+    export PYTHON_CONFIGURE_OPTS="${BIVIO_PYENV_VALGRIND:+--without-pymalloc --with-pydebug --with-valgrind} --enable-shared"
+    # patch is ok, since it only affects darwin
+    pyenv install "$_bivio_pyenv_global_version"
+)
 pyenv global "$_bivio_pyenv_global_version"

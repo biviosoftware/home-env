@@ -85,6 +85,36 @@ if [[ -d $PYENV_ROOT/bin ]]; then
     fi
 fi
 
+bivio_path_insert "$HOME/brew/bin"
+if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
+    export HOMEBREW_NO_EMOJI=1
+    export HOMEBREW_NO_COLOR=1
+fi
+
+bivio_brew_install() {
+    if [[ $(uname) != Darwin ]]; then
+        echo "Brew is only needed on Mac OS" 1>&2
+        return 1
+    fi
+    if [[ ! $(type -p git) ]]; then
+        echo 'You need to install Xcode. Run:
+xcode-select --install
+' 1>&2
+        return 1
+    fi
+    local d="$HOME/brew"
+    if ! mkdir "$d"; then
+        echo "$d already exists; homebrew is already installed" 1>&2
+        return 1
+    fi
+    curl -L -s -S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
+    bivio_not_strict_cmd source "$HOME"/.bashrc
+    (
+        eval "$("$d"/bin/brew shellenv)"
+        brew update --force --quiet
+    )
+}
+
 _bivio_pyenv_source() {
     local source=$1
     # Avoid recursion
@@ -147,12 +177,18 @@ bivio_pyenv_local() {
     _bivio_pyenv_source _bivio_pyenv_local
 }
 
-bivio_pyenv_2() {
-    _bivio_pyenv_version 2.7.16 py2
-}
-
 bivio_pyenv_3() {
-    _bivio_pyenv_version 3.7.2 py3
+    local v=3.7.2
+    if [[ $(uname) == Darwin ]]; then
+        local x=$(sw_vers -productVersion)
+        x=( ${x//./} )
+        if (( ${x[0]} >= 12 )); then
+            # Monterey doesn't compile 3.7.2
+            # https://github.com/pyenv/pyenv/issues/2143#issuecomment-1072032647
+            v=3.10.3
+        fi
+    fi
+    _bivio_pyenv_version "$v" py3
 }
 
 gcl() {
