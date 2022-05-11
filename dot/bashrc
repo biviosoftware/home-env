@@ -37,5 +37,17 @@ _bivio_bashrc_init() {
     _bivio_bashrc_init_seen+=-1
 }
 
-_bivio_bashrc_init
+# $HOME condition is for backwards compatibility for job_agent:
+# https://github.com/radiasoft/sirepo/blob/86b837682df9a26f6/sirepo/pkcli/job_agent.py#L570
+if [[ ${SHIFTER_RUNTIME:-} && $HOME != /home/vagrant ]]; then
+    ulimit -c 0
+    unset PYTHONPATH
+    unset PYTHONSTARTUP
+    export PYENV_ROOT=/home/vagrant/.pyenv
+    export HOME=/home/vagrant
+    _bivio_bashrc_init
+    eval export HOME=~$USER
+else
+    _bivio_bashrc_init
+fi
 unset -f _bivio_bashrc_init
