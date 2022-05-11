@@ -189,7 +189,7 @@ for f in \
     /usr/lib64/mpich/lib \
     /usr/lib64/openmpi/lib \
     /usr/local/lib \
-    /opt/udiImage/modules/mpich/lib64 \
+    /opt/cray/pe/mpt/7.7.19/gni/mpich-gnu-abi/8.2/lib \
     ; do
     bivio_ld_library_path_remove "$f"
     if [[ ! ${BIVIO_MPI_LIB:-} && -d $f && $(shopt -s nullglob && echo $f/libmpi.so*) ]]; then
@@ -203,7 +203,7 @@ done
 for f in \
     "$HOME"/.local/lib \
     ${BIVIO_MPI_LIB:-} \
-    ${BIVIO_MPI_LIB:+/opt/udiImage/modules/mpich/lib64} \
+    ${BIVIO_MPI_LIB:+/opt/cray/pe/mpt/7.7.19/gni/mpich-gnu-abi/8.2/lib} \
     ; do
     bivio_ld_library_path_insert "$f"
 done
