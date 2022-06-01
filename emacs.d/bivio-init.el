@@ -160,7 +160,7 @@
     (interactive)
     (let ((comint-buffer-maximum-size 0))
       (comint-truncate-buffer)))
-  (define-key global-map "\C-c\M-o" 'bivio-comint-clear-buffer))
+  (define-key shell-mode-map "\C-c\M-o" 'bivio-comint-clear-buffer))
 
 (defun b-ffap-with-line ()
   "Go to file under cursor possibly with line number."
