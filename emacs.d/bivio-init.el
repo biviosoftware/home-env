@@ -153,6 +153,15 @@
       (unless (eq nil process)
         (set-process-window-size process (window-height) (window-width))))))
 
+
+(unless (fboundp 'comint-clear-buffer)
+  (defun bivio-comint-clear-buffer ()
+    "Clear the comint buffer. Remove when we are on emacs >= 25"
+    (interactive)
+    (let ((comint-buffer-maximum-size 0))
+      (comint-truncate-buffer)))
+  (define-key global-map "\C-c\M-o" 'bivio-comint-clear-buffer))
+
 (defun b-ffap-with-line ()
   "Go to file under cursor possibly with line number."
   (interactive)
