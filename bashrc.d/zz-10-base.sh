@@ -298,22 +298,33 @@ fi
 g() {
     local x="$1"
     shift
-    grep -iIr --exclude-dir='.git' --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
+    grep -iIr --exclude-dir=.git --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
 function gp() {
     local x="$1"
     shift
-    g --include '*.btest' \
-	--include '*.bunit' \
-	--include '*.t' \
-	--include '*.pm' \
-	--include '*.pl' \
-	--include '*.PL' \
-	--include '*.py' \
+    # --include must be first
+    grep -iIr \
+        --include '*.PL' \
+        --include '*.btest' \
+        --include '*.bunit' \
+        --include '*.pl' \
+        --include '*.pm' \
+        --include '*.py' \
+        --include '*.t' \
+        --exclude-dir=.git \
+        --exclude-dir=\*.tmp \
+        --exclude-dir=files/artisans/plain/f/bOP \
+        --exclude-dir=old \
+        --exclude-dir=tmp \
+        --exclude='*/.#*'\
+        --exclude='*~' \
+        --exclude='.#*' \
+        --exclude=bOP.pm \
         "$x" "${@-.}" |
-	egrep -v '/old/|/files/artisans/plain/f/bOP|Util/t/Dev.tmp|/pkgs/(build|tmp)|Bivio/bOP.pm'
+	egrep -v '/files/artisans/plain/f/bOP'
 }
 
 radia_run() {
