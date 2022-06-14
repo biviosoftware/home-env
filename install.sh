@@ -52,7 +52,7 @@ for repo in home-env \
             u=$install_server/biviosoftware/$repo/.git
         fi
         git clone -q \
-            ${RADIA_CI_BRANCH_HOME_ENV:+--branch=$RADIA_CI_BRANCH_HOME_ENV} \
+            ${RADIA_RUN_BRANCH_HOME_ENV:+--branch=$RADIA_RUN_BRANCH_HOME_ENV} \
             "$u"
 
     fi
