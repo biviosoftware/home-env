@@ -36,8 +36,9 @@ if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; the
     return
 fi
 
-# always set PYENV_ROOT
+# always set PYENV_ROOT and RADIA_CI_VERSION_PYTHON
 export PYENV_ROOT=$HOME/.pyenv
+export RADIA_CI_VERSION_PYTHON=${RADIA_CI_VERSION_PYTHON:-3.10.5}
 if [[ -d $PYENV_ROOT/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1
@@ -178,8 +179,7 @@ bivio_pyenv_local() {
 }
 
 bivio_pyenv_3() {
-    local v=3.10.5
-    _bivio_pyenv_version "$v" py3
+    _bivio_pyenv_version "${RADIA_CI_VERSION_PYTHON}" py3
 }
 
 gcl() {
