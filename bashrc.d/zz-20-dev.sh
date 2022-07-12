@@ -246,7 +246,14 @@ mocha() {
 }
 
 vssh() {
-    bivio_vagrant_ssh "$@"
+    if lsb_release -i -s 2>/dev/null | grep -i ubuntu; then
+        if ! vagrant status 2>&1 | grep -s '^default.*running'; then
+            vagrant up
+        fi
+        vagrant ssh -c "$@"
+    else
+        bivio_vagrant_ssh "$@"
+    fi
 }
 
 for f in $(shopt -s nullglob; echo "$HOME"/.local/etc/bashrc.d/*.sh); do
