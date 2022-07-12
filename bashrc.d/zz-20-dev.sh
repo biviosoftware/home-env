@@ -250,7 +250,7 @@ vssh() {
         if ! vagrant status 2>&1 | grep -s '^default.*running' >& /dev/null; then
             vagrant up
         fi
-        vagrant ssh -c "$@"
+        vagrant ssh ${@:+-c "$@"}
     else
         bivio_vagrant_ssh "$@"
     fi
