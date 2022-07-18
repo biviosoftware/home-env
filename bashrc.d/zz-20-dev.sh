@@ -246,7 +246,7 @@ mocha() {
 }
 
 vssh() {
-    if lsb_release -i -s 2>/dev/null | grep -i ubuntu >& /dev/null; then
+    if grep '^ID=ubuntu' /etc/os-release >& /dev/null; then
         if ! vagrant status 2>&1 | grep '^default.*running' >& /dev/null; then
             vagrant up
         fi
