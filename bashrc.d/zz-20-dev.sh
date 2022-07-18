@@ -246,7 +246,14 @@ mocha() {
 }
 
 vssh() {
-    bivio_vagrant_ssh "$@"
+    if grep '^ID=ubuntu' /etc/os-release >& /dev/null; then
+        if ! vagrant status 2>&1 | grep '^default.*running' >& /dev/null; then
+            vagrant up
+        fi
+        vagrant ssh ${*:+-c "$*"}
+    else
+        bivio_vagrant_ssh "$@"
+    fi
 }
 
 for f in $(shopt -s nullglob; echo "$HOME"/.local/etc/bashrc.d/*.sh); do
