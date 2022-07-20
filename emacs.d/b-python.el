@@ -115,6 +115,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
 (defun b-python-pykern-fmt-run ()
   (shell-command (concat "pykern fmt run "
                          (buffer-file-name)))
+  (minibuffer-message "Running pykern fmt")
   (revert-buffer :ignore-auto :noconfirm))
 
 (defun b-python-template nil
