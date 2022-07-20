@@ -49,6 +49,13 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
    ((string-match "\\.py$" (buffer-file-name)) "module")
    (t nil)))
 
+(defun b-python-maybe-pykern-fmt-run ()
+  (when (string-match
+         (concat "^" (expand-file-name "src/radiasoft" "~") ".*")
+         (buffer-file-name))
+    (add-hook 'after-save-hook #'b-python-pykern-fmt-run
+              nil t)))
+
 (defun b-python-sirepo-service-restart (service)
   "Start sirepo service in project root"
   (interactive)
@@ -105,6 +112,12 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
 	(b-python-project-root
 	 (directory-file-name (file-name-directory pwd)))))))
 
+(defun b-python-pykern-fmt-run ()
+  (shell-command (concat "pykern fmt run "
+                         (buffer-file-name)))
+  (minibuffer-message "Running pykern fmt")
+  (revert-buffer :ignore-auto :noconfirm))
+
 (defun b-python-template nil
   "inserts template according to file name"
   (interactive)
@@ -139,10 +152,11 @@ from pykern.pkdebug import pkdc, pkdlog, pkdp
     (b-python-template-module t)))
 
 (add-hook 'python-mode-hook
-	  '(lambda ()
-	     (set (make-local-variable 'compile-command)
-		  (b-python-compile-command))
-             (abbrev-mode)))
+          '(lambda ()
+             (set (make-local-variable 'compile-command)
+                  (b-python-compile-command))
+             (abbrev-mode)
+             (b-python-maybe-pykern-fmt-run)))
 
 (progn
   (define-key python-mode-map "\C-c\C-m" 'compile)
