@@ -50,9 +50,9 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
    (t nil)))
 
 (defun b-python-maybe-pykern-fmt-run ()
-  (when (string-match (concat "^"
-                              (expand-file-name "src/radiasoft" "~")
-                              ".*") (buffer-file-name))
+  (when (string-match
+         (concat "^" (expand-file-name "src/radiasoft" "~") ".*")
+         (buffer-file-name))
     (add-hook 'after-save-hook #'b-python-pykern-fmt-run
               nil t)))
 
