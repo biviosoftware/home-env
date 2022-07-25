@@ -116,7 +116,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
   (shell-command (concat "pykern fmt run "
                          (buffer-file-name)))
   (minibuffer-message "Running pykern fmt")
-  (revert-buffer :ignore-auto :noconfirm))
+  (revert-buffer :ignore-auto :noconfirm :preserve-modes))
 
 (defun b-python-template nil
   "inserts template according to file name"
