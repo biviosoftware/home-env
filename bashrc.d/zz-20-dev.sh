@@ -38,7 +38,6 @@ fi
 
 # always set PYENV_ROOT and RADIA_RUN_VERSION_PYTHON
 export PYENV_ROOT=$HOME/.pyenv
-export RADIA_RUN_VERSION_PYTHON=${RADIA_RUN_VERSION_PYTHON:-3.10.5}
 if [[ -d $PYENV_ROOT/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
     export PYENV_VIRTUALENV_DISABLE_PROMPT=1

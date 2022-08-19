@@ -32,8 +32,9 @@ unset f
 umask "${BIVIO_UMASK:-g-w,o-rwx}"
 if [[ ! ${bivio_color:-} ]]; then
     export LS_COLORS=
-    export USER_LS_COLORS=
+    export NO_COLOR=1
     export PROMPT_COMMAND=
+    export USER_LS_COLORS=
     export VAGRANT_NO_COLOR=true
 fi
 export USER=${USER:-$(id -u -n)}
@@ -41,6 +42,8 @@ export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 # Darwin (Catalina onwards replaced bash with zsh)
 export BASH_SILENCE_DEPRECATION_WARNING=1
+export RADIA_RUN_VERSION_PYTHON=${RADIA_RUN_VERSION_PYTHON:-3.10.5}
+export RADIA_RUN_VERSION_OS=$(radia_run_version_os)
 
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
