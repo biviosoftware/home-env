@@ -42,8 +42,6 @@ export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 # Darwin (Catalina onwards replaced bash with zsh)
 export BASH_SILENCE_DEPRECATION_WARNING=1
-export RADIA_RUN_VERSION_PYTHON=${RADIA_RUN_VERSION_PYTHON:-3.10.5}
-export RADIA_RUN_VERSION_OS=$(radia_run_version_os)
 
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.

@@ -91,96 +91,6 @@ if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
     export HOMEBREW_NO_COLOR=1
 fi
 
-bivio_brew_install() {
-    if [[ $(uname) != Darwin ]]; then
-        echo "Brew is only needed on Mac OS" 1>&2
-        return 1
-    fi
-    if [[ ! $(type -p git) ]]; then
-        echo 'You need to install Xcode. Run:
-xcode-select --install
-' 1>&2
-        return 1
-    fi
-    local d="$HOME/brew"
-    if ! mkdir "$d"; then
-        echo "$d already exists; homebrew is already installed" 1>&2
-        return 1
-    fi
-    curl -L -s -S https://github.com/Homebrew/brew/tarball/master | tar xz --strip 1 -C "$d"
-    bivio_not_strict_cmd source "$HOME"/.bashrc
-    (
-        eval "$("$d"/bin/brew shellenv)"
-        brew update --force --quiet
-    )
-}
-
-_bivio_pyenv_source() {
-    local source=$1
-    # Avoid recursion
-    if [[ ${_bivio_pyenv_source_stack:-} ]]; then
-        if [[ $_bivio_pyenv_source_stack[@] =~ $source ]]; then
-            return
-        fi
-    else
-        local _bivio_pyenv_source_stack=()
-    fi
-    _bivio_pyenv_source_stack+=($source)
-    (
-        set -e
-        source $source
-    )
-    local res=$?
-    _bivio_pyenv_source_stack=${_bivio_pyenv_source_stack[@]/$source/}
-    if [[ $res != 0 ]]; then
-        echo 'ERROR: install failed' 1>&2
-    fi
-    return $res
-}
-
-_bivio_pyenv_version() {
-    bivio_not_strict_cmd _bivio_pyenv_version_do "$@"
-}
-
-_bivio_pyenv_version_do() {
-    local v=$1
-    local ve=$2
-    # This line stops a warning from the pyenv installer
-    bivio_path_insert "$PYENV_ROOT"/bin 1
-    bivio_not_strict_cmd source "$HOME"/.bashrc
-    bivio_not_strict_cmd bivio_pyenv_global "$v"
-    bivio_not_strict_cmd source "$HOME"/.bashrc
-    pip install --upgrade pip
-    pip install --upgrade setuptools tox
-    pyenv virtualenv "$v" "$ve"
-    pyenv global "$ve"
-}
-
-bivio_pyenv_deactivate() {
-    if [[ ${PYENV_ACTIVATE:-} ]]; then
-        # so safe to deactivate any time
-        pyenv deactivate || true
-    fi
-    # This needs to be cleared for auto-de/activation to work again
-    unset VIRTUAL_ENV
-    # Remove global version
-    rm -f "$PYENV_ROOT"/version
-}
-
-bivio_pyenv_global() {
-    local _bivio_pyenv_global_version=$1
-    bivio_pyenv_deactivate
-    _bivio_pyenv_source _bivio_pyenv_global
-}
-
-bivio_pyenv_local() {
-    _bivio_pyenv_source _bivio_pyenv_local
-}
-
-bivio_pyenv_3() {
-    _bivio_pyenv_version "${RADIA_RUN_VERSION_PYTHON}" py3
-}
-
 gcl() {
     local r=$1
     if ! [[ $r =~ / ]]; then
@@ -197,42 +107,8 @@ gcl() {
     fi
 }
 
-gchmod() {
-    git update-index --chmod=+x "$@"
-}
-
-ghead() {
-    git checkout HEAD "$@"
-}
-
-gpu() {
-    git push origin master "$@"
-    git push --tags
-}
-
 gst() {
     git status -s "$@"
-}
-
-gtag() {
-    local tag=$1
-    git tag -d "$tag"
-    git push origin :refs/tags/"$tag"
-    git tag "$tag"
-    git push --tags
-}
-
-gup() {
-    git pull "$@"
-    git fetch --tags
-}
-
-http() {
-    python3 -m http.server "${BIVIO_HTTPD_PORT:-8000}"
-}
-
-mocha() {
-    command mocha "$@" | perl -p -e 's/\e.*?m//g'
 }
 
 vssh() {
