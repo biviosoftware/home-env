@@ -36,7 +36,7 @@ if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; the
     return
 fi
 
-# always set PYENV_ROOT and RADIA_RUN_VERSION_PYTHON
+# always set PYENV_ROOT
 export PYENV_ROOT=$HOME/.pyenv
 if [[ -d $PYENV_ROOT/bin ]]; then
     # Avoid warning "prompt changing will be removed from future release"
