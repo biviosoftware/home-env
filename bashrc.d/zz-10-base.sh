@@ -220,6 +220,12 @@ if [[ ! ${RADIA_SCRATCH:-} ]]; then
     fi
 fi
 
+if [[ ! ${HISTFILE:-} ]]; then
+    f="$HOME"/jupyter/.bash_history
+    if [[ -w $f ]]; then
+        export HISTFILE=$f
+    fi
+fi
 unset f
 
 export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"

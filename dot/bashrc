@@ -25,10 +25,12 @@ _bivio_bashrc_init() {
     fi
     local f
     for f in \
+        "$HOME"/jupyter/.pre_bivio_bashrc \
         "$HOME"/.pre_bivio_bashrc \
         /etc/bashrc \
         "$HOME"/src/*/home-env/bashrc.d/*.sh \
         "$HOME"/.post_bivio_bashrc \
+        "$HOME"/jupyter/.post_bivio_bashrc \
         ; do
         if [[ -f $f ]]; then
             source "$f"
