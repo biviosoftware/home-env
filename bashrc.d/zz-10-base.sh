@@ -133,11 +133,11 @@ bivio_classpath_append() {
     fi
 }
 
-bivio_ld_library_path_insert() {
+bivio_ld_library_path_append() {
     local dir="$1"
     local ignore_not_exist="${2:-}"
     if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$LD_LIBRARY_PATH: =~ :$dir: ) ]]; then
-	export LD_LIBRARY_PATH="$dir${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$dir"
     fi
 }
 
@@ -178,35 +178,33 @@ for f in \
     bivio_path_insert "$f"
 done
 
-# Remove LD paths that might have mpi. /usr/local/lib is in
-# /etc/ld.so.conf so remove it also. If libmpi exists in lib64,
-# BIVIO_MPI_LIB should be set to one of those, because that's
-# the value used in compiles, which doesn't happen in Shifter.
-# Give precedence to mpich, since that matches what Shifter
-# uses.
+# POSIT: BIVIO_MPI_LIB is only used for compiling
+# See https://github.com/radiasoft/download
 unset BIVIO_MPI_LIB
 for f in \
     /usr/lib64/mpich/lib \
     /usr/lib64/openmpi/lib \
     /usr/local/lib \
-    /opt/cray/pe/mpt/7.7.19/gni/mpich-gnu-abi/8.2/lib \
     ; do
-    bivio_ld_library_path_remove "$f"
-    if [[ ! ${BIVIO_MPI_LIB:-} && -d $f && $(shopt -s nullglob && echo $f/libmpi.so*) ]]; then
+    if [[ $(shopt -s nullglob && echo $f/libmpi.so*) ]]; then
         export BIVIO_MPI_LIB=$f
+        break
     fi
 done
-
-# NERSC's SHIFTER has to have precedence in LD_LIBRARY_PATH
-# but we also need BIVIO_MPI_LIB because it is where the
-# hdf5 and other libs are.
-for f in \
-    "$HOME"/.local/lib \
-    ${BIVIO_MPI_LIB:-} \
-    ${BIVIO_MPI_LIB:+/opt/cray/pe/mpt/7.7.19/gni/mpich-gnu-abi/8.2/lib} \
-    ; do
-    bivio_ld_library_path_insert "$f"
-done
+if [[ ${SHIFTER_RUNTIME:-} ]]; then
+    if [[ ! ${LD_LIBRARY_PATH:-} ]]; then
+        echo "ERROR: LD_LIBRARY_PATH is empty in Shifter; see ${BASH_SOURCE[0]}" 1>&2
+    elif [[ ! ${SLURM_JOB_ID:-} ]]; then
+        # Inside Shifter at NERSC. On a login node, we have no MPI, so we want to clear
+        # LD_LIBRARY_PATH so programs don't crash which import mpi.
+        # See https://github.com/biviosoftware/home-env/issues/49.
+        export LD_LIBRARY_PATH=
+    fi
+elif [[ ${BIVIO_MPI_LIB:-} ]]; then
+     bivio_ld_library_path_append "$BIVIO_MPI_LIB"
+fi
+# RadiaSoft libraries which do not take precedence over Shifter or MPI
+bivio_ld_library_path_append $HOME/.local/lib
 
 # Used by RadiaSoft (RADIA) staff. Works on NERSC or JupyterHub
 if [[ ! ${RADIA_SCRATCH:-} ]]; then
