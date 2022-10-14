@@ -32,8 +32,9 @@ unset f
 umask "${BIVIO_UMASK:-g-w,o-rwx}"
 if [[ ! ${bivio_color:-} ]]; then
     export LS_COLORS=
-    export USER_LS_COLORS=
+    export NO_COLOR=1
     export PROMPT_COMMAND=
+    export USER_LS_COLORS=
     export VAGRANT_NO_COLOR=true
 fi
 export USER=${USER:-$(id -u -n)}

@@ -51,7 +51,9 @@ for repo in home-env \
             # NOTE: requires install
             u=$install_server/biviosoftware/$repo/.git
         fi
-        git clone -q "$u"
+        git clone -q \
+            ${RADIA_RUN_BRANCH_HOME_ENV:+--branch=$RADIA_RUN_BRANCH_HOME_ENV} \
+            "$u"
 
     fi
 done

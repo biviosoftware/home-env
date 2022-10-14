@@ -130,7 +130,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
   (goto-char (point-min))
   (insert
    (concat "# -*- coding: utf-8 -*-
-u\"\"\"?
+\"\"\"?
 
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
