@@ -107,6 +107,17 @@ gcl() {
     fi
 }
 
+gbranchdel() {
+    # Delete local branches that no longer have a remote tracking branch
+    # https://stackoverflow.com/a/33548037/5518313
+    git fetch --prune
+    declare b
+    for b in $(git for-each-ref --format '%(refname) %(upstream:track)' refs/heads \
+                   | awk '$2 == "[gone]" {sub("refs/heads/", "", $1); print $1}'); do
+        git branch -D $b
+    done
+}
+
 gst() {
     git status -s "$@"
 }
