@@ -322,7 +322,7 @@ From the window at the lower right corner, select the one at the upper left."
   "Calls git push in the current directory"
   (interactive)
   (message "Pushing...")
-  (shell-command "git push"))
+  (shell-command "gpush"))
 
 (define-key global-map "\177" 'backward-delete-char-untabify)
 
