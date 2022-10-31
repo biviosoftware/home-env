@@ -118,6 +118,16 @@ gbranchdel() {
     done
 }
 
+gpush() {
+    if git push "$@" 2>/dev/null; then
+        return
+    fi
+    declare b=$(git rev-parse --abbrev-ref HEAD)
+    if ! git config --get "branch.$b.merge" ; then
+        git push --set-upstream origin "$b"
+    fi
+}
+
 gst() {
     git status -s "$@"
 }
