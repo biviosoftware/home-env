@@ -103,7 +103,11 @@ for f in $(shopt -s nullglob; echo {bin,dot}/*); do
     else
         dst="$HOME"/.${f#dot/}
     fi
-    if [ -e "$dst" ]; then
+    if [[ -e "$dst" ]]; then
+        if [[ $src =~ dot/inputrc ]]; then
+            # inputrc was added much later so don't override
+            continue
+        fi
         if cmp --silent "$dst" "$src"; then
             continue
         fi
