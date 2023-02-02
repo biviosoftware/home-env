@@ -10,7 +10,8 @@
 (setq lsp-completion-provider :none)
 (setq lsp-pyright-auto-import-completions
       nil)
-(setq lsp-signature-auto-activate nil) ;; disalbe bottom documentation popup
+;; disable bottom documentation popup
+(setq lsp-signature-auto-activate nil)
 (add-hook 'js-mode-hook #'lsp)
 (add-hook 'web-mode-hook #'lsp)
 (setq gc-cons-threshold 100000000)
