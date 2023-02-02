@@ -11,8 +11,6 @@
 (setq lsp-pyright-auto-import-completions
       nil)
 (setq lsp-signature-auto-activate nil) ;; disalbe bottom documentation popup
-(setq company-dabbrev-downcase 1)
-(setq company-idle-delay 0.01)
 (add-hook 'js-mode-hook #'lsp)
 (add-hook 'web-mode-hook #'lsp)
 (setq gc-cons-threshold 100000000)
