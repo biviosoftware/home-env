@@ -1,6 +1,6 @@
 export BIVIO_SRC_HOME_ENV="$HOME"/src/biviosoftware/home-env
 bivio_not_src_home_env() {
-    local d=$BIVIO_SRC_HOME_ENV
+    declare d=$BIVIO_SRC_HOME_ENV
     if [[ ! ( ${BASH_SOURCE[0]} =~ $d ) && -d $d ]]; then
         return 0
     fi
@@ -60,7 +60,7 @@ if [[ ${TERM:-} =~ ^(screen.xterm-256color|screen|screen256|screen-256color)$ &&
 fi
 
 bivio_not_strict_cmd() {
-    local flags=$-
+    declare flags=$-
     set +eu
     "$@"
     if [[ $flags =~ e ]]; then
@@ -72,8 +72,8 @@ bivio_not_strict_cmd() {
 }
 
 dirs() {
-    local f
-    local -i i=0
+    declare f
+    declare -i i=0
     for f in $(command dirs); do
       	echo "    $i  $f"
       	i=$i+1
@@ -88,7 +88,7 @@ bivio_ps1() {
     if [[ ! ${PS1:-} ]]; then
         return
     fi
-    local x='['
+    declare x='['
     if [[ ${1+1} ]]; then
         x="$x$1;"
     fi
@@ -128,15 +128,36 @@ if [[ ${PS1:-} ]]; then
 fi
 
 bivio_classpath_append() {
-    local jar="$1"
+    declare jar="$1"
     if [[ ! ( :${CLASSPATH:-}: =~ :$jar: ) ]]; then
 	export CLASSPATH=${CLASSPATH:-}${CLASSPATH+:}$jar
     fi
 }
 
+bivio_classpath_insert_dir() {
+    declare dir=$1
+    if [[ ! -d $dir ]]; then
+        return
+    fi
+    declare v=
+    if ls -d "$dir"/*.{java,class} &> /dev/null; then
+        if [[ ! ( :${CLASSPATH:-}: =~ :$dir: ) ]]; then
+            v=$dir
+        fi
+    fi
+    if ls -d "$dir"/*.jar &> /dev/null; then
+        if [[ ! ( :${CLASSPATH:-}: =~ :$dir/\*: ) ]]; then
+            v=$dir/*
+        fi
+    fi
+    if [[ $v ]]; then
+        export CLASSPATH=$dir${CLASSPATH+:}${CLASSPATH:-}
+    fi
+}
+
 bivio_ld_library_path_append() {
-    local dir="$1"
-    local ignore_not_exist="${2:-}"
+    declare dir="$1"
+    declare ignore_not_exist="${2:-}"
     if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$LD_LIBRARY_PATH: =~ :$dir: ) ]]; then
 	export LD_LIBRARY_PATH="${LD_LIBRARY_PATH:+$LD_LIBRARY_PATH:}$dir"
     fi
@@ -151,8 +172,8 @@ bivio_path_dedup() {
 }
 
 bivio_path_insert() {
-    local dir="$1"
-    local ignore_not_exist="${2:-}"
+    declare dir="$1"
+    declare ignore_not_exist="${2:-}"
     if [[ ( $ignore_not_exist || -d $dir ) && ! ( :$PATH: =~ :$dir: ) ]]; then
 	export PATH="$dir:$PATH"
     fi
@@ -236,16 +257,12 @@ if bivio_in_docker && [[ ${BIVIO_MPI_PREFIX:-} =~ openmpi ]]; then
 fi
 
 export JAVA_HOME=/usr/lib/jvm/java
-#java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore
-# Get most recent java and any jars in /usr/java
-for f in $(ls "$HOME"/.local/share/java/*.jar /usr/java/*.jar 2> /dev/null || true); do
-    bivio_classpath_append $f
-done
-unset f
+bivio_classpath_insert_dir /usr/java
+bivio_classpath_insert_dir "$HOME"/.local/share/java
 
 if [[ -d $HOME/src/java ]]; then
     export JAVA_ROOT=$HOME/src/java
-    bivio_classpath_append "$JAVA_ROOT"
+    bivio_classpath_insert_dir "$JAVA_ROOT"
 fi
 
 export FTP_PASSIVE=1
@@ -301,14 +318,14 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
 fi
 
 g() {
-    local x="$1"
+    declare x="$1"
     shift
     grep -iIr --exclude-dir=.git --exclude='*~' --exclude='.#*' --exclude='*/.#*' \
         "$x" "${@-.}" 2>/dev/null
 }
 
 function gp() {
-    local x="$1"
+    declare x="$1"
     shift
     # --include must be first
     grep -iIr \
@@ -333,7 +350,7 @@ function gp() {
 }
 
 radia_run() {
-    local u=${install_server:-}
+    declare u=${install_server:-}
     if [[ ! $u || $u == github ]]; then
         u=https://radia.run
     fi
