@@ -352,9 +352,9 @@ function gp() {
 radia_run() {
     declare u=${install_server:-}
     if [[ ! $u || $u == github ]]; then
-        u=https://depot.radiasoft.org
+        u=https://radia.run
     fi
-    curl -s -S -L "$u/index.sh" | bash -l -s "$@"
+    curl -s -S -L "$u" | bash -l -s "$@"
 }
 
 if [[ $(type -p emacs) && $(type -p emacsclient) ]]; then
