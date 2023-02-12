@@ -151,7 +151,7 @@ bivio_classpath_insert_dir() {
         fi
     fi
     if [[ $v ]]; then
-        export CLASSPATH=$dir${CLASSPATH+:}${CLASSPATH:-}
+        export CLASSPATH=$v${CLASSPATH+:}${CLASSPATH:-}
     fi
 }
 
