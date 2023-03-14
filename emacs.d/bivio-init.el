@@ -368,56 +368,9 @@ From the window at the lower right corner, select the one at the upper left."
 ;;;; VC keys
 (define-key vc-prefix-map "p" 'bivio-git-push)
 
- ;; '(font-lock-comment-face ((t (:foreground "red"))))
- ;; '(font-lock-doc-face ((t (:foreground "red"))))
- ;; '(font-lock-string-face ((t (:foreground "magenta"))))
- ;; '(font-lock-keyword-face ((t (:foreground "blue"))))
- ;; '(font-lock-builtin-face ((t (:foreground "blue"))))
- ;; '(font-lock-function-name-face ((t (:foreground "green"))))
- ;; '(font-lock-type-face ((t (:foreground "cyan"))))
- ;; '(font-lock-variable-name-face ((t (:foreground "green"))))
-
 ;; Allow rpm spec *.include files to set rpm
 (custom-set-variables
  '(safe-local-variable-values (quote ((eval sh-set-shell "rpm" nil nil)))))
-
-(custom-set-faces
- ;;; (what-cursor-position) \C-u \C-x = verbose details about face under cursor
- ;;; (list-colors-display)  colors available to emacs
- ;;; (describe-face) explains what faces are shown
- '(font-lock-comment-face ((t (:foreground "magenta"))))
- '(font-lock-doc-face ((t (:foreground "magenta"))))
- '(font-lock-keyword-face ((t (:foreground "cyan"))))
- '(font-lock-builtin-face ((t (:foreground "cyan"))))
- '(font-lock-type-face ((t (:foreground "green"))))
- '(font-lock-function-name-face ((t (:foreground "blue"))))
- '(font-lock-variable-name-face ((t (:foreground "blue"))))
- '(font-lock-constant-face ((t (:foreground "cyan"))))
- '(cperl-hash-face ((t (:foreground "black"))))
- '(cperl-array-face ((t (:foreground "black"))))
- '(sh-heredoc ((t (:foreground "magenta"))))
- '(font-lock-string-face ((t (:foreground "magenta"))))
- '(diff-added-face ((t (:foreground "blue" :weight bold))))
- '(diff-changed-face ((t (:foreground "magenta" :weight extra-bold))))
- '(diff-context-face ((((class color) (background dark)) (:foreground "black"))))
- '(diff-file-header-face ((t nil)))
- '(diff-header-face ((t nil)))
- '(diff-removed-face ((t (:foreground "red" :weight bold))))
- '(minibuffer-prompt ((((background dark)) nil)))
- '(mmm-default-submode-face ((t (:foreground "red" :background nil))))
- '(mmm-init-submode-face ((t (:background nil))))
- '(mmm-cleanup-submode-face ((t (:background nil))))
- '(mmm-declaration-submode-face ((t (:background nil))))
- '(mmm-comment-submode-face ((t (:background nil))))
- '(mmm-output-submode-face ((t (:background nil))))
- '(mmm-special-submode-face ((t (:background nil))))
- '(mmm-code-submode-face ((t (:background nil))))
- '(web-mode-html-tag-face ((t (:foreground "blue"))))
- '(web-mode-html-tag-bracket-face ((t (:foreground "blue"))))
- '(web-mode-html-attr-name-face ((t (:foreground "cyan"))))
- '(web-mode-html-attr-value-face ((t (:foreground "magenta"))))
- '(rst-level-1 ((t nil)))
- )
 
 (if (functionp 'server-force-delete)
     (server-force-delete))
