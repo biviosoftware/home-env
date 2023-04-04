@@ -42,7 +42,11 @@ for repo in home-env \
     if [[ -d $repo ]]; then
         (
             cd "$repo"
-            git pull -q
+            if [[ ${bivio_home_env_ignore_git_dir_ownership:+1} ]]; then
+                git -c 'safe.directory=*'  pull  -q
+            else
+                git pull -q
+            fi
         )
     else
         u=https://github.com/biviosoftware/$repo.git
