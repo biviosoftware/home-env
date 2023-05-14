@@ -138,7 +138,7 @@
                   (set (make-local-variable 'tab-width) 4))
               (if (if (boundp 'bivio-delete-trailing-whitespace)
                       bivio-delete-trailing-whitespace
-                    (not (string-match-p "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/" bn)))
+                    (not (string-match-p "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/" bn)))
                   (add-hook 'write-contents-functions
                             (lambda()
                               (save-excursion
