@@ -81,12 +81,13 @@
    shell-dirstack-query "command dirs"
    explicit-shell-file-name shell-file-name)
   (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
-; stuff not for everybody
+;TODO(robnagler) Something useful when working on large shell buffers
 ;            ;; Disable font-locking in this buffer to improve performance
 ;            (font-lock-mode -1)
 ;            ;; Prevent font-locking from being re-enabled in this buffer
 ;            (make-local-variable 'font-lock-function)
 ;            (setq font-lock-function (lambda (_) nil))
+;TODO(robnagler) this doesn't work for me, but would be useful
 ;            (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
   (define-key shell-mode-map "\C-cc" 'dirs))
 
