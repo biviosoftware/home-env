@@ -27,6 +27,7 @@
 (put 'downcase-region 'disabled nil)
 (put 'eval-expression 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+(defvar bivio-redraw-after-isearch-p t "whether to call after redraw-display (only if in vagrant)")
 (setq
  case-fold-search t
  case-replace t
@@ -61,13 +62,16 @@
 
 ;;; Hack to check if running in vagrant, and need to add "redraw"
 ;;; See: http://emacs.stackexchange.com/questions/9512/why-does-the-buffer-get-garbled
+(defun bivio-isearch-update-post-hook ()
+  (if bivio-redraw-after-isearch-p
+      (redraw-display)))
 (if (and
      (file-accessible-directory-p "/vagrant")
      (not (string-match-p
            "^1\n"
            (ignore-errors
              (shell-command-to-string "grep -c '^core id[[:space:]]*:' /proc/cpuinfo")))))
-    (add-hook 'isearch-update-post-hook 'redraw-display))
+    (add-hook 'isearch-update-post-hook 'bivio-isearch-update-post-hook))
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
@@ -127,24 +131,27 @@
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
-;(defvar bivio-delete-trailing-whitespace t)
-;(setq bivio-delete-trailing-whitespace nil)
-(add-hook 'find-file-hook
-	  (lambda ()
-            (let ((case-fold-search nil)
-                  (bn (or buffer-file-name "")))
-              (if (string-match-p "/Radia/\\|/SRW/" bn)
-                  (set (make-local-variable 'tab-width) 4))
-              (if (if (boundp 'bivio-delete-trailing-whitespace)
-                      bivio-delete-trailing-whitespace
-                    (not (string-match-p "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/" bn)))
-                  (add-hook 'write-contents-functions
-                            (lambda()
-                              (save-excursion
-                                (delete-trailing-whitespace))))))))
-(add-hook 'css-mode-hook
-	  '(lambda ()
-	     (setq css-indent-offset 2)))
+(defvar bivio-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|\\.[Ii][Ii][Ff]$"
+  "whether to delete trailing whitespace on save")
+(defun bivio-write-contents-hook ()
+  "delete trailing whitespace"""
+  (save-excursion
+    (delete-trailing-whitespace)))
+(defun bivio-find-file-hook ()
+  "Controls whether to delete trailing whitespace and tab-width"
+  (let ((case-fold-search nil)
+        (bn (or buffer-file-name "")))
+    (if (string-match-p "/Radia/\\|/SRW/" bn)
+        (set (make-local-variable 'tab-width) 4))
+    (if (if (boundp 'bivio-delete-trailing-whitespace)
+            bivio-delete-trailing-whitespace
+          (not (string-match-p bivio-delete-trailing-whitespace-re bn)))
+        (add-hook 'write-contents-functions 'bivio-write-contents-hook))))
+
+(add-hook 'find-file-hook 'bivio-find-file-hook)
+(defun bivio-css-mode-hook ()
+  (setq css-indent-offset 2))
+(add-hook 'css-mode-hook 'bivio-css-mode-hook)
 
 (defun b-comint-fix-window-size ()
   "Change process window size."
