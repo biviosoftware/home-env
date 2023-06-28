@@ -1,4 +1,5 @@
 (provide 'bivio-init)
+(require 'b-lsp)
 (require 'b-evil)
 (require 'b-python)
 (require 'b-perl)
@@ -27,7 +28,7 @@
 (put 'downcase-region 'disabled nil)
 (put 'eval-expression 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
-(defvar bivio-redraw-after-isearch-p t "whether to call after redraw-display (only if in vagrant)")
+(defvar bivio-redraw-after-isearch t "whether to call after redraw-display (only if in vagrant)")
 (setq
  case-fold-search t
  case-replace t
@@ -63,7 +64,7 @@
 ;;; Hack to check if running in vagrant, and need to add "redraw"
 ;;; See: http://emacs.stackexchange.com/questions/9512/why-does-the-buffer-get-garbled
 (defun bivio-isearch-update-post-hook ()
-  (if bivio-redraw-after-isearch-p
+  (if bivio-redraw-after-isearch
       (redraw-display)))
 (if (and
      (file-accessible-directory-p "/vagrant")
@@ -138,10 +139,12 @@
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
-(defvar bivio-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|\\.[Ii][Ii][Ff]$"
-  "whether to delete trailing whitespace on save")
+(defvar bivio-not-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/\\|\\.[Ii][Ii][Ff]$"
+  "matches files to not delete trailing whitespace on save")
+(defvar bivio-delete-trailing-whitespace t "whether to delete trailing whitespace on save")
+(make-variable-buffer-local 'bivio-delete-trailing-whitespace)
 (defun bivio-write-contents-hook ()
-  "delete trailing whitespace"""
+  "calls delete-trailing-whitespace in excursion"
   (save-excursion
     (delete-trailing-whitespace)))
 (defun bivio-find-file-hook ()
@@ -150,13 +153,13 @@
         (bn (or buffer-file-name "")))
     (if (string-match-p "/Radia/\\|/SRW/" bn)
         (set (make-local-variable 'tab-width) 4))
-    (if (if (boundp 'bivio-delete-trailing-whitespace)
-            bivio-delete-trailing-whitespace
-          (not (string-match-p bivio-delete-trailing-whitespace-re bn)))
+    (if (and bivio-delete-trailing-whitespace
+             (not (string-match-p bivio-not-delete-trailing-whitespace-re bn)))
         (add-hook 'write-contents-functions 'bivio-write-contents-hook))))
 
 (add-hook 'find-file-hook 'bivio-find-file-hook)
 (defun bivio-css-mode-hook ()
+  "set css-indent-offset to 2"
   (setq css-indent-offset 2))
 (add-hook 'css-mode-hook 'bivio-css-mode-hook)
 
