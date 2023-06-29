@@ -28,6 +28,7 @@
 (put 'downcase-region 'disabled nil)
 (put 'eval-expression 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
+(defvar bivio-redraw-after-isearch t "whether to call after redraw-display (only if in vagrant)")
 (setq
  case-fold-search t
  case-replace t
@@ -62,16 +63,34 @@
 
 ;;; Hack to check if running in vagrant, and need to add "redraw"
 ;;; See: http://emacs.stackexchange.com/questions/9512/why-does-the-buffer-get-garbled
+(defun bivio-isearch-update-post-hook ()
+  (if bivio-redraw-after-isearch
+      (redraw-display)))
 (if (and
      (file-accessible-directory-p "/vagrant")
      (not (string-match-p
            "^1\n"
            (ignore-errors
              (shell-command-to-string "grep -c '^core id[[:space:]]*:' /proc/cpuinfo")))))
-    (add-hook 'isearch-update-post-hook 'redraw-display))
+    (add-hook 'isearch-update-post-hook 'bivio-isearch-update-post-hook))
 
 (add-to-list 'compilation-error-regexp-alist
 	     '(".*at \\([^ ]+\\) line \\([0-9]+\\)\\.?\n" 1 2))
+(defun bivio-shell-mode-hook (&optional arg)
+  (setq
+   shell-dirstack-query "command dirs"
+   explicit-shell-file-name shell-file-name)
+  (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
+;TODO(robnagler) Something useful when working on large shell buffers
+;            ;; Disable font-locking in this buffer to improve performance
+;            (font-lock-mode -1)
+;            ;; Prevent font-locking from being re-enabled in this buffer
+;            (make-local-variable 'font-lock-function)
+;            (setq font-lock-function (lambda (_) nil))
+;TODO(robnagler) this doesn't work for me, but would be useful
+;            (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
+  (define-key shell-mode-map "\C-cc" 'dirs))
+
 (if (file-readable-p "/bin/bash")
     (progn
       (setq
@@ -79,14 +98,7 @@
        shell-command-switch "-lc")
       (require 'bash-completion)
       (bash-completion-setup)
-      (add-hook
-       'shell-mode-hook
-       (lambda (&optional arg)
-         (setq
-          shell-dirstack-query "command dirs"
-          explicit-shell-file-name shell-file-name)
-         (add-hook 'window-configuration-change-hook 'b-comint-fix-window-size nil t)
-         (define-key shell-mode-map "\C-cc" 'dirs)))))
+      (add-hook 'shell-mode-hook 'bivio-shell-mode-hook)))
 
 ;;; https://github.com/syl20bnr/spacemacs/issues/6820#issuecomment-239665146
 ;;; keep same window for starting shells or listing buffers
@@ -128,24 +140,29 @@
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
 
-;(defvar bivio-delete-trailing-whitespace t)
-;(setq bivio-delete-trailing-whitespace nil)
-(add-hook 'find-file-hook
-	  (lambda ()
-            (let ((case-fold-search nil)
-                  (bn (or buffer-file-name "")))
-              (if (string-match-p "/Radia/\\|/SRW/" bn)
-                  (set (make-local-variable 'tab-width) 4))
-              (if (if (boundp 'bivio-delete-trailing-whitespace)
-                      bivio-delete-trailing-whitespace
-                    (not (string-match-p "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/" bn)))
-                  (add-hook 'write-contents-functions
-                            (lambda()
-                              (save-excursion
-                                (delete-trailing-whitespace))))))))
-(add-hook 'css-mode-hook
-	  '(lambda ()
-	     (setq css-indent-offset 2)))
+(defvar bivio-not-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/\\|\\.[Ii][Ii][Ff]$"
+  "matches files to not delete trailing whitespace on save")
+(defvar bivio-delete-trailing-whitespace t "whether to delete trailing whitespace on save")
+(make-variable-buffer-local 'bivio-delete-trailing-whitespace)
+(defun bivio-write-contents-hook ()
+  "calls delete-trailing-whitespace in excursion"
+  (save-excursion
+    (delete-trailing-whitespace)))
+(defun bivio-find-file-hook ()
+  "Controls whether to delete trailing whitespace and tab-width"
+  (let ((case-fold-search nil)
+        (bn (or buffer-file-name "")))
+    (if (string-match-p "/Radia/\\|/SRW/" bn)
+        (set (make-local-variable 'tab-width) 4))
+    (if (and bivio-delete-trailing-whitespace
+             (not (string-match-p bivio-not-delete-trailing-whitespace-re bn)))
+        (add-hook 'write-contents-functions 'bivio-write-contents-hook))))
+
+(add-hook 'find-file-hook 'bivio-find-file-hook)
+(defun bivio-css-mode-hook ()
+  "set css-indent-offset to 2"
+  (setq css-indent-offset 2))
+(add-hook 'css-mode-hook 'bivio-css-mode-hook)
 
 (defun b-comint-fix-window-size ()
   "Change process window size."
@@ -189,15 +206,6 @@
 
 (setq comint-output-filter-functions
       (remove 'ansi-color-process-output comint-output-filter-functions))
-
-;(add-hook 'shell-mode-hook
-;          (lambda ()
-;            ;; Disable font-locking in this buffer to improve performance
-;            (font-lock-mode -1)
-;            ;; Prevent font-locking from being re-enabled in this buffer
-;            (make-local-variable 'font-lock-function)
-;            (setq font-lock-function (lambda (_) nil))
-;            (add-hook 'comint-preoutput-filter-functions 'xterm-color-filter nil t)))
 
 (if (and (getenv "BCONF")
          (or (getenv "BIVIO_HTTPD_PORT")
