@@ -91,6 +91,13 @@ if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
     export HOMEBREW_NO_COLOR=1
 fi
 
+for r in 'sirepo'; do
+    p="$HOME/src/radiasoft/$r/etc/.home-env"
+    if [[ -f $p ]]; then
+        source "$p"
+    fi
+done
+
 gcl() {
     local r=$1
     if ! [[ $r =~ / ]]; then
@@ -131,6 +138,7 @@ gpush() {
 gst() {
     git status -s "$@"
 }
+
 
 vssh() {
     if grep '^ID=ubuntu' /etc/os-release >& /dev/null; then
