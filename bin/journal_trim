@@ -29,6 +29,8 @@ s{(?<=srj-\w-)(\w+)}{x(uid=>$1)}eg;
 s{/srv/sirepo/db/user/(\w+)/}{'/db/'.x(uid=>$1).'/'}eg;
 s{(?<=/job-cmd-lib-file/)(\w+)}{x(key=>$1)}eg;
 s{(/db/uid\d+/[^/]+/)(\w{8})}{$1.x(sid=>$2)}eg;
+# arbitrary keys not covered by the above. may trim actual words, but unlikely
+s{\b([a-z0-9]{32})\b}{substr($1, 0, 4)}eig;
 
 # emacs line ending
 s{\\\n}{}s;
@@ -39,8 +41,11 @@ _main() {
     local file=${1:-}
     if [[ $file ]]; then
         perl -pi -e "$_perl" "$file"
-    else
+    elif type pbpaste &> /dev/null; then
         pbpaste | perl -p -e "$_perl" | pbcopy
+    else:
+        echo "error missing argument
+usage: $0 file"
     fi
 }
 
