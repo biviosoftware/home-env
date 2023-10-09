@@ -257,7 +257,9 @@ if bivio_in_docker && [[ ${BIVIO_MPI_PREFIX:-} =~ openmpi ]]; then
     export OMPI_MCA_btl=self,sm,tcp
 fi
 
-export JAVA_HOME=/usr/lib/jvm/java
+if [[ -d /usr/lib/jvm/java ]]; then
+    export JAVA_HOME=/usr/lib/jvm/java
+fi
 bivio_classpath_insert_dir /usr/java
 bivio_classpath_insert_dir "$HOME"/.local/share/java
 
