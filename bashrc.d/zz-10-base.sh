@@ -270,22 +270,23 @@ fi
 
 export FTP_PASSIVE=1
 
-if [[ -f $HOME/.ssh/ssh_agent ]]; then
-    source "$HOME"/.ssh/ssh_agent > /dev/null
-    if [[ ${PS1:-} ]]; then
-        if ! ps ${SSH_AGENT_PID-0} 2>&1 | grep -s -q ssh-agent; then
-	    # Start a daemon and add
-	    ssh-agent > "$HOME"/.ssh/ssh_agent
-	    source "$HOME"/.ssh/ssh_agent
-	    ssh-add
+f=$HOME/.ssh/ssh_agent
+if [[ -f $f ]]; then
+    source "$f" > /dev/null
+    if [[ ${PS1:-} && -t 0 ]]; then
+        if (( ${SSH_AGENT_PID:-0} <= 0 )) || ! ps "$SSH_AGENT_PID" | grep -s -q ssh-agent; then
+	    ssh-agent > "$f"
+	    source "$f"
+	    ssh-add -t "${SSH_ADD_EXPIRY:-300}"
             x="$HOME"/.vagrant.d/insecure_private_key
             if [[ -f $x  ]]; then
-                ssh-add $x
+                ssh-add "$x"
             fi
             unset x
 	fi
     fi
 fi
+unset f
 
 #POSIT: duplicate code in install.sh
 if [[ -z ${BIVIO_WANT_PERL+x} ]]; then
