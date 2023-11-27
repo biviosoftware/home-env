@@ -274,8 +274,7 @@ f=$HOME/.ssh/ssh_agent
 if [[ -f $f ]]; then
     source "$f" > /dev/null
     if [[ ${PS1:-} && -t 0 ]]; then
-        if ! ps "${SSH_AGENT_PID:-0}" 2>&1 | grep -s -q ssh-agent; then
-	    # Start a daemon and add
+        if (( ${SSH_AGENT_PID:-0} <= 0 )) || ! ps "$SSH_AGENT_PID" | grep -s -q ssh-agent; then
 	    ssh-agent > "$f"
 	    source "$f"
 	    ssh-add -t "${SSH_ADD_EXPIRY:-300}"
