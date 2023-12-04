@@ -92,14 +92,14 @@ if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
 fi
 
 gcl() {
-    local r=$1
+    declare r=$1
     if ! [[ $r =~ / ]]; then
 	r=$(basename "$(pwd)")/$r
     fi
     if ! [[ $r =~ ^[a-z]+:/ ]]; then
         r=https://github.com/$r
     fi
-    local b=$(basename "$r" .git)
+    declare b=$(basename "$r" .git)
     if [[ -r $b ]]; then
         (cd $b && git pull)
     else
