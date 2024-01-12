@@ -129,8 +129,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
   "inserts a template for a python module."
   (goto-char (point-min))
   (insert
-   (concat "# -*- coding: utf-8 -*-
-\"\"\"?
+   (concat "\"\"\"?
 
 :copyright: " (b-python-copyright) "
 :license: " b-python-license "
@@ -147,8 +146,6 @@ from pykern.pkdebug import pkdc, pkdlog, pkdp
   "inserts a template for a pytest."
   (progn
     (goto-char (point-min))
-    (insert "import pytest
-")
     (b-python-template-module t)))
 
 (add-hook 'python-mode-hook
