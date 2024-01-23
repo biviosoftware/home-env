@@ -29,7 +29,7 @@ _err() {
 
 _main() {
     declare args=( "$@" )
-    if (( ${#args} <= 2 )); then
+    if (( ${#args[@]} < 2 )); then
         _err "usage: $0 source... v:dest OR v:source dest
 You can prefix any file with 'v:' and the correct credential and host will be substituded."
     fi
