@@ -41,10 +41,10 @@ EOF
 
 _main() {
     declare file=${1:-}
-    export journal_trim_secure=1
+    export journal_trim_secure=0
     if [[ $file =~ ^--?secure$ ]]; then
         shift
-        export journal_trim_secure=0
+        export journal_trim_secure=1
         file=${1:-1}
     elif [[ $file =~ ^- ]]; then
         _usage "invalid arg=$file"
