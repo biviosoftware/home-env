@@ -14,39 +14,56 @@ sub x {
 m{INFO:tornado.access:200 POST /job-api-request|^-- Logs begin at} && ($_ = '');
 s{^\w+ +\d+ (\S+) \S+ \S+}{$1};
 # file names
-s{^(\S+ ).*?/home.+?site-packages/}{$1};
+s{(\s| File \")/home/\S+?site-packages/}{ }g;
 # time
 s{\[\S+? \+0000\] }{};
-s{(?<=\bl[io]-)(\w{8})}{x(uid=>$1)}eg;
-# jid
-s{\b(\w{8})-(\w{8})(?=-\w+)}{x(uid=>$1).'-'.x(sid=>$2)}eg;
-s{(GET /[^/]+/[a-z0-9]+/(?:\w+/)?)([a-zA-Z0-9]{8})(?=/| )}{$1 . x(sid=>$2)}eg;
-s{(?<=\buid=)(\w+)}{x(uid=>$1)}eg;
-s{(?<=\bu=)(\w+)}{x(uid=>$1)}eg;
-s{(?<=\bsimulationId.: .\b)(\w+)\b}{x(sid=>$1)}eg;
-s{(\b\d+\.\d+\.\d+\.\d+\b)}{x(ip=>$1)}eg;
-s{([-\w]+\.bivio.biz)}{x(host=>$1)}eg;
-s{(?<=srj-\w-)(\w+)}{x(uid=>$1)}eg;
-s{/srv/sirepo/db/user/(\w+)/}{'/db/'.x(uid=>$1).'/'}eg;
-s{(?<=/sim-db-file/)(\w{8})(/\w+/)(\w{8})}{x(uid=>$1) . $2 . x(sid=>$3)}eg;
-s{(/db/uid\d+/[^/]+/)(\w{8})}{$1.x(sid=>$2)}eg;
-# arbitrary keys may be reused sometimes
-s{\b([a-z0-9]{32})\b}{x(key=>$1)}ieg;
+if ($ENV{journal_trim_secure}) {
+    s{(?<=\bl[io]-)(\w{8})}{x(uid=>$1)}eg;
+    # jid
+    s{\b(\w{8})-(\w{8})(?=-\w+)}{x(uid=>$1).'-'.x(sid=>$2)}eg;
+    s{(GET /[^/]+/[a-z0-9]+/(?:\w+/)?)([a-zA-Z0-9]{8})(?=/| )}{$1 . x(sid=>$2)}eg;
+    s{(?<=\buid=)(\w+)}{x(uid=>$1)}eg;
+    s{(?<=\bu=)(\w+)}{x(uid=>$1)}eg;
+    s{(?<=\bsimulationId.: .\b)(\w+)\b}{x(sid=>$1)}eg;
+    s{(\b\d+\.\d+\.\d+\.\d+\b)}{x(ip=>$1)}eg;
+    s{([-\w]+\.bivio.biz)}{x(host=>$1)}eg;
+    s{(?<=srj-\w-)(\w+)}{x(uid=>$1)}eg;
+    s{/srv/sirepo/db/user/(\w+)/}{'/db/'.x(uid=>$1).'/'}eg;
+    s{(?<=/sim-db-file/)(\w{8})(/\w+/)(\w{8})}{x(uid=>$1) . $2 . x(sid=>$3)}eg;
+    s{(/db/uid\d+/[^/]+/)(\w{8})}{$1.x(sid=>$2)}eg;
+    # arbitrary keys may be reused sometimes
+    s{\b([a-z0-9]{32})\b}{x(key=>$1)}ieg;
+}
 # emacs line ending
 s{\\\n}{}s;
 EOF
 )
 
 _main() {
-    local file=${1:-}
+    declare file=${1:-}
+    export journal_trim_secure=0
+    if [[ $file =~ ^--?secure$ ]]; then
+        shift
+        export journal_trim_secure=1
+        file=${1:-1}
+    elif [[ $file =~ ^- ]]; then
+        _usage "invalid arg=$file"
+    fi
     if [[ $file ]]; then
         perl -pi -e "$_perl" "$file"
     elif type pbpaste &> /dev/null; then
         pbpaste | perl -p -e "$_perl" | pbcopy
     else
-        echo "error missing argument
-usage: $0 file"
+        _usage 'error missing argument'
     fi
+}
+
+_usage() {
+    echo "$*
+usage: $0 [-secure] file
+processes output from journalctl to remove unnecessary info.
+-secure: anonymize identifiers and secrets" 1>&2
+    return 1
 }
 
 _main "$@"
