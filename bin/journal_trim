@@ -14,7 +14,7 @@ sub x {
 m{INFO:tornado.access:200 POST /job-api-request|^-- Logs begin at} && ($_ = '');
 s{^\w+ +\d+ (\S+) \S+ \S+}{$1};
 # file names
-s{(\s| File ")/home/\S+?site-packages/}{ }g;
+s{(\s| File \")/home/\S+?site-packages/}{ }g;
 # time
 s{\[\S+? \+0000\] }{};
 if ($ENV{journal_trim_secure}) {
