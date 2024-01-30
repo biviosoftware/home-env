@@ -1,5 +1,4 @@
 (provide 'bivio-init)
-(require 'b-lsp)
 (require 'b-evil)
 (require 'b-python)
 (require 'b-perl)
