@@ -1,0 +1,53 @@
+#!/bin/bash
+#
+# Copy using cached info from bivio_vagrant_ssh to copy to/from guest from the host
+#
+set -eou pipefail
+
+#TODO(robnagler) should be a way to share more easily
+declare _state_file=.vagrant/.bivio_vagrant_ssh.sh
+
+_copy() {
+    declare args=( "$@" )
+    declare host=${ssh_cmd[2]}
+    # see check in _main
+    declare cmd=( scp -P "${ssh_cmd[@]:4}" )
+    for a in "${args[@]}"; do
+        if [[ $a =~ ^v: ]]; then
+            cmd+=( "$host:${a#v:}" )
+        else
+            cmd+=( "$a" )
+        fi
+    done
+    "${cmd[@]}"
+}
+
+_err() {
+    echo "$1" 1>&2
+    exit 1
+}
+
+_main() {
+    declare args=( "$@" )
+    if (( ${#args[@]} < 2 )); then
+        _err "usage: $0 source... v:dest OR v:source dest
+You can prefix any file with 'v:' and the correct credential and host will be substituded."
+    fi
+    if [[ ! -r $_state_file ]]; then
+        if [[ -d .vagrant ]]; then
+            err_exit 'you need to run bivio_vagrant_ssh (vssh) first'
+        fi
+        _err 'you need to be in a vagrant directory'
+    fi
+    source "$_state_file" 2>/dev/null
+    if [[ ${ssh_cmd[3]} != -p ]]; then
+        _err "vssh incompatibility, expecting '-p' at index=3 ssh_cmd=${ssh_cmd[*]}"
+    fi
+    _copy "$@"
+}
+
+_msg() {
+    echo "$1" 1>&2
+}
+
+_main "$@"

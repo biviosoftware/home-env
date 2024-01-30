@@ -132,6 +132,10 @@ gst() {
     git status -s "$@"
 }
 
+vscp() {
+    bivio_vagrant_scp "$@"
+}
+
 vssh() {
     if grep '^ID=ubuntu' /etc/os-release >& /dev/null; then
         if ! vagrant status 2>&1 | grep '^default.*running' >& /dev/null; then
