@@ -106,8 +106,9 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
 		   (file-name-directory
 		    (or (buffer-file-name) (error "buffer has no name")))))))
     (if (string-equal pwd "/")
-	(error "not in python directory")
-      (if (file-exists-p (concat pwd "/setup.py"))
+	(error (concat "not in python directory=" pwd))
+      (if (or (file-exists-p (concat pwd "/pyproject.toml"))
+          (file-exists-p (concat pwd "/setup.py")))
 	  pwd
 	(b-python-project-root
 	 (directory-file-name (file-name-directory pwd)))))))
