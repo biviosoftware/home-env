@@ -2,11 +2,20 @@
 (provide 'b-python)
 (require 'python)
 
-(defvar b-python-copyright-owner "RadiaSoft LLC."
-  "*Who owns the copyrights for templates")
+(defcustom b-python-fmt-file-regexp (expand-file-name "~/src/radiasoft/")
+  "What Python files should be passed through pykern.pkcli.fmt on save"
+  :type "regexp"
+  :group 'b-python)
 
-(defvar b-python-license "http://www.apache.org/licenses/LICENSE-2.0.html"
-  "*What license")
+(defcustom b-python-copyright-owner "RadiaSoft LLC."
+  "*Who owns the copyrights for Python files"
+  :type "string"
+  :group 'b-python)
+
+(defcustom b-python-license "http://www.apache.org/licenses/LICENSE-2.0.html"
+  "*What license for Python files"
+  :type "string"
+  :group 'b-python)
 
 (defun b-python-compile-command ()
   "Returns a string compile-command."
@@ -51,7 +60,7 @@ See http://stackoverflow.com/a/32059968/3075806 for explanation."
 
 (defun b-python-maybe-pykern-fmt-run ()
   (when (string-match
-         (concat "^" (expand-file-name "src/radiasoft" "~") ".*")
+         b-python-fmt-file-regexp
          (buffer-file-name))
     (add-hook 'after-save-hook #'b-python-pykern-fmt-run
               nil t)))
@@ -150,7 +159,7 @@ from pykern.pkdebug import pkdc, pkdlog, pkdp
     (b-python-template-module t)))
 
 (add-hook 'python-mode-hook
-          '(lambda ()
+          (lambda ()
              (set (make-local-variable 'compile-command)
                   (b-python-compile-command))
              (abbrev-mode)

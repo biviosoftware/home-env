@@ -86,26 +86,26 @@ or b-perl-template-:
   (describe-function 'b-perl))
 
 (add-hook 'cperl-mode-hook
-	  '(lambda ()
-	     (cperl-set-style "PerlStyle")
-	     (setq cperl-continued-statement-offset 4)
-	     (setq cperl-merge-trailing-else nil)
-	     (setq cperl-tab-always-indent nil)
-	     (setq fill-column 79)
-	     (set (make-local-variable 'compile-command)
-		   (b-perl-compile-command))
-	     (if (>= (string-to-number cperl-version) 5.0)
-		 (progn
-		   (setq cperl-close-paren-offset -4)
-		   (setq cperl-brace-offset 0)
-		   (setq cperl-indent-parens-as-block t)
-		   (set (make-local-variable 'dabbrev-abbrev-char-regexp)
-			"\\sw\\|\\s_\\|:")))
-	     (if (>= (string-to-number cperl-version) 6.0)
-		 (progn
-		   (setq cperl-continued-brace-offset -4)
-		   (setq cperl-indent-parens-as-block t)))
-	  ))
+	  (lambda ()
+	    (cperl-set-style "PerlStyle")
+	    (setq cperl-continued-statement-offset 4)
+	    (setq cperl-merge-trailing-else nil)
+	    (setq cperl-tab-always-indent nil)
+	    (setq fill-column 79)
+	    (set (make-local-variable 'compile-command)
+		 (b-perl-compile-command))
+	    (if (>= (string-to-number cperl-version) 5.0)
+		(progn
+		  (setq cperl-close-paren-offset -4)
+		  (setq cperl-brace-offset 0)
+		  (setq cperl-indent-parens-as-block t)
+		  (set (make-local-variable 'dabbrev-abbrev-char-regexp)
+		       "\\sw\\|\\s_\\|:")))
+	    (if (>= (string-to-number cperl-version) 6.0)
+		(progn
+		  (setq cperl-continued-brace-offset -4)
+		  (setq cperl-indent-parens-as-block t)))
+	    ))
 
 (defun b-perl-call-super nil
   "Generates a call to SUPER::<current sub>"
@@ -311,7 +311,7 @@ Otherwise, inserts in the methods section."
     (if (not type)
 	(progn
 	  (setq type
-		(case qualifier
+		(cl-case qualifier
 		  (?a 'ABSTRACT)
 		  (?c (setq name (upcase name)) 'CONSTANT)
 		  (?f 'FACTORY)
