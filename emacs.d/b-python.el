@@ -3,7 +3,7 @@
 (require 'python)
 
 (defcustom b-python-fmt-file-regexp (expand-file-name "~/src/radiasoft/")
-  "What Python files should be automatically set"
+  "What Python files should be passed through pykern.pkcli.fmt on save"
   :type "regexp"
   :group 'b-python)
 
