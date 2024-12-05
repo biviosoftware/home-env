@@ -139,6 +139,19 @@
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
+(setq flymake-yamllint-arguments
+      (list "--config-data"
+            "extends: default
+             rules:
+               brackets:
+                 min-spaces-inside: 0
+                 max-spaces-inside: 1
+               comments:
+                 require-starting-space: false
+               comments-indentation: disable
+               document-start: disable
+               line-length: disable
+               truthy: disable"))
 (add-hook 'yaml-mode-hook 'flymake-yamllint-setup)
 (add-hook 'yaml-mode-hook
           (lambda ()
