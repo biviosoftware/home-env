@@ -11,6 +11,7 @@
 (require 'diff-mode)
 (require 'markdown-mode)
 (require 'yaml-mode)
+(require 'flymake-yamllint)
 (require 'css-mode)
 (require 'shell)
 (require 'mmm-mode)
@@ -138,6 +139,26 @@
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
 
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
+(setq flymake-yamllint-arguments
+      (list "--config-data"
+            "extends: default
+rules:
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  comments:
+    require-starting-space: false
+  comments-indentation: disable
+  document-start: disable
+  line-length: disable
+  truthy: disable"))
+(add-hook 'yaml-mode-hook 'flymake-yamllint-setup)
+(add-hook 'yaml-mode-hook
+          (lambda ()
+            (flymake-mode)
+            (flymake-yamllint-setup)))
+(setq flymake-start-on-flymake-mode t) 
+(setq flymake-no-changes-timeout 0.3)
 
 (defvar bivio-not-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/\\|\\.[Ii][Ii][Ff]$"
   "matches files to not delete trailing whitespace on save")
