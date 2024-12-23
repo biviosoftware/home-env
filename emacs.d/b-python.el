@@ -24,7 +24,7 @@
     ((string-equal "pytest" (b-python-file-type)) "pykern test ")
     (t "python "))
    (if (buffer-file-name)
-       (file-name-nondirectory (buffer-file-name))
+       (buffer-file-name)
      "")))
 
 (defun b-python-copyright nil
