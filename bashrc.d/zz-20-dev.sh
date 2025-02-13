@@ -47,7 +47,9 @@ if [[ -d $PYENV_ROOT/bin ]]; then
         # PERFORMANCE: rehash takes .5s, and sometimes it hangs on
         # writing to a file: ~/.pyenv/shims/.pyenv-shim. If we don't
         # have an interactive shell, don't rehash.
-        if [[ ! -w $PYENV_ROOT/shims || ! ${PS1:-} ]]; then
+        # apptainer returns true for "test -w" which causes pyenv rehash to fail
+        # after 60 seconds of looping trying to create a shim creation lock.
+        if [[ ! -w $PYENV_ROOT/shims || ! ${PS1:-} || ${APPTAINER_NAME:-} ]]; then
             # If we can't update shims, then can't rehash (see download/installers/container-run)
             _no_rehash=--no-rehash
         fi
