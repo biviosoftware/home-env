@@ -22,7 +22,7 @@ if [[ ! ${bivio_color:-} ]]; then
 fi
 
 # Undo bivio functions from /etc/bashrc.d
-for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | egrep '^(b_|bivio_)'); do
+for f in bconf b bu ba bi bihs ctd g gp $(compgen -A function | grep -E '^(b_|bivio_)'); do
     if [[ $f != bivio_not_src_home_env ]]; then
         unset -f "$f"
     fi
@@ -350,7 +350,7 @@ function gp() {
         --exclude='.#*' \
         --exclude=bOP.pm \
         "$x" "${@-.}" |
-	egrep -v '/files/artisans/plain/f/bOP'
+	grep -E -v '/files/artisans/plain/f/bOP'
 }
 
 radia_run() {
