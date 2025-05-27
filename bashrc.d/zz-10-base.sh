@@ -358,7 +358,10 @@ radia_run() {
     if [[ ! $u || $u == github ]]; then
         u=https://radia.run
     fi
-    curl --fail --location --silent --show-error "$u" | install_server="$u" bash --login "${install_debug:+-x}" -s "$@"
+    curl --fail --location --show-error --silent "$u" \
+        | install_server="$u" \
+        install_depot_server="${install_depot_server:-${RADIA_RUN_DEPOT_SERVER:-}}" \
+        bash "${install_debug:+-x}" -s "$@"
 }
 
 if [[ $(type -p emacs) && $(type -p emacsclient) ]]; then
