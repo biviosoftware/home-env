@@ -360,7 +360,6 @@ radia_run() {
     fi
     curl --fail --location --show-error --silent "$u" \
         | install_server="$u" \
-        install_depot_server="${install_depot_server:-${RADIA_RUN_DEPOT_SERVER:-}}" \
         bash "${install_debug:+-x}" -s "$@"
 }
 
