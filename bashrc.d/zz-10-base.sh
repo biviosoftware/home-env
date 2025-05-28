@@ -359,7 +359,7 @@ radia_run() {
         u=https://radia.run
     fi
     curl --fail --location --show-error --silent "$u" \
-        | install_server="$u" \
+        | install_server="${install_server:-${RADIA_RUN_SERVER:-}}" \
         bash "${install_debug:+-x}" -s "$@"
 }
 
