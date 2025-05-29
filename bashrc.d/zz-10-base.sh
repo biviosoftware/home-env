@@ -360,7 +360,7 @@ radia_run() {
     fi
     curl --fail --location --show-error --silent "$u" \
         | install_server="${install_server:-${RADIA_RUN_SERVER:-}}" \
-        bash "${install_debug:+-x}" -s "$@"
+        bash ${install_debug:+-x} -s "$@"
 }
 
 if [[ $(type -p emacs) && $(type -p emacsclient) ]]; then
