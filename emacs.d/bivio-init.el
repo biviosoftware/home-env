@@ -17,7 +17,6 @@
 (require 'mmm-mode)
 (require 'uniquify)
 (require 'web-mode)
-(require 'java-mode)
 
 (global-font-lock-mode t)
 (transient-mark-mode t)
