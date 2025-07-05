@@ -16,11 +16,7 @@
 (require 'shell)
 (require 'mmm-mode)
 (require 'uniquify)
-;;(require 'xterm-color)
-;;; remove after emacs 23 is gone
-(ignore-errors (require 'web-mode))
-(ignore-errors (require 'espresso))
-(ignore-errors (require 'java-mode))
+(require 'web-mode)
 
 (global-font-lock-mode t)
 (transient-mark-mode t)
@@ -105,7 +101,6 @@
 (push (cons "\\*shell\\*" display-buffer--same-window-action) display-buffer-alist)
 (push (cons "\\*Buffer List\\*" display-buffer--same-window-action) display-buffer-alist)
 
-
 (defalias 'perl-mode 'cperl-mode)
 (add-to-list
  'auto-mode-alist '("\\.\\(bview\\|bconf\\|btest\\|bunit\\|t\\|pl\\|PL\\|pm\\)\\'" . cperl-mode))
@@ -118,27 +113,19 @@
 
 (define-key java-mode-map "\C-c\C-m" 'compile)
 
-(if (fboundp 'web-mode)
-    (progn
-      (setq web-mode-code-indent-offset 4)
-      (setq web-mode-css-indent-offset 4)
-      (setq web-mode-markup-indent-offset 4)
-      (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.[agj]sp\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.as[cp]x\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.jsx?\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.tsx?\\'" . web-mode))
-      (add-to-list 'auto-mode-alist '("\\.json\\'" . web-mode))))
-
+(let ((suffixes
+       '("as[cp]x" "[agj]sp" "djhtml" "erb" "html?" "json" "jsx?" "mustache"
+          "phtml" "tpl\\.php" "tsx?" "vue"))
+      (indent 4))
+  (let ((pattern (concat "\\.\\(" (string-join suffixes "\\|") "\\)\\'")))
+    (setq web-mode-code-indent-offset indent)
+    (setq web-mode-css-indent-offset indent)
+    (setq web-mode-markup-indent-offset indent)
+    (add-to-list 'auto-mode-alist `(,pattern . web-mode))))
 
 (add-to-list 'auto-mode-alist '("\\.md$" . gfm-mode))
-
 (add-to-list 'auto-mode-alist '("\\.\\(sls\\|yml\\)$" . yaml-mode))
+
 (setq flymake-yamllint-arguments
       (list "--config-data"
             "extends: default
@@ -157,7 +144,7 @@ rules:
           (lambda ()
             (flymake-mode)
             (flymake-yamllint-setup)))
-(setq flymake-start-on-flymake-mode t) 
+(setq flymake-start-on-flymake-mode t)
 (setq flymake-no-changes-timeout 0.3)
 
 (defvar bivio-not-delete-trailing-whitespace-re "/[Ww]iki/\\w+$\\|/Radia/\\|/SRW/\\|/rshellweg/src/\\|\\.[Ii][Ii][Ff]$"
