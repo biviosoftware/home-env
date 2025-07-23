@@ -117,7 +117,7 @@
        '("as[cp]x" "[agj]sp" "djhtml" "erb" "html?" "json" "jsx?" "mustache"
           "phtml" "tpl\\.php" "tsx?" "vue"))
       (indent 4))
-  (let ((pattern (concat "\\.\\(" (string-join suffixes "\\|") "\\)\\'")))
+  (let ((pattern (concat "\\.\\(" (mapconcat 'identity suffixes "\\|") "\\)\\'")))
     (setq web-mode-code-indent-offset indent)
     (setq web-mode-css-indent-offset indent)
     (setq web-mode-markup-indent-offset indent)
