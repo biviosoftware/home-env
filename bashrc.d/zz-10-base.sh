@@ -321,6 +321,17 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     fi
 fi
 
+if [[ ! ${NVM_DIR:-} ]]; then
+    if [[ ${XDG_CONFIG_HOME:-} ]]; then
+        export NVM_DIR=$XDG_CONFIG_HOME/nvm
+    else
+        export NVM_DIR=$HOME/.nvm
+    fi
+fi
+if [[ -r $NVM_DIR/nvm.sh ]]; then
+    source "$NVM_DIR"/nvm.sh
+fi
+
 g() {
     declare x="$1"
     shift
