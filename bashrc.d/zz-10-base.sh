@@ -322,11 +322,7 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
 fi
 
 if [[ ! ${NVM_DIR:-} ]]; then
-    if [[ ${XDG_CONFIG_HOME:-} ]]; then
-        export NVM_DIR=$XDG_CONFIG_HOME/nvm
-    else
-        export NVM_DIR=$HOME/.nvm
-    fi
+    export NVM_DIR=$HOME/.local/nvm
 fi
 if [[ -r $NVM_DIR/nvm.sh ]]; then
     source "$NVM_DIR"/nvm.sh
