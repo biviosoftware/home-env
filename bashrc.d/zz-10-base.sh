@@ -321,9 +321,7 @@ if [[ ${BIVIO_WANT_PERL:-} ]]; then
     fi
 fi
 
-if [[ ! ${NVM_DIR:-} ]]; then
-    export NVM_DIR=$HOME/.local/nvm
-fi
+export NVM_DIR=$HOME/.local/nvm
 if [[ -r $NVM_DIR/nvm.sh ]]; then
     source "$NVM_DIR"/nvm.sh
 fi
