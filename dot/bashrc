@@ -37,7 +37,9 @@ _bivio_bashrc_init() {
         fi
     done
     _bivio_bashrc_init_seen+=-1
+    _bivio_bashrc_prompt_command=$PROMPT_COMMAND
 }
 
 _bivio_bashrc_init
+PROMPT_COMMAND=$_bivio_bashrc_prompt_command
 unset -f _bivio_bashrc_init
