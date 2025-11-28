@@ -250,6 +250,9 @@ fi
 unset f
 
 export PKG_CONFIG_PATH="$HOME/.local/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+# gcc supported included paths. cmake must be explicit
+export C_INCLUDE_PATH=$HOME/.local/lib
+export CPLUS_INCLUDE_PATH=$HOME/.local/lib
 
 if bivio_in_docker && [[ ${BIVIO_MPI_PREFIX:-} =~ openmpi ]]; then
     # https://github.com/radiasoft/devops/issues/132
