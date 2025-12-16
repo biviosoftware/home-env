@@ -93,7 +93,11 @@
        shell-file-name "/bin/bash"
        shell-command-switch "-lc")
       (require
-       'bash-completion (if (>= emacs-major-version 26) "bash-completion-3.2" "bash-completion-3.1"))
+       'bash-completion
+       (cond
+        ((eq system-type 'darwin) "bash-completion-2.1")
+        ((>= emacs-major-version 26) "bash-completion-3.2")
+        ("bash-completion-3.1")))
       (bash-completion-setup)
       (add-hook 'shell-mode-hook 'bivio-shell-mode-hook)))
 
