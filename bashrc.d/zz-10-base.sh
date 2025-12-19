@@ -37,6 +37,12 @@ if [[ ! ${bivio_color:-} ]]; then
     export PROMPT_COMMAND=
     export USER_LS_COLORS=
     export VAGRANT_NO_COLOR=true
+    unset -f ip
+    if ip -color=never token &> /dev/null; then
+        ip() {
+            command ip --color=never "$@"
+        }
+    fi
 fi
 export USER=${USER:-$(id -u -n)}
 export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
