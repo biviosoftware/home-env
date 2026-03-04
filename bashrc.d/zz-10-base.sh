@@ -49,6 +49,10 @@ export LOGNAME=${LOGNAME:-$(logname 2>/dev/null || echo $USER)}
 unset BCONF
 # Darwin (Catalina onwards replaced bash with zsh)
 export BASH_SILENCE_DEPRECATION_WARNING=1
+# Silence warning from python numexpr.utils
+if [[ ${NUMEXPR_MAX_THREADS:-} ]]; then
+    export NUMEXPR_MAX_THREADS=1
+fi
 
 # python pip installs in /tmp, which doesn't work if the package is large
 # and /tmp is on tmpfs.
