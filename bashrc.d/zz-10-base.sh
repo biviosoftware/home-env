@@ -50,7 +50,7 @@ unset BCONF
 # Darwin (Catalina onwards replaced bash with zsh)
 export BASH_SILENCE_DEPRECATION_WARNING=1
 # Silence warning from python numexpr.utils
-if [[ ${NUMEXPR_MAX_THREADS:-} ]]; then
+if [[ ! ${NUMEXPR_MAX_THREADS:-} ]]; then
     export NUMEXPR_MAX_THREADS=1
 fi
 
