@@ -31,8 +31,9 @@ unset f
 
 umask "${BIVIO_UMASK:-g-w,o-rwx}"
 if [[ ! ${bivio_color:-} ]]; then
-    unset CLICOLOR
+    unset CLICOLOR FORCE_COLOR
     export LS_COLORS=
+    export NODE_DISABLE_COLORS=1
     export NO_COLOR=1
     export PROMPT_COMMAND=
     export USER_LS_COLORS=
