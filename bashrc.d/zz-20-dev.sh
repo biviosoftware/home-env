@@ -36,6 +36,12 @@ if [[ ${PS1:-} && -t 0 ]] && shopt -q login_shell && _bivio_home_env_update; the
     return
 fi
 
+bivio_path_insert "$HOME/brew/bin"
+if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
+    export HOMEBREW_NO_EMOJI=1
+    export HOMEBREW_NO_COLOR=1
+fi
+
 # always set PYENV_ROOT
 export PYENV_ROOT=$HOME/.pyenv
 if [[ -d $PYENV_ROOT/bin ]]; then
@@ -85,12 +91,6 @@ if [[ -d $PYENV_ROOT/bin ]]; then
         }
         export PROMPT_COMMAND=bivio_pyenv_virtualenv_hook
     fi
-fi
-
-bivio_path_insert "$HOME/brew/bin"
-if [[ ! ${bivio_color:-} && $(type -p brew) ]]; then
-    export HOMEBREW_NO_EMOJI=1
-    export HOMEBREW_NO_COLOR=1
 fi
 
 gcl() {
